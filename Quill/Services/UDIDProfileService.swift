@@ -295,7 +295,7 @@ final class UDIDProfileService {
         struct Signed: Decodable { let profile: String }
         do {
             let signed = try Core.now(Signed.self, xml.base64EncodedString().withCString { sc_profile_sign($0) })
-            guard let data = Data(base64Encoded: signed.profile) else { throw AppError("Ungültige Antwort.") }
+            guard let data = Data(base64Encoded: signed.profile) else { throw AppError("Unlesbare Antwort des Kerns.") }
             UDIDLog.write("Profil signiert (\(data.count) Bytes)")
             return data
         } catch {

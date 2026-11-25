@@ -1,5 +1,6 @@
 import Foundation
 import Observation
+import QuillCore
 import UIKit
 
 /// Liest die UDID ohne Kopplung und ohne Rechner über ein temporäres iOS-Profil.

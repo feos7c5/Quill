@@ -1,0 +1,51 @@
+# Exports all localizable strings with Xcode and reports missing translations.
+name: Export localizations
+
+on:
+  workflow_dispatch:
+
+jobs:
+  export:
+    runs-on: xcode-27
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-ios
+
+      - name: Cache Rust
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: QuillCore
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Set up dependencies, Rust core and project
+        env:
+          QUILL_DEVICE_ONLY: "1"
+        run: ./setup.sh
+
+      - name: Export localizations
+        run: |
+          set -o pipefail
+          xcodebuild -exportLocalizations \
+            -project Quill.xcodeproj \
+            -localizationPath build/loc \
+            -sdk iphoneos \
+            -exportLanguage de -exportLanguage en -exportLanguage fr \
+            -exportLanguage es -exportLanguage it -exportLanguage tr \
+            CODE_SIGNING_ALLOWED=NO 2>&1 | tee export.log | tail -40
+
+      - name: Upload export
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: localizations
+          path: |
+            build/loc
+            export.log
+          if-no-files-found: warn

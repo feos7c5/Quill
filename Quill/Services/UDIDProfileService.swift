@@ -72,9 +72,9 @@ final class UDIDProfileService {
             self?.finish(.failure(AppError("Keine Antwort aus den Einstellungen. Erneut versuchen oder die UDID von Hand eintragen.")))
         }
         // Kurz warten, bis der Server bereit ist, sonst lädt Safari ins Leere.
-        Task {
+        Task { @MainActor in
             try? await Task.sleep(for: .milliseconds(300))
-            UIApplication.shared.open(URL(string: "http://127.0.0.1:\(started.port)/udid.mobileconfig")!)
+            await UIApplication.shared.open(URL(string: "http://127.0.0.1:\(started.port)/udid.mobileconfig")!)
         }
     }
 

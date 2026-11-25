@@ -1,0 +1,53 @@
+[package]
+name = "quill-core"
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+description = "Gerätekanal (Remote Pairing, Tunnel, Installation) und Apple-Account für Quill"
+publish = false
+
+[lib]
+name = "quill_core"
+crate-type = ["staticlib", "rlib"]
+
+[dependencies]
+# Gerätedienste; ohne Standard-Features, damit nur ein TLS-Backend (ring) im Spiel ist.
+idevice = { version = "0.1.68", default-features = false, features = [
+  "ring",
+  "afc",
+  "installation_proxy",
+  "remote_pairing",
+  "rsd",
+  "tunnel_tcp_stack",
+] }
+# Apple-Account, Entwicklerdienste, Signieren mit Account-Zertifikat.
+isideload = { version = "0.5.2", default-features = false, features = ["install", "tokio-mt"] }
+tokio = { version = "1", features = ["rt-multi-thread", "net", "time", "sync", "macros"] }
+rustls = { version = "0.23", default-features = false, features = ["ring", "std", "tls12"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+base64 = "0.22"
+plist = "1.8"
+socket2 = "0.6"
+uuid = { version = "1", features = ["v4"] }
+sha2 = "0.10"
+hex = "0.4"
+rsa = { version = "0.9", features = ["sha2"] }
+rcgen = { version = "0.14", default-features = false, features = ["ring", "pem", "crypto"] }
+rustls-pki-types = "1"
+x509-cert = { version = "0.2", features = ["pem"] }
+p12-keystore = { version = "0.3.0-rc4", package = "isideload-p12-keystore" }
+rand = "0.8"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", default-features = false, features = ["fmt", "std"] }
+rootcause = "0.12"
+
+[dev-dependencies]
+tempfile = "3"
+
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = "debuginfo"

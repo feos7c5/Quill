@@ -1,0 +1,88 @@
+# Baut Quill auf einem Mac mit Xcode 27 und legt eine unsignierte IPA als Artefakt ab.
+# Signieren und installieren: die IPA mit dem eigenen Account signieren (z. B. AirSign, Sideloadly).
+name: IPA bauen
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ipa:
+    runs-on: xcode-27
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Werkzeuge anzeigen
+        run: |
+          sw_vers
+          xcodebuild -version
+          xcrun --sdk iphoneos --show-sdk-version
+
+      - name: Rust installieren
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-apple-ios
+
+      - name: Rust-Cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: QuillCore
+
+      - name: XcodeGen installieren
+        run: brew install xcodegen
+
+      - name: Abhängigkeiten, Rust-Kern, Projekt
+        env:
+          QUILL_DEVICE_ONLY: "1"
+        run: ./setup.sh
+
+      - name: Archiv bauen (unsigniert)
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -project Quill.xcodeproj \
+            -scheme Quill \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath build/Quill.xcarchive \
+            -skipPackagePluginValidation \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            archive 2>&1 | tee build.log | grep -E "error:|warning: .*(deprecated|never)|\*\* (ARCHIVE|BUILD)" || true
+          test -d build/Quill.xcarchive/Products/Applications/Quill.app
+
+      - name: Compilerfehler zusammenfassen
+        if: failure()
+        run: |
+          echo "## Compilerfehler" >> "$GITHUB_STEP_SUMMARY"
+          grep -E "error:" build.log | sort -u | head -200 | tee -a "$GITHUB_STEP_SUMMARY" || true
+
+      - name: IPA packen
+        run: |
+          mkdir -p build/ipa/Payload
+          cp -R build/Quill.xcarchive/Products/Applications/Quill.app build/ipa/Payload/
+          cd build/ipa && zip -qry ../Quill.ipa Payload
+          ls -lh ../Quill.ipa
+
+      - name: IPA hochladen
+        uses: actions/upload-artifact@v4
+        with:
+          name: Quill-ipa
+          path: build/Quill.ipa
+          if-no-files-found: error
+
+      - name: Build-Log hochladen
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: build.log
+          if-no-files-found: ignore

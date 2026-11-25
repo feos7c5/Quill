@@ -1,0 +1,7 @@
+Vendor/
+*.xcodeproj
+Quill/Resources/Info.plist
+.DS_Store
+xcuserdata/
+QuillCore/target/
+QuillWidget/Info.plist

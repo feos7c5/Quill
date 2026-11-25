@@ -1,0 +1,158 @@
+name: Quill
+options:
+  bundleIdPrefix: com.example
+  deploymentTarget:
+    iOS: "27.0"
+  createIntermediateGroups: true
+  developmentLanguage: de
+
+packages:
+  # Lokales Paket (wird von setup.sh nach Vendor/Zsign geklont, MIT-Lizenz).
+  Zsign:
+    path: Vendor/Zsign
+  ZIPFoundation:
+    url: https://github.com/weichsel/ZIPFoundation
+    from: 0.9.19
+
+schemes:
+  Quill:
+    build:
+      targets:
+        Quill: all
+        QuillWidget: all
+    archive:
+      config: Release
+
+targets:
+  Quill:
+    type: application
+    platform: iOS
+    sources:
+      - path: Quill
+    dependencies:
+      - package: Zsign
+        product: Zsign
+      - package: ZIPFoundation
+        product: ZIPFoundation
+      # Rust-Kern (statische Bibliothek), gebaut von scripts/build-core.sh.
+      - framework: Vendor/QuillCore.xcframework
+        embed: false
+      # Vom Rust-Kern gebraucht; statische Bibliotheken bringen ihre Framework-Abhängigkeiten nicht mit.
+      - sdk: SystemConfiguration.framework
+      - sdk: Security.framework
+      - sdk: CoreFoundation.framework
+      # Widget und Steuerzentrale
+      - target: QuillWidget
+    entitlements:
+      path: Quill/Resources/Quill.entitlements
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.example.quill
+        # Gemeinsamer Container für Widget-Daten. Bei eigener Bundle-ID mit anpassen.
+        APP_GROUP: group.com.example.quill
+        MARKETING_VERSION: "1.0.0"
+        CURRENT_PROJECT_VERSION: "1"
+        SWIFT_VERSION: "5.0"
+        TARGETED_DEVICE_FAMILY: "1,2"
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: ""
+        ENABLE_USER_SCRIPT_SANDBOXING: "YES"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+    info:
+      path: Quill/Resources/Info.plist
+      properties:
+        CFBundleDisplayName: Quill
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        QuillAppGroup: $(APP_GROUP)
+        UILaunchScreen: {}
+        UIFileSharingEnabled: true
+        LSSupportsOpeningDocumentsInPlace: true
+        ITSAppUsesNonExemptEncryption: false
+        NSLocalNetworkUsageDescription: Quill koppelt sich über das lokale Netzwerk mit diesem iPhone, um Apps zu installieren, und stellt die WLAN-Dateiübertragung bereit.
+        NSBonjourServices:
+          - _remotepairing-pairable-host._tcp
+        CFBundleURLTypes:
+          - CFBundleURLName: Quill
+            CFBundleURLSchemes:
+              - quill
+        LSApplicationQueriesSchemes:
+          - livecontainer
+        UIBackgroundModes:
+          - processing
+        BGTaskSchedulerPermittedIdentifiers:
+          - $(PRODUCT_BUNDLE_IDENTIFIER).refresh
+        NSAppTransportSecurity:
+          NSAllowsLocalNetworking: true
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        CFBundleDocumentTypes:
+          - CFBundleTypeName: iOS App
+            LSHandlerRank: Alternate
+            LSItemContentTypes:
+              - com.apple.itunes.ipa
+          - CFBundleTypeName: Zertifikat
+            LSHandlerRank: Alternate
+            LSItemContentTypes:
+              - com.rsa.pkcs-12
+              - com.apple.mobileprovision
+              - public.x509-certificate
+        UTImportedTypeDeclarations:
+          - UTTypeIdentifier: com.apple.itunes.ipa
+            UTTypeDescription: iOS App
+            UTTypeConformsTo:
+              - public.data
+              - public.zip-archive
+            UTTypeTagSpecification:
+              public.filename-extension:
+                - ipa
+          - UTTypeIdentifier: com.apple.mobileprovision
+            UTTypeDescription: Provisioning Profile
+            UTTypeConformsTo:
+              - public.data
+            UTTypeTagSpecification:
+              public.filename-extension:
+                - mobileprovision
+
+  QuillWidget:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: QuillWidget
+        excludes:
+          - Info.plist
+          - "*.entitlements"
+      - path: Quill/Shared
+    dependencies:
+      - sdk: WidgetKit.framework
+      - sdk: SwiftUI.framework
+    entitlements:
+      path: QuillWidget/QuillWidget.entitlements
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.example.quill.widget
+        APP_GROUP: group.com.example.quill
+        MARKETING_VERSION: "1.0.0"
+        CURRENT_PROJECT_VERSION: "1"
+        SWIFT_VERSION: "5.0"
+        TARGETED_DEVICE_FAMILY: "1,2"
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: ""
+        SKIP_INSTALL: "YES"
+    info:
+      path: QuillWidget/Info.plist
+      properties:
+        CFBundleDisplayName: Quill
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        QuillAppGroup: $(APP_GROUP)
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension

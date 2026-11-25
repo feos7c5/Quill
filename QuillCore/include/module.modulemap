@@ -1,0 +1,4 @@
+module QuillCore {
+    header "QuillCore.h"
+    export *
+}

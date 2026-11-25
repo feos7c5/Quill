@@ -40,13 +40,22 @@ final class AppleAccountService {
     private(set) var status: AccountStatus?
     private(set) var lastError: String?
 
-    var email: String? { status?.email ?? UserDefaults.standard.string(forKey: Self.emailKey) }
+    var email: String? { status?.email ?? Self.savedEmail }
+
+    /// E-Mail und „merken“ liegen auch im Schlüsselbund: Der übersteht eine Neuinstallation der IPA,
+    /// UserDefaults nicht. Sonst müsste man sich nach jedem Update neu anmelden.
+    private static var savedEmail: String? {
+        UserDefaults.standard.string(forKey: emailKey) ?? Keychain.get(emailKey)
+    }
+    private static var savedRemember: Bool {
+        UserDefaults.standard.bool(forKey: rememberKey) || Keychain.get(rememberKey) == "1"
+    }
     var team: AccountTeam? { status?.team }
     var teams: [AccountTeam] { status?.teams ?? [] }
     var isSignedIn: Bool { state == .signedIn && status?.loggedIn == true }
     /// Angemeldet und Team gewählt: bereit zum Signieren.
     var isReady: Bool { isSignedIn && team != nil }
-    var canRestore: Bool { UserDefaults.standard.bool(forKey: Self.rememberKey) && Keychain.get(Self.passwordKey) != nil }
+    var canRestore: Bool { Self.savedRemember && Keychain.get(Self.passwordKey) != nil }
 
     private var anisetteURL: String {
         let value = (UserDefaults.standard.string(forKey: Self.anisetteKey) ?? "").trimmed
@@ -86,11 +95,17 @@ final class AppleAccountService {
             }
             UserDefaults.standard.set(email, forKey: Self.emailKey)
             UserDefaults.standard.set(remember, forKey: Self.rememberKey)
+            Keychain.set(email, for: Self.emailKey)
             if remember {
                 Keychain.set(password, for: Self.passwordKey)
+                Keychain.set("1", for: Self.rememberKey)
             } else {
                 Keychain.delete(Self.passwordKey)
+                Keychain.delete(Self.rememberKey)
             }
+            // Anisette-Zustand und Account-Schlüssel sichern: Nach einer Neuinstallation erkennt
+            // Apple dasselbe „Gerät“ wieder und verlangt keinen neuen Bestätigungscode.
+            CoreVault.backup()
             self.status = status
             state = .signedIn
             await restoreTeamChoice()
@@ -104,7 +119,7 @@ final class AppleAccountService {
     /// Meldet mit gespeichertem Passwort an, z. B. beim App-Start oder vor einem Refresh.
     func restoreIfPossible(interactive: Bool = true) async {
         guard !isSignedIn, state != .signingIn, canRestore,
-              let email = UserDefaults.standard.string(forKey: Self.emailKey),
+              let email = Self.savedEmail,
               let password = Keychain.get(Self.passwordKey) else { return }
         await signIn(email: email, password: password, remember: true, interactive: interactive)
     }
@@ -149,6 +164,9 @@ final class AppleAccountService {
         if forget {
             _ = try? await Core.run(Core.Ignored.self) { sc_account_forget() }
             Keychain.delete(Self.passwordKey)
+            Keychain.delete(Self.emailKey)
+            Keychain.delete(Self.rememberKey)
+            CoreVault.clear()
             UserDefaults.standard.removeObject(forKey: Self.emailKey)
             UserDefaults.standard.removeObject(forKey: Self.teamKey)
             UserDefaults.standard.set(false, forKey: Self.rememberKey)
@@ -237,4 +255,49 @@ final class TwoFactorBridge: @unchecked Sendable {
             selectedNumberID: payload.selectedNumberId
         ))
     }
+}
+
+
+/// Sichert die kleinen Anmeldedateien des Kerns (Anisette-Zustand, Account-Schlüssel) im Schlüsselbund
+/// und stellt sie nach einer Neuinstallation wieder her. Der Schlüsselbund bleibt bei Neuinstallation
+/// erhalten, der App-Ordner nicht.
+enum CoreVault {
+    private static let key = "core.vault"
+    private static let folders = ["anisette", "account"]
+    /// Schutz gegen Ausreißer: Der Schlüsselbund ist nicht für große Daten gedacht.
+    private static let maxBytes = 256 * 1024
+
+    static func backup() {
+        var files: [String: String] = [:]
+        var total = 0
+        for folder in folders {
+            let root = Paths.core.appendingPathComponent(folder, isDirectory: true)
+            guard let enumerator = FileManager.default.enumerator(at: root, includingPropertiesForKeys: [.isRegularFileKey]) else { continue }
+            for case let url as URL in enumerator {
+                guard (try? url.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile) == true,
+                      let data = try? Data(contentsOf: url) else { continue }
+                total += data.count
+                guard total <= maxBytes else { return }
+                let relative = folder + "/" + url.path.replacingOccurrences(of: root.path + "/", with: "")
+                files[relative] = data.base64EncodedString()
+            }
+        }
+        guard !files.isEmpty, let json = try? JSONEncoder().encode(files) else { return }
+        Keychain.set(String(decoding: json, as: UTF8.self), for: key)
+    }
+
+    /// Vor dem Start des Kerns aufrufen. Überschreibt nichts, was schon da ist.
+    static func restoreIfMissing() {
+        guard let text = Keychain.get(key),
+              let files = try? JSONDecoder().decode([String: String].self, from: Data(text.utf8)) else { return }
+        for (relative, base64) in files {
+            guard !relative.contains(".."), let data = Data(base64Encoded: base64) else { continue }
+            let url = Paths.core.appendingPathComponent(relative)
+            guard !FileManager.default.fileExists(atPath: url.path) else { continue }
+            try? FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+            try? Paths.writeProtected(data, to: url)
+        }
+    }
+
+    static func clear() { Keychain.delete(key) }
 }

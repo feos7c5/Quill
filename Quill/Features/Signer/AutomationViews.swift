@@ -86,6 +86,8 @@ struct UDIDView: View {
                         }
                     }
                     if profileService.phase == .waiting {
+                        // Das geladene Profil steht oben auf der Startseite der Einstellungen.
+                        Button("Einstellungen öffnen", systemImage: "gear") { SystemSettings.open() }
                         Button("Abbrechen", systemImage: "xmark", role: .cancel) {
                             profileService.cancel()
                         }

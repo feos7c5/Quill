@@ -13,6 +13,7 @@ enum Core {
 
     /// Einmal beim App-Start.
     static func start() {
+        CoreVault.restoreIfMissing()
         _ = try? decodeRaw(Paths.core.path.withCString { sc_init($0) })
     }
 

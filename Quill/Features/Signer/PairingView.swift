@@ -44,7 +44,7 @@ struct PairingView: View {
                         }
                     }
                     Button("Einstellungen öffnen", systemImage: "gear") {
-                        openURL(URL(string: UIApplication.openSettingsURLString)!)
+                        SystemSettings.open()
                     }
                     if pairing.phase != .idle {
                         NavigationLink("Protokoll") { LogFileView(url: PairingLog.url, title: "Kopplung") }

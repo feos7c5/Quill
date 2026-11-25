@@ -1,6 +1,7 @@
 import CryptoKit
 import Foundation
 import Security
+import UIKit
 
 enum Paths {
     static let documents: URL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
@@ -148,4 +149,21 @@ func randomPassword() -> String {
     var bytes = [UInt8](repeating: 0, count: 18)
     _ = SecRandomCopyBytes(kSecRandomDefault, bytes.count, &bytes)
     return Data(bytes).base64EncodedString()
+}
+
+/// Öffnet die Einstellungen-App auf der Startseite. Apple erlaubt Apps nur die eigene Einstellungsseite;
+/// tiefere Sprünge (Entwicklermodus, Profile) öffnen seit iOS 18 nur noch die Startseite.
+/// „App-prefs:“ ist nicht dokumentiert; klappt es nicht, öffnet Quill seine eigene Seite.
+@MainActor
+enum SystemSettings {
+    static func open() {
+        guard let root = URL(string: "App-prefs:") else { return openOwnPage() }
+        UIApplication.shared.open(root) { opened in
+            if !opened { openOwnPage() }
+        }
+    }
+
+    private static func openOwnPage() {
+        if let url = URL(string: UIApplication.openSettingsURLString) { UIApplication.shared.open(url) }
+    }
 }

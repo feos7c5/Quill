@@ -7,6 +7,7 @@ struct QuillWidgetBundle: WidgetBundle {
     var body: some Widget {
         StatusWidget()
         RefreshControl()
+        PairingLiveActivity()
     }
 }
 

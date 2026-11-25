@@ -178,22 +178,52 @@ async fn cancelled(flag: Arc<AtomicBool>) {
 
 async fn accept(
     listener: std::net::TcpListener,
-    mut file: RpPairingFile,
+    file: RpPairingFile,
     info: PairableHostInfo,
     output: PathBuf,
 ) -> CoreResult<Value> {
     let listener = TcpListener::from_std(listener).map_err(port_error)?;
-    let (stream, _) = listener.accept().await.map_err(port_error)?;
-    update("connected", "iPhone connected, pairing…", None);
 
-    let mut host = PairableHost::new(RpPairingSocket::new_device(stream), info);
-    let peer = host
-        .accept(&mut file, |pin| async move {
-            update("pin", "Enter this code in Settings.", Some(pin));
-        })
-        .await
-        .map_err(|e| CoreError::with("Pairing failed.", e))?;
-
+    // Wie Husk: Jede Verbindung sofort bedienen. iOS öffnet beim Auswählen in den Einstellungen
+    // mitunter Verbindungen, die nie etwas senden; würde Quill nur die erste annehmen, käme der
+    // eigentliche Kopplungsversuch nie an und kein Code erschiene.
+    let pin_shown = Arc::new(AtomicBool::new(false));
+    let mut attempts = tokio::task::JoinSet::new();
+    let (file, peer) = loop {
+        tokio::select! {
+            connection = listener.accept() => {
+                let (stream, address) = connection.map_err(port_error)?;
+                tracing::info!("pairing: connection from {address}");
+                if !pin_shown.load(Ordering::SeqCst) {
+                    update("connected", "iPhone connected, pairing…", None);
+                }
+                let mut attempt_file = file.clone();
+                let info = info.clone();
+                let pin_shown = pin_shown.clone();
+                attempts.spawn(async move {
+                    let mut host = PairableHost::new(RpPairingSocket::new_device(stream), info);
+                    let peer = host
+                        .accept(&mut attempt_file, |pin| {
+                            pin_shown.store(true, Ordering::SeqCst);
+                            update("pin", "Enter this code in Settings.", Some(pin));
+                            async {}
+                        })
+                        .await?;
+                    Ok::<_, idevice::IdeviceError>((attempt_file, peer))
+                });
+            }
+            Some(done) = attempts.join_next() => match done {
+                Ok(Ok(paired)) => break paired,
+                // Scheitert ein Versuch vor dem Code, war es nicht der Kopplungsversuch: weiter warten.
+                Ok(Err(e)) if !pin_shown.load(Ordering::SeqCst) => {
+                    tracing::info!("pairing: connection ended before the code step: {e}");
+                    update("listening", "Waiting for the iPhone to select Quill in Settings.", None);
+                }
+                Ok(Err(e)) => return Err(CoreError::with("Pairing failed.", e)),
+                Err(e) => return Err(CoreError::with("Pairing failed.", e)),
+            },
+        }
+    };
     if file.alt_irk().map(<[u8]>::len) != Some(16) || peer.remotepairing_udid.is_empty() {
         return Err("The iPhone did not provide a complete pairing identity. Nothing was saved.".into());
     }
@@ -228,16 +258,21 @@ mod tests {
         assert!(advert["txt"].as_object().unwrap().len() > 2);
         assert!(start("noch einmal".into(), output.clone()).is_err());
 
-        // Ein Gegenüber, das kein Remote Pairing spricht, beendet die Sitzung mit Fehler.
+        // Ein Gegenüber, das kein Remote Pairing spricht, beendet die Sitzung nicht:
+        // Quill wartet weiter auf den echten Kopplungsversuch (wie Husk).
         let port = advert["port"].as_u64().unwrap();
+        let silent = std::net::TcpStream::connect(format!("127.0.0.1:{port}")).unwrap();
         let mut stream = std::net::TcpStream::connect(format!("127.0.0.1:{port}")).unwrap();
         std::io::Write::write_all(&mut stream, b"not pairing").unwrap();
         drop(stream);
-        wait_finished();
-        assert_eq!(snapshot()["phase"], "error");
-        assert!(!output.exists());
+        let deadline = Instant::now() + Duration::from_secs(5);
+        while snapshot()["phase"] != "listening" {
+            assert!(Instant::now() < deadline, "Kopplung wartet nicht weiter");
+            std::thread::sleep(Duration::from_millis(20));
+        }
+        assert!(lock().running);
+        drop(silent);
 
-        start("Quill Test".into(), output.clone()).unwrap();
         cancel();
         wait_finished();
         assert_eq!(snapshot()["phase"], "stopped");

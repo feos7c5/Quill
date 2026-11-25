@@ -87,6 +87,7 @@ targets:
         UIBackgroundModes:
           - processing
           - audio
+        NSSupportsLiveActivities: true
         BGTaskSchedulerPermittedIdentifiers:
           - quill.refresh
           # Kopplung und UDID-Erkennung laufen als BGContinuedProcessingTask mit Systemanzeige.

@@ -42,6 +42,7 @@ struct SettingsView: View {
                 }
                 NavigationLink("Protokoll des Kerns") { LogFileView(url: Paths.core.appendingPathComponent("core.log"), title: "Protokoll") }
                 NavigationLink("Protokoll der UDID-Erkennung") { LogFileView(url: UDIDProfileService.logURL, title: "UDID-Erkennung") }
+                NavigationLink("Protokoll der Kopplung") { LogFileView(url: PairingLog.url, title: "Kopplung") }
                 if device.isPaired {
                     Button("Kopplung entfernen", role: .destructive) { device.unpair() }
                 }

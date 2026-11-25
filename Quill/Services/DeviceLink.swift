@@ -191,6 +191,7 @@ final class PairingService: NSObject, NetServiceDelegate {
     @ObservationIgnored private var backgroundTask: UIBackgroundTaskIdentifier = .invalid
     @ObservationIgnored private var observers: [NSObjectProtocol] = []
     @ObservationIgnored private var notifiedPIN: String?
+    @ObservationIgnored private var lastLoggedPhase: String?
     @ObservationIgnored private var keepingAlive = false
     @ObservationIgnored var onPaired: ((PairSnapshot.Peer) -> Void)?
 
@@ -216,13 +217,20 @@ final class PairingService: NSObject, NetServiceDelegate {
                     try Core.now(PairAdvert.self, sc_pair_start(name, path))
                 }
             }
+            PairingLog.reset()
+            PairingLog.write("Start, iOS \(UIDevice.current.systemVersion), Port \(advert.port), Dienst \(advert.serviceType)")
             publish(advert)
             phase = .listening
-            message = String(localized: "Jetzt Einstellungen → Datenschutz & Sicherheit → Entwicklermodus öffnen und Quill auswählen.")
+            message = String(localized: "Jetzt Einstellungen → Datenschutz & Sicherheit → Entwicklermodus öffnen und Quill auswählen. Der Code erscheint erst danach, als Mitteilung und oben in der Systemanzeige.")
             notifiedPIN = nil
             observeLifecycle()
             KeepAlive.shared.begin()
             keepingAlive = true
+            ContinuedWork.shared.begin(kind: "pairing",
+                                       title: String(localized: "Quill wartet auf die Kopplung"),
+                                       subtitle: String(localized: "Einstellungen › Datenschutz & Sicherheit › Entwicklermodus"),
+                                       log: { PairingLog.write($0) },
+                                       onExpire: { [weak self] in self?.cancel() })
             startPolling(pending: pending)
         } catch {
             phase = .failed(error.localizedDescription)
@@ -259,6 +267,10 @@ final class PairingService: NSObject, NetServiceDelegate {
     }
 
     private func apply(_ snapshot: PairSnapshot, pending: URL) {
+        if snapshot.phase != lastLoggedPhase {
+            lastLoggedPhase = snapshot.phase
+            PairingLog.write("Phase \(snapshot.phase): \(snapshot.message)\(snapshot.detail.map { " · \($0)" } ?? "")")
+        }
         message = Core.localized(snapshot.message, detail: snapshot.detail)
         switch snapshot.phase {
         case "listening": phase = .listening
@@ -267,6 +279,8 @@ final class PairingService: NSObject, NetServiceDelegate {
             if let pin = snapshot.pin {
                 phase = .pin(pin)
                 notify(pin: pin)
+                ContinuedWork.shared.update(title: String(localized: "Kopplungscode \(pin)"),
+                                            subtitle: String(localized: "In den Einstellungen eingeben"))
             }
         case "paired":
             do {
@@ -298,9 +312,10 @@ final class PairingService: NSObject, NetServiceDelegate {
         content.title = String(localized: "Quill-Kopplungscode")
         content.body = String(localized: "\(pin) in den Einstellungen eingeben.")
         content.sound = .default
-        content.interruptionLevel = .timeSensitive
         let request = UNNotificationRequest(identifier: Self.pinNotification, content: content, trigger: nil)
-        UNUserNotificationCenter.current().add(request)
+        UNUserNotificationCenter.current().add(request) { error in
+            PairingLog.write(error.map { "Mitteilung mit Code fehlgeschlagen: \($0.localizedDescription)" } ?? "Mitteilung mit Code gesendet")
+        }
     }
 
     private func finish() {
@@ -314,7 +329,9 @@ final class PairingService: NSObject, NetServiceDelegate {
         for observer in observers { NotificationCenter.default.removeObserver(observer) }
         observers = []
         endBackgroundTask()
+        ContinuedWork.shared.end(success: phase == .paired)
         backgroundNote = nil
+        lastLoggedPhase = nil
         if keepingAlive {
             KeepAlive.shared.end()
             keepingAlive = false
@@ -328,10 +345,14 @@ final class PairingService: NSObject, NetServiceDelegate {
     private func observeLifecycle() {
         let center = NotificationCenter.default
         observers.append(center.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: .main) { [weak self] _ in
-            MainActor.assumeIsolated { self?.beginBackgroundTask() }
+            MainActor.assumeIsolated {
+                PairingLog.write("Quill im Hintergrund · Systemanzeige \(ContinuedWork.shared.isSystemTask ? "aktiv" : "nicht aktiv") · Wachhalten \(KeepAlive.shared.isPlaying ? "aktiv" : "nicht aktiv")")
+                self?.beginBackgroundTask()
+            }
         })
         observers.append(center.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated {
+                PairingLog.write("Quill wieder im Vordergrund")
                 self?.endBackgroundTask()
                 self?.backgroundNote = nil
             }
@@ -362,8 +383,13 @@ final class PairingService: NSObject, NetServiceDelegate {
 
     // MARK: - NetServiceDelegate
 
+    nonisolated func netServiceDidPublish(_ sender: NetService) {
+        Task { @MainActor in PairingLog.write("Bonjour veröffentlicht: \(sender.name)") }
+    }
+
     nonisolated func netService(_ sender: NetService, didNotPublish errorDict: [String: NSNumber]) {
         Task { @MainActor in
+            PairingLog.write("Bonjour fehlgeschlagen: \(errorDict)")
             self.phase = .failed(String(localized: "Bonjour-Veröffentlichung fehlgeschlagen. Quill braucht Zugriff auf das lokale Netzwerk (Einstellungen → Quill)."))
             self.cancel()
         }

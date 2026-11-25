@@ -89,6 +89,8 @@ targets:
           - audio
         BGTaskSchedulerPermittedIdentifiers:
           - quill.refresh
+          # Kopplung und UDID-Erkennung laufen als BGContinuedProcessingTask mit Systemanzeige.
+          - $(PRODUCT_BUNDLE_IDENTIFIER).continued.*
         NSAppTransportSecurity:
           NSAllowsLocalNetworking: true
         UISupportedInterfaceOrientations:

@@ -46,6 +46,9 @@ struct PairingView: View {
                     Button("Einstellungen öffnen", systemImage: "gear") {
                         openURL(URL(string: UIApplication.openSettingsURLString)!)
                     }
+                    if pairing.phase != .idle {
+                        NavigationLink("Protokoll") { LogFileView(url: PairingLog.url, title: "Kopplung") }
+                    }
                 } footer: {
                     Text("Braucht iOS 27, eingeschalteten Entwicklermodus, WLAN und Zugriff auf das lokale Netzwerk. Die Pairing-Datei bleibt geschützt in Quill und gibt denselben Zugriff wie ein vertrauter Rechner.")
                 }
@@ -94,6 +97,8 @@ struct PairingView: View {
                     .monospacedDigit()
                     .textSelection(.enabled)
                     .accessibilityLabel("Kopplungscode \(pin.map(String.init).joined(separator: " "))")
+                Button("Code kopieren", systemImage: "doc.on.doc") { UIPasteboard.general.string = pin }
+                    .font(.footnote)
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 8)

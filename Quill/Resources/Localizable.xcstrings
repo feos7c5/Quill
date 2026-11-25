@@ -3541,6 +3541,40 @@
         }
       }
     },
+    "Code kopieren": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy Code"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copier le code"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copiar código"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copia codice"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kodu kopyala"
+          }
+        }
+      }
+    },
     "Code wurde an deine Apple-Geräte gesendet.": {
       "localizations": {
         "en": {
@@ -5955,6 +5989,74 @@
         }
       }
     },
+    "Einstellungen › Datenschutz & Sicherheit › Entwicklermodus": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Settings › Privacy & Security › Developer Mode"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réglages › Confidentialité et sécurité › Mode développeur"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajustes › Privacidad y seguridad › Modo de desarrollador"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impostazioni › Privacy e sicurezza › Modalità sviluppatore"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ayarlar › Gizlilik ve Güvenlik › Geliştirici Modu"
+          }
+        }
+      }
+    },
+    "Einstellungen › Profil geladen › Installieren": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Settings › Profile Downloaded › Install"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réglages › Profil téléchargé › Installer"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajustes › Perfil descargado › Instalar"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impostazioni › Profilo scaricato › Installa"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ayarlar › Profil İndirildi › Yükle"
+          }
+        }
+      }
+    },
     "Einstellungen → Datenschutz & Sicherheit → Entwicklermodus öffnen und „Quill auf …“ auswählen.": {
       "localizations": {
         "en": {
@@ -8103,6 +8205,40 @@
         }
       }
     },
+    "In den Einstellungen eingeben": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter it in Settings"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "À saisir dans Réglages"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introdúcelo en Ajustes"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inseriscilo in Impostazioni"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ayarlar'a girin"
+          }
+        }
+      }
+    },
     "In der IPA wurde keine .app gefunden.": {
       "localizations": {
         "en": {
@@ -8511,36 +8647,36 @@
         }
       }
     },
-    "Jetzt Einstellungen → Datenschutz & Sicherheit → Entwicklermodus öffnen und Quill auswählen.": {
+    "Jetzt Einstellungen → Datenschutz & Sicherheit → Entwicklermodus öffnen und Quill auswählen. Der Code erscheint erst danach, als Mitteilung und oben in der Systemanzeige.": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Now open Settings → Privacy & Security → Developer Mode and select Quill."
+            "value": "Now open Settings → Privacy & Security → Developer Mode and select Quill. The code only appears after that, as a notification and in the system banner at the top."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ouvrez maintenant Réglages → Confidentialité et sécurité → Mode développeur et sélectionnez Quill."
+            "value": "Ouvrez maintenant Réglages → Confidentialité et sécurité → Mode développeur et sélectionnez Quill. Le code n'apparaît qu'ensuite, en notification et dans la bannière système en haut."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Abre ahora Ajustes → Privacidad y seguridad → Modo de desarrollador y selecciona Quill."
+            "value": "Abre ahora Ajustes → Privacidad y seguridad → Modo de desarrollador y selecciona Quill. El código solo aparece después, como notificación y en el aviso del sistema arriba."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ora apri Impostazioni → Privacy e sicurezza → Modalità sviluppatore e seleziona Quill."
+            "value": "Ora apri Impostazioni → Privacy e sicurezza → Modalità sviluppatore e seleziona Quill. Il codice appare solo dopo, come notifica e nel banner di sistema in alto."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Şimdi Ayarlar → Gizlilik ve Güvenlik → Geliştirici Modu'nu açın ve Quill'i seçin."
+            "value": "Şimdi Ayarlar → Gizlilik ve Güvenlik → Geliştirici Modu'nu açın ve Quill'i seçin. Kod ancak bundan sonra, bildirim olarak ve üstteki sistem göstergesinde görünür."
           }
         }
       }
@@ -9187,6 +9323,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bilgisayarsız Eşle"
+          }
+        }
+      }
+    },
+    "Kopplung": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pairing"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jumelage"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Emparejamiento"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abbinamento"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eşleme"
           }
         }
       }
@@ -12131,6 +12301,40 @@
         }
       }
     },
+    "Protokoll der Kopplung": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pairing Log"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Journal du jumelage"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Registro del emparejamiento"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Registro abbinamento"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eşleme günlüğü"
+          }
+        }
+      }
+    },
     "Protokoll der UDID-Erkennung": {
       "localizations": {
         "en": {
@@ -12810,6 +13014,74 @@
           "stringUnit": {
             "state": "translated",
             "value": "Quill doğrudan Apple ile konuşur. Ayrıca Ayarlar'da belirtilen sunucudan cihaz verileri (“anisette”) alır (varsayılan: ani.iloader.app). Bu sunucu parolanızı değil IP adresinizi görür."
+          }
+        }
+      }
+    },
+    "Quill wartet auf die Kopplung": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill is waiting for pairing"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill attend le jumelage"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill espera el emparejamiento"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill attende l'abbinamento"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill eşlemeyi bekliyor"
+          }
+        }
+      }
+    },
+    "Quill wartet auf die UDID": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill is waiting for the UDID"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill attend l'UDID"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill espera el UDID"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill attende l'UDID"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill UDID'yi bekliyor"
           }
         }
       }
@@ -16132,6 +16404,40 @@
     },
     "https://…?url={ipa}": {
       "shouldTranslate": false
+    },
+    "iOS hat das Profil geladen, Quill danach aber nicht erreicht. Zuverlässiger: im Tab „Signieren“ das Gerät koppeln, das liefert die UDID automatisch.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS downloaded the profile but never reached Quill afterwards. More reliable: pair the device in the “Sign” tab, which provides the UDID automatically."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS a téléchargé le profil mais n'a ensuite pas joint Quill. Plus fiable : jumelez l'appareil dans l'onglet « Signer », ce qui fournit l'UDID automatiquement."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS descargó el perfil pero después no contactó con Quill. Más fiable: empareja el dispositivo en la pestaña «Firmar», que proporciona el UDID automáticamente."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS ha scaricato il profilo ma poi non ha raggiunto Quill. Più affidabile: abbina il dispositivo nella scheda «Firma», che fornisce l'UDID automaticamente."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS profili indirdi ama ardından Quill'e ulaşmadı. Daha güvenilir: “İmzala” sekmesinde cihazı eşleyin, UDID otomatik gelir."
+          }
+        }
+      }
     },
     "iOS hat keine UDID geliefert.": {
       "localizations": {

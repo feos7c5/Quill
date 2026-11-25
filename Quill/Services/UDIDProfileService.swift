@@ -19,9 +19,11 @@ final class UDIDProfileService {
     }
 
     private(set) var phase: Phase = .idle
+    /// Hinweis, wenn iOS das Profil geladen, Quill danach aber nie erreicht hat.
+    private(set) var hint: String?
 
     @ObservationIgnored private var server: HTTPServer?
-    @ObservationIgnored private var background: BackgroundTime?
+    @ObservationIgnored private var tracker = CallbackTracker()
     @ObservationIgnored private var timeout: Task<Void, Never>?
     @ObservationIgnored private var keepingAlive = false
     @ObservationIgnored var onReceived: ((String) -> Void)?
@@ -39,17 +41,23 @@ final class UDIDProfileService {
         UDIDLog.reset()
         UDIDLog.write("Start, iOS \(UIDevice.current.systemVersion)")
         let token = UUID().uuidString
+        hint = nil
+        let tracker = CallbackTracker()
+        self.tracker = tracker
         var started: (server: HTTPServer, port: UInt16)?
         for port in Self.ports {
             do {
                 let base = "http://127.0.0.1:\(port)"
                 let profile = try Self.profile(callbackURL: "\(base)/udid/\(token)")
                 let server = HTTPServer(port: port, loopbackOnly: true,
-                                        handler: Self.makeHandler(token: token, port: port, profile: profile) { [weak self] result in
+                                        handler: Self.makeHandler(token: token, port: port, profile: profile, tracker: tracker) { [weak self] result in
                                             Task { @MainActor in self?.finish(result) }
                                         })
                 server.onState = { state in UDIDLog.write("Server \(port): \(state)") }
-                server.onTrace = { line in UDIDLog.write(line) }
+                server.onTrace = { line in
+                    UDIDLog.write(line)
+                    if line.hasPrefix("Verbindung von") { tracker.connection() }
+                }
                 try server.start()
                 started = (server, port)
                 break
@@ -64,7 +72,14 @@ final class UDIDProfileService {
         server = started.server
         phase = .waiting
         // Während der Nutzer in Safari und den Einstellungen ist, liegt Quill im Hintergrund.
-        background = BackgroundTime(name: "Quill-UDID")
+        // Die Hintergrundaufgabe hält den Server erreichbar und zeigt den Stand über den Einstellungen.
+        ContinuedWork.shared.begin(kind: "udid",
+                                   title: String(localized: "Quill wartet auf die UDID"),
+                                   subtitle: String(localized: "Einstellungen › Profil geladen › Installieren"),
+                                   log: { UDIDLog.write($0) },
+                                   onExpire: { [weak self] in
+                                       self?.finish(.failure(AppError("Keine Antwort aus den Einstellungen. Erneut versuchen oder die UDID von Hand eintragen.")))
+                                   })
         KeepAlive.shared.begin()
         keepingAlive = true
         UDIDLog.write("Wachhalten: \(KeepAlive.shared.isPlaying ? "aktiv" : "NICHT aktiv")")
@@ -97,14 +112,24 @@ final class UDIDProfileService {
             (UIApplication.willEnterForegroundNotification, "Quill wieder im Vordergrund"),
         ]
         lifecycle = events.map { name, text in
-            center.addObserver(forName: name, object: nil, queue: .main) { _ in
+            center.addObserver(forName: name, object: nil, queue: .main) { [unowned self] _ in
                 MainActor.assumeIsolated {
                     let rest = UIApplication.shared.backgroundTimeRemaining
                     let restText = rest > 10_000 ? "unbegrenzt" : "\(Int(rest)) s"
-                    UDIDLog.write("\(text) · Wachhalten \(KeepAlive.shared.isPlaying ? "aktiv" : "NICHT aktiv") · Restzeit \(restText)")
+                    UDIDLog.write("\(text) · Systemanzeige \(ContinuedWork.shared.isSystemTask ? "aktiv" : "nicht aktiv") · Wachhalten \(KeepAlive.shared.isPlaying ? "aktiv" : "nicht aktiv") · Restzeit \(restText)")
+                    if name == UIApplication.willEnterForegroundNotification { self.checkContact() }
                 }
             }
         }
+    }
+
+    /// Zurück in Quill: Hat iOS das Profil geladen, Quill aber nie kontaktiert, ist die Installation
+    /// in den Einstellungen gescheitert, bevor iOS die UDID senden konnte.
+    private func checkContact() {
+        guard phase == .waiting, let served = tracker.servedAt, !tracker.contacted,
+              Date.now.timeIntervalSince(served) > 8 else { return }
+        UDIDLog.write("Profil geladen, danach keine Verbindung von iOS")
+        hint = String(localized: "iOS hat das Profil geladen, Quill danach aber nicht erreicht. Zuverlässiger: im Tab „Signieren“ das Gerät koppeln, das liefert die UDID automatisch.")
     }
 
     func stop() {
@@ -114,8 +139,7 @@ final class UDIDProfileService {
         server = nil
         timeout?.cancel()
         timeout = nil
-        background?.end()
-        background = nil
+        ContinuedWork.shared.end(success: { if case .received = phase { return true }; return false }())
         if keepingAlive {
             KeepAlive.shared.end()
             keepingAlive = false
@@ -145,11 +169,12 @@ final class UDIDProfileService {
     // MARK: - Server
 
     /// Läuft auf der Server-Queue, deshalb nicht an den Main-Actor gebunden.
-    private nonisolated static func makeHandler(token: String, port: UInt16, profile: Data,
+    private nonisolated static func makeHandler(token: String, port: UInt16, profile: Data, tracker: CallbackTracker,
                                                 result: @escaping @Sendable (Result<String, Error>) -> Void) -> HTTPServer.Handler {
         return { request in
             let size = request.bodyFile.map { Paths.size(of: $0) } ?? 0
             UDIDLog.write("\(request.method) \(request.path) · \(request.headers["content-type"] ?? "-") · \(size) Bytes · \(request.headers["user-agent"] ?? "-")")
+            if request.path == "/udid.mobileconfig" { tracker.served() }
             let response = respond(to: request, token: token, port: port, profile: profile, result: result)
             UDIDLog.write("→ \(response.status)")
             return response
@@ -160,7 +185,10 @@ final class UDIDProfileService {
                                             result: @Sendable (Result<String, Error>) -> Void) -> HTTPResponse {
         switch (request.method, request.path) {
         case ("GET", "/udid.mobileconfig"), ("HEAD", "/udid.mobileconfig"):
-            return HTTPResponse(contentType: "application/x-apple-aspen-config", body: .data(profile))
+            var response = HTTPResponse(contentType: "application/x-apple-aspen-config", body: .data(profile))
+            response.headers["Content-Disposition"] = "attachment; filename=\"Quill-UDID.mobileconfig\""
+            response.headers["Cache-Control"] = "no-store"
+            return response
 
         case ("POST", let path) where path.hasPrefix("/udid/"):
             if path != "/udid/\(token)" { UDIDLog.write("Hinweis: unerwarteter Pfad, Token passt nicht") }
@@ -250,8 +278,8 @@ final class UDIDProfileService {
         let plist: [String: Any] = [
             "PayloadContent": [
                 "URL": callbackURL,
-                // DEVICE_NAME ist seit iOS 16 eingeschränkt und kann die Installation scheitern lassen.
-                "DeviceAttributes": ["UDID", "PRODUCT", "VERSION", "SERIAL"],
+                // So knapp wie möglich, wie bei SayoSign; mehr braucht Quill nicht.
+                "DeviceAttributes": ["UDID", "PRODUCT"],
             ],
             "PayloadOrganization": "Quill",
             "PayloadDisplayName": String(localized: "Quill – UDID ermitteln"),
@@ -265,18 +293,34 @@ final class UDIDProfileService {
     }
 }
 
-/// Protokoll der UDID-Erkennung, damit sich Fehler auf dem Gerät nachvollziehen lassen.
-enum UDIDLog {
-    static let url = Paths.core.appendingPathComponent("udid.log")
-    private static let lock = NSLock()
+/// Merkt sich, ob iOS das Profil geladen und Quill danach kontaktiert hat.
+final class CallbackTracker: @unchecked Sendable {
+    private let lock = NSLock()
+    private var _servedAt: Date?
+    private var _contacted = false
 
-    static func reset() {
+    var servedAt: Date? { lock.withLock { _servedAt } }
+    var contacted: Bool { lock.withLock { _contacted } }
+
+    func served() { lock.withLock { _servedAt = .now; _contacted = false } }
+    /// Jede neue Verbindung, nachdem Safari das Profil geladen hat, kommt von den Einstellungen.
+    func connection() { lock.withLock { if _servedAt != nil && Date.now.timeIntervalSince(_servedAt!) > 2 { _contacted = true } } }
+}
+
+/// Schreibt Diagnosezeilen mit Zeitstempel in eine Datei, damit sich Fehler auf dem Gerät nachvollziehen lassen.
+final class FileLog: @unchecked Sendable {
+    let url: URL
+    private let lock = NSLock()
+
+    init(_ name: String) { url = Paths.core.appendingPathComponent(name) }
+
+    func reset() {
         lock.lock()
         defer { lock.unlock() }
         try? FileManager.default.removeItem(at: url)
     }
 
-    static func write(_ line: String) {
+    func write(_ line: String) {
         lock.lock()
         defer { lock.unlock() }
         let stamp = Date.now.formatted(.iso8601.time(includingFractionalSeconds: true))
@@ -289,4 +333,20 @@ enum UDIDLog {
             try? data.write(to: url)
         }
     }
+}
+
+/// Protokoll der UDID-Erkennung.
+enum UDIDLog {
+    private static let log = FileLog("udid.log")
+    static var url: URL { log.url }
+    static func reset() { log.reset() }
+    static func write(_ line: String) { log.write(line) }
+}
+
+/// Protokoll der Kopplung (ohne Code und Schlüssel).
+enum PairingLog {
+    private static let log = FileLog("pairing.log")
+    static var url: URL { log.url }
+    static func reset() { log.reset() }
+    static func write(_ line: String) { log.write(line) }
 }

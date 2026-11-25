@@ -106,6 +106,10 @@ struct UDIDView: View {
                             .font(.footnote)
                             .foregroundStyle(.red)
                     }
+                    if let hint = profileService.hint {
+                        Label(hint, systemImage: "info.circle")
+                            .font(.footnote)
+                    }
                     if profileService.phase != .idle {
                         NavigationLink("Protokoll") {
                             LogFileView(url: UDIDProfileService.logURL, title: "UDID-Erkennung")

@@ -191,6 +191,7 @@ final class PairingService: NSObject, NetServiceDelegate {
     @ObservationIgnored private var backgroundTask: UIBackgroundTaskIdentifier = .invalid
     @ObservationIgnored private var observers: [NSObjectProtocol] = []
     @ObservationIgnored private var notifiedPIN: String?
+    @ObservationIgnored private var keepingAlive = false
     @ObservationIgnored var onPaired: ((PairSnapshot.Peer) -> Void)?
 
     private static let pinNotification = "quill-pairing-pin"
@@ -220,6 +221,8 @@ final class PairingService: NSObject, NetServiceDelegate {
             message = "Jetzt Einstellungen → Datenschutz & Sicherheit → Entwicklermodus öffnen und Quill auswählen."
             notifiedPIN = nil
             observeLifecycle()
+            KeepAlive.shared.begin()
+            keepingAlive = true
             startPolling(pending: pending)
         } catch {
             phase = .failed(error.localizedDescription)
@@ -312,6 +315,10 @@ final class PairingService: NSObject, NetServiceDelegate {
         observers = []
         endBackgroundTask()
         backgroundNote = nil
+        if keepingAlive {
+            KeepAlive.shared.end()
+            keepingAlive = false
+        }
     }
 
     // MARK: - Hintergrund
@@ -334,11 +341,8 @@ final class PairingService: NSObject, NetServiceDelegate {
     private func beginBackgroundTask() {
         guard isRunning, backgroundTask == .invalid else { return }
         backgroundTask = UIApplication.shared.beginBackgroundTask(withName: "Quill-Kopplung") { [weak self] in
-            MainActor.assumeIsolated {
-                self?.message = "Die Hintergrundzeit ist abgelaufen. Zu Quill zurückkehren und neu starten."
-                self?.cancel()
-                self?.endBackgroundTask()
-            }
+            // Die stumme Wiedergabe (KeepAlive) hält Quill weiter wach; nur die Aufgabe sauber beenden.
+            MainActor.assumeIsolated { self?.endBackgroundTask() }
         }
     }
 

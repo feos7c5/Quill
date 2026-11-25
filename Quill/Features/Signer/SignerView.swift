@@ -2,43 +2,39 @@ import SwiftData
 import SwiftUI
 import UniformTypeIdentifiers
 
-/// Start-Tab: Status, Signieren & Installieren, installierte Apps, Apple-Account, Zertifikat.
+/// Start-Tab: Status, Signieren, installierte Apps, Account, Gerät, Zertifikate.
 struct SignerView: View {
     @Environment(\.modelContext) private var context
     @Environment(\.openURL) private var openURL
     @Environment(DeviceLink.self) private var device
     @Environment(AppleAccountService.self) private var account
     @Environment(SigningPipeline.self) private var pipeline
-    @Environment(RefreshService.self) private var refresher
 
     @Query(sort: \InstalledApp.expirationDate) private var installed: [InstalledApp]
     @Query(sort: \SigningIdentity.addedAt, order: .reverse) private var identities: [SigningIdentity]
     @Query private var profiles: [ProfileRecord]
 
     @State private var sheet: SignerSheet?
-    @State private var importer: ImporterKind?
+    // Art und Sichtbarkeit getrennt halten: Beim Schließen setzt SwiftUI die Sichtbarkeit zurück,
+    // bevor das Ergebnis ankommt. Die Art muss dann noch bekannt sein.
+    @State private var importerKind: ImporterKind = .ipa
+    @State private var showImporter = false
     @State private var askURL = false
     @State private var urlText = ""
     @State private var confirmReset = false
+    @State private var busyText: String?
     @State private var errorText: String?
-    @State private var notice: String?
 
     var body: some View {
         List {
             statusSection
             signSection
             InstalledAppsSection(apps: installed)
-            Section {
-                NavigationLink {
-                    AutomationGuideView()
-                } label: {
-                    Label("Automatisch erneuern (Kurzbefehle)", systemImage: "clock.arrow.2.circlepath")
-                }
-            }
             accountSection
+            deviceSection
             identitySection
         }
-        .navigationTitle("Signer")
+        .navigationTitle("Quill")
         .refreshable { await device.refresh() }
         .task {
             if device.isPaired, device.state != .ready { await device.refresh() }
@@ -59,20 +55,20 @@ struct SignerView: View {
             // Eine automatische Anmeldung (App-Start, Refresh) kann nach einem Code fragen.
             if case .needsCode = state, sheet == nil { sheet = .login }
         }
-        .fileImporter(isPresented: Binding(get: { importer != nil }, set: { if !$0 { importer = nil } }),
-                      allowedContentTypes: importer?.types ?? [.item],
-                      allowsMultipleSelection: importer?.multiple ?? false) { result in
-            let kind = importer
-            importer = nil
-            guard case .success(let urls) = result, let kind else { return }
-            handleImport(kind, urls: urls)
+        .fileImporter(isPresented: $showImporter,
+                      allowedContentTypes: importerKind.types,
+                      allowsMultipleSelection: importerKind.multiple) { result in
+            switch result {
+            case .success(let urls): handleImport(importerKind, urls: urls)
+            case .failure(let error): errorText = error.localizedDescription
+            }
         }
-        .alert("IPA-Adresse", isPresented: $askURL) {
+        .alert("IPA von URL laden", isPresented: $askURL) {
             TextField("https://…/App.ipa", text: $urlText)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
                 .keyboardType(.URL)
-            Button("Laden & signieren") { signFromURL() }
+            Button("Laden") { signFromURL() }
             Button("Abbrechen", role: .cancel) {}
         } message: {
             Text("Die IPA wird geladen, signiert und installiert.")
@@ -80,97 +76,110 @@ struct SignerView: View {
         .confirmationDialog("Alle Zertifikate und Profile löschen?", isPresented: $confirmReset, titleVisibility: .visible) {
             Button("Alles löschen", role: .destructive) { reset() }
         } message: {
-            Text("Löscht alle importierten .p12, Profile und einen wartenden CSR-Schlüssel aus Quill. Installierte Apps bleiben, lassen sich mit diesen Zertifikaten aber nicht mehr erneuern.")
+            Text("Löscht alle importierten Zertifikate, Profile und einen wartenden CSR-Schlüssel aus Quill. Installierte Apps bleiben, lassen sich damit aber nicht mehr erneuern.")
         }
-        .alert("Fehler", isPresented: Binding(get: { errorText != nil }, set: { if !$0 { errorText = nil } })) {
-            Button("OK", role: .cancel) {}
-        } message: {
-            Text(errorText ?? "")
-        }
-        .alert("Hinweis", isPresented: Binding(get: { notice != nil }, set: { if !$0 { notice = nil } })) {
-            Button("OK", role: .cancel) {}
-        } message: {
-            Text(notice ?? "")
-        }
+        .messageAlert(message: $errorText)
     }
 
     // MARK: - Status
 
+    private var signerName: String? {
+        if account.isReady, let team = account.team {
+            let who = account.status?.name ?? account.email ?? "Apple-ID"
+            return "\(who) · \(team.isFree ? "7 Tage" : "1 Jahr")"
+        }
+        return identities.first { !$0.isExpired }?.name
+    }
+
     private var statusSection: some View {
         Section {
-            StatusLine()
-            HStack {
-                Text("UDID: \(device.udid?.maskedUDID ?? "unbekannt")")
-                    .font(.system(.footnote, design: .monospaced))
-                    .foregroundStyle(.secondary)
-                Spacer()
-                Button("Detect") {
-                    if device.isPaired {
-                        Task { await device.refresh() }
-                    } else {
-                        sheet = .udid
-                    }
+            let ready = signerName != nil && device.isReady
+            Label {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(ready ? "Bereit" : "Einrichtung nötig")
+                        .font(.headline)
+                    Text(statusDetail)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
                 }
-                .buttonStyle(.bordered)
-                .disabled(device.state == .checking)
-                Button("Copy UDID") {
-                    UIPasteboard.general.string = device.udid
-                    notice = "UDID kopiert."
-                }
-                .buttonStyle(.bordered)
-                .disabled(device.udid == nil)
+            } icon: {
+                Image(systemName: ready ? "checkmark.seal.fill" : "exclamationmark.circle.fill")
+                    .foregroundStyle(ready ? .green : .orange)
+                    .imageScale(.large)
             }
-            if case .unreachable(let reason) = device.state {
-                Label(reason, systemImage: "network.slash")
-                    .font(.footnote)
-                    .foregroundStyle(.orange)
+            LabeledContent("Signieren mit", value: signerName ?? "Kein Zertifikat")
+            LabeledContent("Gerät") {
+                switch device.state {
+                case .ready: Text("Gekoppelt")
+                case .checking: ProgressView()
+                case .unpaired: Text("Nicht gekoppelt")
+                case .unreachable: Text("Nicht erreichbar")
+                }
+            }
+            if let mode = device.developerMode {
+                LabeledContent("Entwicklermodus", value: mode ? "Ein" : "Aus")
             }
         } footer: {
-            Label("Schlüssel und Zugangsdaten bleiben auf diesem iPhone. Ausnahme: Bei der Anmeldung spricht Quill mit Apple und mit dem eingestellten Anisette-Server.",
-                  systemImage: "lock.fill")
+            if case .unreachable(let reason) = device.state {
+                Text(reason)
+            }
         }
     }
 
-    // MARK: - 1. Signieren
+    private var statusDetail: String {
+        if signerName == nil { return "Mit der Apple-ID anmelden oder ein Zertifikat importieren." }
+        switch device.state {
+        case .ready: return "Apps können signiert und installiert werden."
+        case .checking: return "Verbindung wird geprüft …"
+        case .unpaired: return account.isReady ? "Zum Installieren das Gerät koppeln." : "Signieren möglich. Zum direkten Installieren das Gerät koppeln."
+        case .unreachable: return "LocalDevVPN verbinden, dann zum Aktualisieren nach unten ziehen."
+        }
+    }
+
+    // MARK: - Signieren
 
     private var signSection: some View {
-        Section("1. Signieren & Installieren") {
+        Section {
             Button {
-                importer = .ipa
+                present(.ipa)
             } label: {
-                Label("Pick & Sign .ipa aus Dateien", systemImage: "shippingbox.fill")
+                Label("IPA wählen und installieren", systemImage: "plus.app")
                     .frame(maxWidth: .infinity)
-                    .font(.headline)
             }
-            .buttonStyle(.borderedProminent)
-            .tint(.green)
-            .disabled(pipeline.isRunning)
+            .primaryActionRow()
+            .disabled(isBusy)
 
             Button {
                 urlText = ""
                 askURL = true
             } label: {
-                Label("Sign & Install von URL", systemImage: "globe").frame(maxWidth: .infinity)
+                Label("Von URL laden", systemImage: "link")
             }
-            .buttonStyle(.bordered)
-            .disabled(pipeline.isRunning)
+            .disabled(isBusy)
 
             Button {
                 sheet = .liveContainer
             } label: {
-                Label("LiveContainer (unbegrenzt Apps, 3-App-Grenze umgehen)", systemImage: "square.stack.3d.up.fill")
-                    .frame(maxWidth: .infinity)
+                Label("LiveContainer einrichten", systemImage: "square.stack.3d.up")
             }
-            .buttonStyle(.bordered)
-            .tint(.purple)
 
-            if pipeline.isRunning || !pipeline.log.isEmpty {
-                PipelineProgressView()
+            if let busyText {
+                HStack(spacing: 12) {
+                    ProgressView()
+                    Text(busyText).font(.subheadline)
+                }
             }
+            PipelineProgressView()
+        } header: {
+            Text("Signieren")
+        } footer: {
+            Text("LiveContainer startet beliebig viele Apps in einer einzigen installierten App.")
         }
     }
 
-    // MARK: - 2. Apple-Account
+    private var isBusy: Bool { busyText != nil || pipeline.isRunning }
+
+    // MARK: - Apple-Account
 
     private var accountSection: some View {
         Section {
@@ -178,91 +187,124 @@ struct SignerView: View {
                 NavigationLink {
                     AccountDetailView()
                 } label: {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(account.status?.name ?? account.email ?? "Apple-ID").font(.headline)
-                        Text(account.team.map { "\($0.displayName) · \($0.id)" } ?? "Bitte Team wählen")
-                            .font(.caption)
-                            .foregroundStyle(account.team == nil ? .orange : .secondary)
+                    Label {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(account.status?.name ?? account.email ?? "Apple-ID")
+                            Text(account.team.map { "\($0.displayName) · \($0.id)" } ?? "Team wählen")
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+                    } icon: {
+                        Image(systemName: "person.crop.circle")
                     }
                 }
             } else {
                 Button {
                     sheet = .login
                 } label: {
-                    Label(account.state == .signingIn ? "Anmeldung läuft …" : "Mit Apple-ID anmelden (Zertifikat & Profil automatisch)",
-                          systemImage: "key.fill")
-                        .frame(maxWidth: .infinity)
+                    Label(account.state == .signingIn ? "Anmeldung läuft …" : "Mit Apple-ID anmelden", systemImage: "person.crop.circle")
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(.indigo)
-            }
-            HStack {
-                Button {
-                    sheet = .pairing
-                } label: {
-                    Label("Wireless Pair (ohne PC)", systemImage: "link").frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.bordered)
-                Button {
-                    importer = .pairingFile
-                } label: {
-                    Label("Import Config (.plist)", systemImage: "folder").frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.bordered)
+                .disabled(account.state == .signingIn)
             }
         } header: {
-            Text("2. Apple-Account (Zertifikat & Profil automatisch)")
+            Text("Apple-Account")
         } footer: {
-            Text("Bezahlter Account (99 $/Jahr): Apps laufen ein Jahr; ohne Kopplung genügt die UDID („Detect“) und die einmal eingerichtete Installation über itms-services. Kostenlose Apple-ID: 7 Tage, höchstens drei Apps gleichzeitig; einmal „Wireless Pair“ tippen.")
+            Text("Quill erstellt Zertifikat und Profil automatisch. Kostenlose Apple-ID: 7 Tage Laufzeit, höchstens drei Apps. Bezahlter Account: ein Jahr.")
         }
     }
 
-    // MARK: - 3. Zertifikat
+    // MARK: - Gerät
+
+    private var deviceSection: some View {
+        Section {
+            Button {
+                sheet = .pairing
+            } label: {
+                LabeledContent {
+                    if device.isPaired { Image(systemName: "checkmark").foregroundStyle(.secondary) }
+                } label: {
+                    Label("Koppeln ohne Computer", systemImage: "link")
+                }
+            }
+            Button {
+                present(.pairingFile)
+            } label: {
+                Label("Pairing-Datei importieren", systemImage: "square.and.arrow.down")
+            }
+            Button {
+                sheet = .udid
+            } label: {
+                LabeledContent {
+                    Text(device.udid?.maskedUDID ?? "Unbekannt")
+                } label: {
+                    Label("UDID", systemImage: "number")
+                }
+            }
+            .contextMenu {
+                if let udid = device.udid {
+                    Button("Kopieren", systemImage: "doc.on.doc") { UIPasteboard.general.string = udid }
+                }
+            }
+        } header: {
+            Text("Gerät")
+        } footer: {
+            Text("Die Kopplung braucht den Entwicklermodus und die App LocalDevVPN. Danach installiert Quill Apps direkt.")
+        }
+    }
+
+    // MARK: - Zertifikate
 
     private var identitySection: some View {
         Section {
-            HStack {
-                Button {
-                    importer = .identityFiles
-                } label: {
-                    Label("Import .p12 / .mobileprovision / .zip", systemImage: "folder").frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.bordered)
-                .tint(.green)
-            }
-            HStack {
-                Button {
-                    sheet = .export
-                } label: {
-                    Label("Export .p12", systemImage: "square.and.arrow.up").frame(maxWidth: .infinity)
-                }
-                .buttonStyle(.bordered)
-                .disabled(identities.isEmpty)
-                Button("Reset", role: .destructive) { confirmReset = true }
-                    .buttonStyle(.bordered)
-                    .disabled(identities.isEmpty && profiles.isEmpty && IdentityStore.pendingCSRDate == nil)
-            }
-            HStack {
-                Button("(1) Generate CSR") { sheet = .csr }
-                    .buttonStyle(.bordered)
-                    .frame(maxWidth: .infinity)
-                Button("(2) Open Apple Dev") { openAppleDeveloper() }
-                    .buttonStyle(.bordered)
-                    .frame(maxWidth: .infinity)
-            }
             NavigationLink {
                 IdentitiesView()
             } label: {
-                LabeledContent("Zertifikate & Profile", value: "\(identities.count) · \(profiles.count)")
+                LabeledContent {
+                    Text("\(identities.count)")
+                } label: {
+                    Label("Zertifikate & Profile", systemImage: "checkmark.seal")
+                }
             }
+            Button {
+                present(.identityFiles)
+            } label: {
+                Label("Importieren", systemImage: "square.and.arrow.down")
+            }
+            Button {
+                sheet = .export
+            } label: {
+                Label("Zertifikat exportieren", systemImage: "square.and.arrow.up")
+            }
+            .disabled(identities.isEmpty)
+            Button {
+                sheet = .csr
+            } label: {
+                Label("Zertifikatsanfrage (CSR) erzeugen", systemImage: "doc.badge.plus")
+            }
+            Button {
+                openAppleDeveloper()
+            } label: {
+                Label("Apple Developer öffnen", systemImage: "safari")
+            }
+            Button(role: .destructive) {
+                confirmReset = true
+            } label: {
+                Label("Zurücksetzen", systemImage: "trash")
+            }
+            .disabled(identities.isEmpty && profiles.isEmpty && IdentityStore.pendingCSRDate == nil)
         } header: {
-            Text("3. Zertifikat (.p12 / Profile / CSR)")
+            Text("Eigene Zertifikate")
         } footer: {
-            Text("Zertifikat von einem UDID-Registrierungsdienst oder aus Apple Developer? .p12 und Profil (auch als .zip) importieren – ohne Apple-Anmeldung. Oder CSR erzeugen, auf developer.apple.com hochladen und die .cer hier importieren; die UDID liegt dabei in der Zwischenablage.")
+            Text("Import von .p12, .mobileprovision, .cer oder .zip, etwa von einem UDID-Registrierungsdienst. Eine Apple-Anmeldung ist dafür nicht nötig.")
         }
     }
 
     // MARK: - Aktionen
+
+    private func present(_ kind: ImporterKind) {
+        importerKind = kind
+        showImporter = true
+    }
 
     private func handleImport(_ kind: ImporterKind, urls: [URL]) {
         switch kind {
@@ -295,8 +337,18 @@ struct SignerView: View {
 
     private func importAndSign(_ url: URL) async {
         do {
-            let app = try await AppLibrary.importIPA(from: url, context: context)
-            try await sign(app)
+            // Vor dem Kopieren prüfen, damit ein fehlendes Zertifikat sofort gemeldet wird.
+            let method = try signingMethod()
+            busyText = "Importiere \(url.lastPathComponent) …"
+            let app: LibraryApp
+            do {
+                app = try await AppLibrary.importIPA(from: url, context: context)
+            } catch {
+                busyText = nil
+                throw error
+            }
+            busyText = nil
+            try await pipeline.run(SigningInput(source: app, options: SignOptions.loadDefaults(), method: method), context: context)
         } catch {
             errorText = error.localizedDescription
         }
@@ -309,6 +361,9 @@ struct SignerView: View {
         }
         Task {
             do {
+                let method = try signingMethod()
+                busyText = "Lade \(url.lastPathComponent) …"
+                defer { busyText = nil }
                 let (file, response) = try await URLSession.shared.download(from: url)
                 guard let http = response as? HTTPURLResponse, http.statusCode == 200 else {
                     throw AppError("Der Server hat die IPA nicht geliefert.")
@@ -316,19 +371,21 @@ struct SignerView: View {
                 let name = url.pathExtension.lowercased() == "ipa" ? url.lastPathComponent : "Download.ipa"
                 let ipa = Paths.temporary.appendingPathComponent("\(UUID().uuidString)-\(name)")
                 try FileManager.default.moveItem(at: file, to: ipa)
+                busyText = "Importiere …"
                 let app = try await AppLibrary.importIPA(from: ipa, move: true, context: context)
-                try await sign(app)
+                busyText = nil
+                try await pipeline.run(SigningInput(source: app, options: SignOptions.loadDefaults(), method: method), context: context)
             } catch {
                 errorText = error.localizedDescription
             }
         }
     }
 
-    private func sign(_ app: LibraryApp) async throws {
+    private func signingMethod() throws -> SigningMethod {
         guard let method = pipeline.defaultMethod(context: context) else {
-            throw AppError("Kein Zertifikat vorhanden. Mit der Apple-ID anmelden oder ein .p12 mit Profil importieren.")
+            throw AppError("Noch kein Zertifikat vorhanden. Zuerst mit der Apple-ID anmelden oder ein Zertifikat (.p12) mit Profil importieren.")
         }
-        try await pipeline.run(SigningInput(source: app, options: SignOptions.loadDefaults(), method: method), context: context)
+        return method
     }
 
     private func reset() {
@@ -376,89 +433,11 @@ private enum ImporterKind {
 
     var types: [UTType] {
         switch self {
-        case .ipa: return [UTType("com.apple.itunes.ipa") ?? .data, .data]
-        case .pairingFile: return [.propertyList, .data]
+        case .ipa: return [UTType(filenameExtension: "ipa") ?? .data, .zip, .data]
+        case .pairingFile: return [.propertyList, .xml, .data]
         case .identityFiles: return [.item]
         }
     }
 
     var multiple: Bool { self == .identityFiles }
-}
-
-/// Zusammenfassung wie im Screenshot: Signer bereit (Name • Team • Laufzeit • +RAM) • Gekoppelt • Entwicklermodus.
-struct StatusLine: View {
-    @Environment(DeviceLink.self) private var device
-    @Environment(AppleAccountService.self) private var account
-    @Query(sort: \SigningIdentity.addedAt, order: .reverse) private var identities: [SigningIdentity]
-
-    var body: some View {
-        HStack(alignment: .top, spacing: 10) {
-            Circle()
-                .fill(color)
-                .frame(width: 14, height: 14)
-                .padding(.top, 3)
-            Text(text)
-                .font(.system(.callout, design: .monospaced))
-                .foregroundStyle(color)
-        }
-        .accessibilityElement(children: .combine)
-    }
-
-    private var signerReady: Bool { account.isReady || identities.contains { !$0.isExpired } }
-
-    private var color: Color {
-        if signerReady && device.isReady { return .green }
-        if signerReady || device.isPaired { return .orange }
-        return .red
-    }
-
-    private var text: String {
-        var parts: [String] = []
-        if account.isReady, let team = account.team {
-            let who = account.status?.name ?? account.email ?? "Apple-ID"
-            let duration = team.isFree ? "7d Personal" : "1y"
-            let ram = SignOptions.loadDefaults().increasedMemoryLimit ? " • +RAM" : ""
-            parts.append("Signer bereit (\(who) • Team \(team.id) • \(duration)\(ram))")
-        } else if let identity = identities.first(where: { !$0.isExpired }) {
-            parts.append("Signer bereit (\(identity.name) • Team \(identity.teamID))")
-        } else {
-            parts.append("Kein Zertifikat")
-        }
-        switch device.state {
-        case .ready: parts.append("Gekoppelt ✓")
-        case .checking: parts.append("Prüfe …")
-        case .unpaired: parts.append("Nicht gekoppelt")
-        case .unreachable: parts.append("Gekoppelt, nicht erreichbar")
-        }
-        if let mode = device.developerMode {
-            parts.append(mode ? "Dev Mode ✓" : "Dev Mode aus")
-        }
-        return parts.joined(separator: " • ")
-    }
-}
-
-/// Fortschritt und Protokoll des laufenden oder letzten Signiervorgangs.
-struct PipelineProgressView: View {
-    @Environment(SigningPipeline.self) private var pipeline
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            if pipeline.isRunning {
-                ProgressView(value: pipeline.progress) {
-                    Text(pipeline.status).font(.footnote)
-                }
-            } else if pipeline.failed {
-                Label(pipeline.status, systemImage: "xmark.octagon").font(.footnote).foregroundStyle(.red)
-            } else {
-                Label(pipeline.status, systemImage: "checkmark.circle").font(.footnote).foregroundStyle(.secondary)
-            }
-            DisclosureGroup("Protokoll") {
-                Text(pipeline.log.joined(separator: "\n"))
-                    .font(.system(.caption2, design: .monospaced))
-                    .textSelection(.enabled)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            .font(.footnote)
-        }
-    }
 }

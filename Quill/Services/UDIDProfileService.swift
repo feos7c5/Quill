@@ -23,9 +23,10 @@ final class UDIDProfileService {
     @ObservationIgnored private var server: HTTPServer?
     @ObservationIgnored private var background: BackgroundTime?
     @ObservationIgnored private var timeout: Task<Void, Never>?
+    @ObservationIgnored private var keepingAlive = false
     @ObservationIgnored var onReceived: ((String) -> Void)?
 
-    private static let port: UInt16 = 8765
+    private nonisolated static let port: UInt16 = 8765
     /// So lange wartet Quill auf die Antwort aus den Einstellungen.
     private static let waitSeconds = 180
 
@@ -48,6 +49,10 @@ final class UDIDProfileService {
         phase = .waiting
         // Während der Nutzer in Safari und den Einstellungen ist, liegt Quill im Hintergrund.
         background = BackgroundTime(name: "Quill-UDID")
+        if !keepingAlive {
+            KeepAlive.shared.begin()
+            keepingAlive = true
+        }
         timeout = Task { [weak self] in
             try? await Task.sleep(for: .seconds(Self.waitSeconds))
             guard !Task.isCancelled else { return }
@@ -63,6 +68,10 @@ final class UDIDProfileService {
         timeout = nil
         background?.end()
         background = nil
+        if keepingAlive {
+            KeepAlive.shared.end()
+            keepingAlive = false
+        }
     }
 
     private func finish(_ result: Result<String, Error>) {
@@ -74,9 +83,11 @@ final class UDIDProfileService {
         case .failure(let error):
             phase = .failed(error.localizedDescription)
         }
-        // Kurz weiterlaufen lassen, damit die Weiterleitung noch ausgeliefert wird.
-        Task { [weak self] in
-            try? await Task.sleep(for: .seconds(2))
+        // Weiterlaufen lassen, bis Safari die Abschlussseite geladen hat.
+        timeout?.cancel()
+        timeout = Task { [weak self] in
+            try? await Task.sleep(for: .seconds(20))
+            guard !Task.isCancelled else { return }
             self?.stop()
         }
     }
@@ -86,6 +97,7 @@ final class UDIDProfileService {
     /// Läuft auf der Server-Queue, deshalb nicht an den Main-Actor gebunden.
     private nonisolated static func makeHandler(token: String, profile: Data,
                                                 result: @escaping @Sendable (Result<String, Error>) -> Void) -> HTTPServer.Handler {
+        let port = Self.port
         return { request in
             switch (request.method, request.path) {
             case ("GET", "/udid.mobileconfig"):
@@ -100,9 +112,27 @@ final class UDIDProfileService {
                     return .text("Keine UDID", status: 400)
                 }
                 result(.success(udid))
+                // iOS erwartet hier eine Weiterleitung auf eine http(s)-Seite und öffnet sie in Safari.
+                // Ein eigenes URL-Schema an dieser Stelle lässt die Installation scheitern.
                 var response = HTTPResponse(status: 301)
-                response.headers["Location"] = "quill://udid?value=\(udid)"
+                response.headers["Location"] = "http://127.0.0.1:\(port)/done?udid=\(udid)"
                 return response
+
+            case ("GET", "/done"):
+                let udid = (request.query["udid"] ?? "").filter { $0.isHexDigit || $0 == "-" }
+                let html = """
+                <!doctype html><html lang="de"><head><meta charset="utf-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1">
+                <meta name="color-scheme" content="light dark"><title>Quill</title>
+                <style>body{font:-apple-system-body;font-family:-apple-system;text-align:center;padding:3rem 1.5rem}
+                a{display:inline-block;margin-top:1.5rem;padding:.8rem 1.6rem;border-radius:999px;background:#3366f2;color:#fff;text-decoration:none;font-weight:600}
+                code{font-size:.85rem;word-break:break-all}</style></head><body>
+                <h2>UDID erkannt</h2><p><code>\(udid)</code></p>
+                <a href="quill://udid?value=\(udid)">Zurück zu Quill</a>
+                <script>location.href = "quill://udid?value=\(udid)";</script>
+                </body></html>
+                """
+                return HTTPResponse(contentType: "text/html; charset=utf-8", body: .data(Data(html.utf8)))
 
             default:
                 return .text("Not found", status: 404)

@@ -169,6 +169,7 @@ struct AccountDetailView: View {
     @State private var certificates: [AppleCertificate] = []
     @State private var isLoading = false
     @State private var revoking: AppleCertificate?
+    @State private var confirmRevoke = false
     @State private var confirmSignOut = false
     @State private var errorText: String?
 
@@ -226,7 +227,7 @@ struct AccountDetailView: View {
                         }
                     }
                     .swipeActions {
-                        Button("Widerrufen", role: .destructive) { revoking = certificate }
+                        Button("Widerrufen", role: .destructive) { revoking = certificate; confirmRevoke = true }
                     }
                 }
             } header: {
@@ -244,7 +245,7 @@ struct AccountDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .task(id: account.team?.id) { await load() }
         .refreshable { await load() }
-        .confirmationDialog("Zertifikat widerrufen?", isPresented: Binding(get: { revoking != nil }, set: { if !$0 { revoking = nil } }),
+        .confirmationDialog("Zertifikat widerrufen?", isPresented: $confirmRevoke,
                             titleVisibility: .visible) {
             Button("Widerrufen", role: .destructive) {
                 if let serial = revoking?.serial { revoke(serial) }

@@ -43,11 +43,12 @@ struct RootView: View {
     @State private var errorMessage: String?
     @State private var identityImport: IdentifiedBatch?
     @State private var pendingPairing: Data?
+    @State private var askPairing = false
 
     var body: some View {
         TabView(selection: $selection) {
             NavigationStack { SignerView() }
-                .tabItem { Label("Signer", systemImage: "signature") }
+                .tabItem { Label("Signieren", systemImage: "signature") }
                 .tag(AppTab.signer)
 
             NavigationStack { LibraryView() }
@@ -89,7 +90,7 @@ struct RootView: View {
         .sheet(item: $identityImport) { batch in
             IdentityImportView(batch: batch)
         }
-        .alert("Pairing-Datei übernehmen?", isPresented: Binding(get: { pendingPairing != nil }, set: { if !$0 { pendingPairing = nil } })) {
+        .alert("Pairing-Datei übernehmen?", isPresented: $askPairing) {
             Button("Übernehmen") {
                 if let data = pendingPairing { acceptPairing(data) }
             }
@@ -129,6 +130,7 @@ struct RootView: View {
             }
             selection = .signer
             pendingPairing = data
+            askPairing = true
             return
         }
         guard url.isFileURL else { return }

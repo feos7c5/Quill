@@ -39,7 +39,7 @@ struct LiveContainerView: View {
                 }
 
                 Section {
-                    Toggle("Mehr Arbeitsspeicher anfragen (+RAM)", isOn: $increasedMemory)
+                    Toggle("Mehr Arbeitsspeicher anfragen", isOn: $increasedMemory)
                         .disabled(!account.isReady)
                     if let progress = service.downloadProgress {
                         ProgressView("Lade LiveContainer …", value: progress)
@@ -49,12 +49,11 @@ struct LiveContainerView: View {
                     Button {
                         Task { await install() }
                     } label: {
-                        Label(current == nil ? "Laden & installieren" : "Aktualisieren / neu installieren",
-                              systemImage: "arrow.down.app.fill")
+                        Label(current == nil ? "Laden und installieren" : "Aktualisieren",
+                              systemImage: "arrow.down.app")
                             .frame(maxWidth: .infinity)
                     }
-                    .buttonStyle(.borderedProminent)
-                    .tint(.purple)
+                    .primaryActionRow()
                     .disabled(working || pipeline.isRunning)
                 } header: {
                     Text("1. Laden und installieren")
@@ -102,7 +101,7 @@ struct LiveContainerView: View {
                 }
 
                 if let errorText {
-                    Section { Label(errorText, systemImage: "xmark.octagon.fill").foregroundStyle(.red) }
+                    Section { Label(errorText, systemImage: "exclamationmark.triangle.fill").foregroundStyle(.red) }
                 }
             }
             .navigationTitle("LiveContainer")

@@ -24,16 +24,13 @@ struct PairingView: View {
 
                 Section {
                     phaseView
-                    if let note = pairing.backgroundNote {
-                        Label(note, systemImage: "hourglass").foregroundStyle(.orange).font(.footnote)
-                    }
                 }
 
                 Section("So geht’s") {
-                    step(1, "Unten auf „Kopplung starten“ tippen.")
-                    step(2, "Einstellungen → Datenschutz & Sicherheit → Entwicklermodus öffnen und „Quill auf …“ auswählen.")
-                    step(3, "Den Code eingeben, den Quill hier und als Mitteilung zeigt. Zügig zurückkehren: Im Hintergrund hat Quill nur begrenzt Zeit.")
-                    step(4, "LocalDevVPN öffnen und verbinden. Quill prüft danach die Verbindung.")
+                    StepRow(number: 1, text: "„Kopplung starten“ tippen.")
+                    StepRow(number: 2, text: "Einstellungen → Datenschutz & Sicherheit → Entwicklermodus öffnen und „Quill auf …“ auswählen.")
+                    StepRow(number: 3, text: "Den Code eingeben, den Quill hier und als Mitteilung zeigt.")
+                    StepRow(number: 4, text: "LocalDevVPN öffnen und verbinden. Quill prüft danach die Verbindung.")
                 }
 
                 Section {
@@ -45,7 +42,7 @@ struct PairingView: View {
                         } label: {
                             Label("Kopplung starten", systemImage: "link").frame(maxWidth: .infinity)
                         }
-                        .buttonStyle(.borderedProminent)
+                        .primaryActionRow()
                     }
                     Button("Einstellungen öffnen", systemImage: "gear") {
                         openURL(URL(string: UIApplication.openSettingsURLString)!)
@@ -54,7 +51,7 @@ struct PairingView: View {
                     Text("Braucht iOS 27, eingeschalteten Entwicklermodus, WLAN und Zugriff auf das lokale Netzwerk. Die Pairing-Datei bleibt geschützt in Quill und gibt denselben Zugriff wie ein vertrauter Rechner.")
                 }
             }
-            .navigationTitle("Wireless Pair")
+            .navigationTitle("Koppeln")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
@@ -94,7 +91,8 @@ struct PairingView: View {
             VStack(spacing: 8) {
                 Text("Code in den Einstellungen eingeben").font(.footnote).foregroundStyle(.secondary)
                 Text(spaced(pin))
-                    .font(.system(size: 44, weight: .bold, design: .monospaced))
+                    .font(.system(size: 44, weight: .semibold, design: .rounded))
+                    .monospacedDigit()
                     .textSelection(.enabled)
                     .accessibilityLabel("Kopplungscode \(pin.map(String.init).joined(separator: " "))")
             }
@@ -115,16 +113,6 @@ struct PairingView: View {
             }
         case .failed(let message):
             Label(message, systemImage: "xmark.octagon.fill").foregroundStyle(.red)
-        }
-    }
-
-    private func step(_ number: Int, _ text: String) -> some View {
-        HStack(alignment: .top, spacing: 10) {
-            Text("\(number)")
-                .font(.footnote.weight(.bold))
-                .frame(width: 22, height: 22)
-                .background(Circle().fill(.tint.opacity(0.15)))
-            Text(text).font(.callout)
         }
     }
 

@@ -100,7 +100,7 @@ struct StatusWidgetView: View {
             if let next = snapshot.nextApp {
                 Text("\(next.daysLeft(at: entry.date))")
                     .font(.system(size: 40, weight: .bold, design: .rounded))
-                    .foregroundStyle(color(next))
+                    .foregroundStyle(next.expiration.timeIntervalSince(entry.date) > 2 * 86_400 ? Color.primary : color(next))
                     .contentTransition(.numericText())
                 Text("Tage · \(next.name)")
                     .font(.caption)
@@ -118,11 +118,9 @@ struct StatusWidgetView: View {
                 header(snapshot)
                 Spacer()
                 Link(destination: WidgetSnapshot.refreshAllURL) {
-                    Label("Refresh All", systemImage: "arrow.triangle.2.circlepath")
+                    Label("Alle erneuern", systemImage: "arrow.clockwise")
                         .font(.caption.weight(.semibold))
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 4)
-                        .background(Capsule().fill(.green.opacity(0.25)))
+                        .foregroundStyle(.tint)
                 }
             }
             if snapshot.apps.isEmpty {
@@ -134,8 +132,7 @@ struct StatusWidgetView: View {
                         icon(app)
                         Text(app.name).font(.callout).lineLimit(1)
                         Spacer()
-                        Circle().fill(color(app)).frame(width: 8, height: 8)
-                        Text(app.expiration < entry.date ? "abgelaufen" : "\(app.daysLeft(at: entry.date))d")
+                        Text(app.expiration < entry.date ? "abgelaufen" : "\(app.daysLeft(at: entry.date)) T.")
                             .font(.caption.monospacedDigit())
                             .foregroundStyle(color(app))
                     }
@@ -148,7 +145,7 @@ struct StatusWidgetView: View {
     private func header(_ snapshot: WidgetSnapshot) -> some View {
         HStack(spacing: 4) {
             Image(systemName: snapshot.deviceReady ? "checkmark.seal.fill" : "exclamationmark.triangle.fill")
-                .foregroundStyle(snapshot.deviceReady ? .green : .orange)
+                .foregroundStyle(snapshot.deviceReady ? Color.secondary : Color.orange)
             Text("Quill").font(.caption.weight(.semibold))
         }
     }
@@ -196,7 +193,7 @@ struct StatusWidgetView: View {
 
     private func color(_ app: WidgetSnapshot.App) -> Color {
         if app.expiration < entry.date { return .red }
-        return app.expiration.timeIntervalSince(entry.date) > 2 * 86_400 ? .green : .yellow
+        return app.expiration.timeIntervalSince(entry.date) > 2 * 86_400 ? .secondary : .orange
     }
 }
 

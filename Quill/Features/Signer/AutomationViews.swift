@@ -13,11 +13,11 @@ struct AutomationGuideView: View {
             }
 
             Section("Einrichten (einmal)") {
-                step(1, "Kurzbefehle → Automation → „+“ → „Tageszeit“, z. B. 4:00 Uhr, täglich. „Sofort ausführen“ wählen und „Bei Ausführung benachrichtigen“ ausschalten.")
-                step(2, "Aktion „VPN festlegen“ → LocalDevVPN → „Verbinden“.")
-                step(3, "Aktion „Warten“ → 3 Sekunden.")
-                step(4, "Aktion „Apps erneuern“ (Quill). „Nur bald ablaufende“ eingeschaltet lassen.")
-                step(5, "Optional: „VPN festlegen“ → „Trennen“.")
+                StepRow(number: 1, text: "Kurzbefehle → Automation → „+“ → „Tageszeit“, z. B. 4:00 Uhr, täglich. „Sofort ausführen“ wählen und „Bei Ausführung benachrichtigen“ ausschalten.")
+                StepRow(number: 2, text: "Aktion „VPN festlegen“ → LocalDevVPN → „Verbinden“.")
+                StepRow(number: 3, text: "Aktion „Warten“ → 3 Sekunden.")
+                StepRow(number: 4, text: "Aktion „Apps erneuern“ (Quill). „Nur bald ablaufende“ eingeschaltet lassen.")
+                StepRow(number: 5, text: "Optional: „VPN festlegen“ → „Trennen“.")
                 Button("Kurzbefehle öffnen", systemImage: "square.2.layers.3d") {
                     openURL(URL(string: "shortcuts://")!)
                 }
@@ -53,16 +53,6 @@ struct AutomationGuideView: View {
         .navigationTitle("Automatisch erneuern")
         .navigationBarTitleDisplayMode(.inline)
     }
-
-    private func step(_ number: Int, _ text: String) -> some View {
-        HStack(alignment: .top, spacing: 10) {
-            Text("\(number)")
-                .font(.footnote.weight(.bold))
-                .frame(width: 22, height: 22)
-                .background(Circle().fill(.tint.opacity(0.15)))
-            Text(text).font(.callout)
-        }
-    }
 }
 
 /// UDID ohne Kopplung: von Hand oder aus einem importierten Profil.
@@ -87,16 +77,16 @@ struct UDIDView: View {
                     Button {
                         profileService.start()
                     } label: {
-                        Label("Automatisch erkennen (Safari-Profil)", systemImage: "safari")
+                        Label("Automatisch erkennen", systemImage: "sparkle.magnifyingglass")
                             .frame(maxWidth: .infinity)
                     }
-                    .buttonStyle(.borderedProminent)
+                    .primaryActionRow()
                     .disabled(profileService.phase == .waiting)
                     switch profileService.phase {
                     case .idle:
                         EmptyView()
                     case .waiting:
-                        Label("Safari lädt das Profil. Dann Einstellungen → „Profil geladen“ → Installieren. Danach öffnet sich Quill wieder.",
+                        Label("In Safari „Zulassen“ tippen, dann Einstellungen → „Profil geladen“ → Installieren. Danach öffnet Safari eine Seite, die zu Quill zurückführt.",
                               systemImage: "hourglass")
                             .font(.footnote)
                     case .received(let udid):

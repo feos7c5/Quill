@@ -23,6 +23,7 @@ struct SignView: View {
     @State private var iconItem: PhotosPickerItem?
     @State private var iconData: Data?
     @State private var picker: PickerKind?
+    @State private var showPicker = false
 
     @State private var errorText: String?
     @State private var signedApp: LibraryApp?
@@ -73,7 +74,7 @@ struct SignView: View {
                 }
             }
             .interactiveDismissDisabled(isSigning)
-            .fileImporter(isPresented: Binding(get: { picker != nil }, set: { if !$0 { picker = nil } }),
+            .fileImporter(isPresented: $showPicker,
                           allowedContentTypes: [.item],
                           allowsMultipleSelection: picker == .libraries) { result in
                 guard case .success(let urls) = result else { return }
@@ -82,7 +83,6 @@ struct SignView: View {
                 } else {
                     libraries.append(contentsOf: urls.filter { ["dylib", "framework"].contains($0.pathExtension.lowercased()) })
                 }
-                picker = nil
             }
             .onChange(of: iconItem) { _, item in
                 Task { iconData = try? await item?.loadTransferable(type: Data.self) }
@@ -216,7 +216,7 @@ struct SignView: View {
                 Label(url.lastPathComponent, systemImage: "shippingbox")
             }
             .onDelete { libraries.remove(atOffsets: $0) }
-            Button("Bibliothek hinzufügen", systemImage: "plus") { picker = .libraries }
+            Button("Bibliothek hinzufügen", systemImage: "plus") { picker = .libraries; showPicker = true }
         } header: {
             Text("Zusätzliche Bibliotheken")
         } footer: {
@@ -228,6 +228,7 @@ struct SignView: View {
         Section("Erweitert") {
             Button {
                 picker = .entitlements
+                showPicker = true
             } label: {
                 LabeledContent("Eigene Entitlements", value: entitlementsURL?.lastPathComponent ?? "aus Profil")
             }

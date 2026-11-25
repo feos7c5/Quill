@@ -125,6 +125,9 @@ struct AppDetailView: View {
 
     @State private var showSignSheet = false
     @State private var isInstalling = false
+    @State private var installProgress = 0.0
+    @State private var installStatus = "Installiere …"
+    @State private var didInstall = false
     @State private var libraries: [String]?
     @State private var isLoadingLibraries = false
     @State private var confirmDelete = false
@@ -153,9 +156,14 @@ struct AppDetailView: View {
                 }
                 if app.isSigned {
                     if isInstalling {
-                        HStack { ProgressView(); Text("Installiere …") }
+                        ProgressView(value: installProgress) { Text(installStatus).font(.subheadline) }
                     } else {
                         Button("Installieren", systemImage: "arrow.down.app") { install() }
+                    }
+                    if didInstall {
+                        Label("Installiert.", systemImage: "checkmark.circle.fill")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
                     }
                 }
                 ShareLink(item: app.ipaURL, preview: SharePreview(app.exportFileName)) {
@@ -221,11 +229,20 @@ struct AppDetailView: View {
     /// Über den Gerätekanal, wenn gekoppelt; sonst über itms-services (Einstellungen → Installation).
     private func install() {
         isInstalling = true
+        didInstall = false
+        installProgress = 0
+        installStatus = "Verbinde …"
         Task {
             defer { isInstalling = false }
             do {
                 if device.isPaired {
-                    try await device.install(app.ipaURL) { _, _ in }
+                    try await device.install(app.ipaURL) { fraction, message in
+                        Task { @MainActor in
+                            installProgress = fraction
+                            if !message.isEmpty { installStatus = message }
+                        }
+                    }
+                    didInstall = true
                 } else {
                     try installer.install(ipaURL: app.ipaURL, bundleID: app.bundleID, version: app.version, title: app.name)
                 }

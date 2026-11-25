@@ -12,7 +12,8 @@ final class RefreshService {
     private(set) var isRefreshingAll = false
     private(set) var lastError: String?
 
-    static var taskIdentifier: String { (Bundle.main.bundleIdentifier ?? "quill") + ".refresh" }
+    /// Fester Name: Nach dem Signieren mit anderer Bundle-ID muss er weiter zur Info.plist passen.
+    nonisolated static let taskIdentifier = "quill.refresh"
     /// Ab so vielen Tagen Restlaufzeit gilt eine App als „bald ablaufend“.
     nonisolated static let dueWithinDays = 3
 

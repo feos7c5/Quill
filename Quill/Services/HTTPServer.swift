@@ -153,6 +153,13 @@ private final class HTTPConnection {
         }
         parsed = (String(requestLine[0]).uppercased(), components?.path ?? "/", query, headers)
 
+        if headers["expect"]?.lowercased() == "100-continue" {
+            connection.send(content: Data("HTTP/1.1 100 Continue\r\n\r\n".utf8), completion: .contentProcessed { _ in })
+        }
+        if headers["transfer-encoding"]?.lowercased().contains("chunked") == true {
+            buffer = rest
+            return consumeChunked()
+        }
         let length = Int(headers["content-length"] ?? "") ?? 0
         guard length > 0 else { return respond() }
 
@@ -163,6 +170,46 @@ private final class HTTPConnection {
         bodyHandle = handle
         remaining = length
         consumeBody(rest)
+    }
+
+    /// Body mit „Transfer-Encoding: chunked“ (kleine Bodys, z. B. die Antwort eines iOS-Profils).
+    private func consumeChunked() {
+        if let body = Self.decodeChunked(buffer) {
+            let file = Paths.temporary.appendingPathComponent("upload-\(UUID().uuidString)")
+            guard (try? body.write(to: file)) != nil else { return close() }
+            bodyFile = file
+            buffer = Data()
+            return respond()
+        }
+        guard buffer.count < 8 * 1024 * 1024 else { return close() }
+        connection.receive(minimumIncompleteLength: 1, maximumLength: Self.chunkSize) { data, _, isComplete, error in
+            if let data, !data.isEmpty {
+                self.buffer.append(data)
+                self.consumeChunked()
+            } else if error != nil || isComplete {
+                self.close()
+            } else {
+                self.consumeChunked()
+            }
+        }
+    }
+
+    /// Liefert den zusammengesetzten Body, sobald der Abschluss-Chunk (Länge 0) da ist; sonst nil.
+    private static func decodeChunked(_ data: Data) -> Data? {
+        var body = Data()
+        var index = data.startIndex
+        let crlf = Data("\r\n".utf8)
+        while let lineEnd = data.range(of: crlf, in: index..<data.endIndex) {
+            let sizeText = String(decoding: data[index..<lineEnd.lowerBound], as: UTF8.self)
+                .split(separator: ";").first.map(String.init) ?? ""
+            guard let size = Int(sizeText.trimmingCharacters(in: .whitespaces), radix: 16) else { return nil }
+            if size == 0 { return body }
+            let start = lineEnd.upperBound
+            guard data.endIndex - start >= size + 2 else { return nil }
+            body.append(data[start..<start + size])
+            index = start + size + 2
+        }
+        return nil
     }
 
     private func consumeBody(_ data: Data) {

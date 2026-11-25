@@ -81,8 +81,9 @@ targets:
           - livecontainer
         UIBackgroundModes:
           - processing
+          - audio
         BGTaskSchedulerPermittedIdentifiers:
-          - $(PRODUCT_BUNDLE_IDENTIFIER).refresh
+          - quill.refresh
         NSAppTransportSecurity:
           NSAllowsLocalNetworking: true
         UISupportedInterfaceOrientations:

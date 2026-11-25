@@ -99,7 +99,7 @@ final class SigningPipeline {
                 throw AppError("Nicht mit der Apple-ID angemeldet oder kein Team gewählt.")
             }
             guard let udid = device.udid else {
-                throw AppError("Quill kennt die UDID dieses iPhones noch nicht. Über „Wireless Pair“ koppeln oder die UDID unter „Detect“ von Hand eintragen.")
+                throw AppError("Quill kennt die UDID dieses iPhones noch nicht. Über „Koppeln ohne Computer“ koppeln oder die UDID unter „Detect“ von Hand eintragen.")
             }
             step(0.15, "Registriere Gerät …")
             try await account.registerDevice(udid: udid, name: device.deviceName)
@@ -161,7 +161,7 @@ final class SigningPipeline {
             step(0.9, "Übergebe an iOS …")
             try ota.install(ipaURL: signed.ipaURL, bundleID: bundleID, version: signed.version, title: signed.name)
         } else {
-            throw AppError("Zum Installieren entweder über „Wireless Pair“ koppeln oder unter Einstellungen → „Installation ohne Kopplung“ einrichten. Die signierte IPA liegt in der Bibliothek.")
+            throw AppError("Zum Installieren entweder über „Koppeln ohne Computer“ koppeln oder unter Einstellungen → „Installation ohne Kopplung“ einrichten. Die signierte IPA liegt in der Bibliothek.")
         }
 
         let installed = try record(
@@ -187,7 +187,7 @@ final class SigningPipeline {
         case .account:
             await account.restoreIfPossible(interactive: interactive)
             guard account.isReady else {
-                throw AppError(account.lastError ?? "Für den Refresh bitte mit der Apple-ID anmelden.")
+                throw AppError(account.lastError ?? "Zum Erneuern bitte mit der Apple-ID anmelden.")
             }
             method = .account
         case .identity:

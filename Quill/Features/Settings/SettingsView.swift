@@ -81,7 +81,7 @@ struct SettingsView: View {
             } header: {
                 Text("Standard beim Signieren")
             } footer: {
-                Text("Gilt auch für „Pick & Sign“ und „Sign & Install von URL“. Ohne eigene App-IDs teilen Erweiterungen das Profil der Haupt-App; das spart App-IDs, manche Erweiterungen laufen dann aber nicht.")
+                Text("Gilt auch für „IPA wählen und installieren“ und „Von URL laden“. Ohne eigene App-IDs teilen Erweiterungen das Profil der Haupt-App; das spart App-IDs, manche Erweiterungen laufen dann aber nicht.")
             }
 
             Section("Downloads") {

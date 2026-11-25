@@ -14,7 +14,7 @@ struct IdentitiesView: View {
                     Label("CSR vom \(pending.formatted(date: .abbreviated, time: .shortened)) wartet auf die .cer von Apple.",
                           systemImage: "hourglass")
                 } footer: {
-                    Text("Die .cer über „Import .p12 / .mobileprovision / .zip“ importieren.")
+                    Text("Die .cer über „Importieren“ hinzufügen.")
                 }
             }
             Section("Zertifikate") {
@@ -380,7 +380,7 @@ struct ExportIdentityView: View {
                     Text("Wer diese Datei und ihr Passwort hat, kann in deinem Namen signieren. Nur an sichere Orte speichern.")
                 }
             }
-            .navigationTitle("Export .p12")
+            .navigationTitle("Zertifikat exportieren")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
@@ -446,17 +446,17 @@ struct CSRView: View {
                         ShareLink(item: csrURL) {
                             Label("CSR sichern (in Dateien)", systemImage: "square.and.arrow.up")
                         }
-                        Button("(2) Apple Developer öffnen", systemImage: "safari") {
+                        Button("Apple Developer öffnen", systemImage: "safari") {
                             if let udid = device.udid { UIPasteboard.general.string = udid }
                             openURL(URL(string: "https://developer.apple.com/account/resources/certificates/add")!)
                         }
-                        Text("Dort „Apple Development“ wählen, die CSR hochladen, die .cer laden und hier über „Import .p12 / .mobileprovision / .zip“ importieren. Für das Profil das Gerät mit der UDID aus der Zwischenablage registrieren.")
+                        Text("Dort „Apple Development“ wählen, die CSR hochladen, die .cer laden und hier über „Importieren“ hinzufügen. Für das Profil das Gerät mit der UDID aus der Zwischenablage registrieren.")
                             .font(.footnote)
                             .foregroundStyle(.secondary)
                     }
                 } else {
                     Section {
-                        Button("(1) CSR erzeugen") { create() }
+                        Button("CSR erzeugen") { create() }
                             .disabled(name.trimmed.isEmpty)
                     } footer: {
                         if IdentityStore.pendingCSRDate != nil {
@@ -466,7 +466,7 @@ struct CSRView: View {
                     }
                 }
             }
-            .navigationTitle("Generate CSR")
+            .navigationTitle("Zertifikatsanfrage")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {

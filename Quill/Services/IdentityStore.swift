@@ -230,7 +230,7 @@ enum IdentityStore {
     @discardableResult
     static func importCertificate(_ data: Data, context: ModelContext) throws -> SigningIdentity {
         guard let key = Keychain.get(pendingKeyKey) else {
-            throw AppError("Zu dieser .cer gibt es keinen Schlüssel. Zuerst unter „(1) Generate CSR“ eine CSR erzeugen und bei Apple hochladen.")
+            throw AppError("Zu dieser .cer gibt es keinen Schlüssel. Zuerst unter „Zertifikatsanfrage (CSR) erzeugen“ eine CSR erzeugen und bei Apple hochladen.")
         }
         // Apple liefert DER; manche Werkzeuge PEM.
         let der = pemToDER(data) ?? data

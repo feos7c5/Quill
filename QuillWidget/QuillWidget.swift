@@ -66,7 +66,7 @@ struct StatusWidget: Widget {
                 .containerBackground(.fill.tertiary, for: .widget)
         }
         .configurationDisplayName("Quill")
-        .description("Restlaufzeit der Apps und Refresh mit einem Tipp.")
+        .description("Restlaufzeit der Apps und Erneuern mit einem Tipp.")
         .supportedFamilies([.systemSmall, .systemMedium, .accessoryCircular, .accessoryRectangular, .accessoryInline])
     }
 }

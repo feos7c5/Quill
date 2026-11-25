@@ -94,7 +94,7 @@ final class DeviceLink {
         if state != .ready { await refresh() }
         switch state {
         case .ready: return
-        case .unpaired: throw AppError("Quill ist noch nicht gekoppelt. Unter „Wireless Pair“ koppeln.")
+        case .unpaired: throw AppError("Quill ist noch nicht gekoppelt. Unter „Koppeln ohne Computer“ koppeln.")
         case .unreachable(let reason): throw AppError(reason)
         case .checking: throw AppError("Die Verbindung wird gerade geprüft.")
         }
@@ -146,7 +146,7 @@ final class DeviceLink {
             throw AppError("Die Datei ist keine Pairing-Datei (.plist).")
         }
         if plist["HostCertificate"] != nil || plist["DeviceCertificate"] != nil {
-            throw AppError("Das ist eine Lockdown-Pairing-Datei. Ab iOS 27 nutzt Quill nur Remote Pairing; bitte „Wireless Pair“ verwenden oder eine Remote-Pairing-Datei wählen.")
+            throw AppError("Das ist eine Lockdown-Pairing-Datei. Ab iOS 27 nutzt Quill nur Remote Pairing; bitte „Koppeln ohne Computer“ verwenden oder eine Remote-Pairing-Datei wählen.")
         }
         guard plist["identifier"] is String else {
             throw AppError("Die Datei ist keine Remote-Pairing-Datei.")

@@ -24,7 +24,7 @@ struct AutomationGuideView: View {
             }
 
             Section {
-                Label("Passwort für Refresh merken (Apple-ID-Anmeldung)", systemImage: "key")
+                Label("Passwort zum Erneuern merken (Apple-ID-Anmeldung)", systemImage: "key")
                 Label("Quill gekoppelt, LocalDevVPN installiert", systemImage: "link")
                 Label("Die ursprüngliche IPA bleibt in der Bibliothek", systemImage: "square.grid.2x2")
             } header: {

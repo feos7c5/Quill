@@ -46,7 +46,7 @@ struct LoginView: View {
                     .autocorrectionDisabled()
                 SecureField("Passwort", text: $password)
                     .textContentType(.password)
-                Toggle("Passwort für Refresh merken", isOn: $remember)
+                Toggle("Passwort zum Erneuern merken", isOn: $remember)
             } footer: {
                 Text("Mit „merken“ liegt das Passwort im Schlüsselbund dieses iPhones, damit Quill Apps ohne erneute Eingabe erneuern kann. Am besten eine eigene Apple-ID nur für die Entwicklung verwenden.")
             }

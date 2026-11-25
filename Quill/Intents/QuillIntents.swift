@@ -14,7 +14,7 @@ struct RefreshAppsIntent: AppIntent {
     static let title: LocalizedStringResource = "Apps erneuern"
     static let description = IntentDescription(
         "Signiert von Quill installierte Apps neu und installiert sie als Upgrade. Die Daten bleiben erhalten. Braucht eine Verbindung über LocalDevVPN.",
-        categoryName: "Refresh"
+        categoryName: "Erneuern"
     )
     static let openAppWhenRun = false
 
@@ -48,7 +48,7 @@ struct OpenAndRefreshAppsIntent: AppIntent {
     static let title: LocalizedStringResource = "Quill öffnen und Apps erneuern"
     static let description = IntentDescription(
         "Öffnet Quill und erneuert alle bald ablaufenden Apps. Kann bei Bedarf nach einem Bestätigungscode fragen.",
-        categoryName: "Refresh"
+        categoryName: "Erneuern"
     )
     static let openAppWhenRun = true
 

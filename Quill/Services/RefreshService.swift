@@ -36,7 +36,7 @@ final class RefreshService {
     @discardableResult
     func refreshAll(_ apps: [InstalledApp], pipeline: SigningPipeline, context: ModelContext,
                     interactive: Bool = true) async -> [String] {
-        guard !isRefreshingAll else { return ["Ein Refresh läuft bereits."] }
+        guard !isRefreshingAll else { return ["Das Erneuern läuft bereits."] }
         isRefreshingAll = true
         defer { isRefreshingAll = false }
         lastError = nil
@@ -81,7 +81,7 @@ final class RefreshService {
         guard fireDate > .now else { return }
         let content = UNMutableNotificationContent()
         content.title = "„\(app.name)“ läuft morgen ab"
-        content.body = "In Quill auf „Refresh“ tippen, damit die App weiter startet. Die Daten bleiben erhalten."
+        content.body = "In Quill auf „Erneuern“ tippen, damit die App weiter startet. Die Daten bleiben erhalten."
         content.sound = .default
         let components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: fireDate)
         let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)

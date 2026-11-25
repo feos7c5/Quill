@@ -128,7 +128,7 @@ struct SignView: View {
                 Toggle("Mehr Arbeitsspeicher (+RAM)", isOn: $options.increasedMemoryLimit)
                 Toggle("Erweiterungen mit eigener App-ID", isOn: $options.registerExtensions)
             } else if identities.isEmpty {
-                Label("Kein Zertifikat vorhanden. Im Tab „Signer“ mit der Apple-ID anmelden oder ein .p12 mit Profil importieren.",
+                Label("Kein Zertifikat vorhanden. Im Tab „Signieren“ mit der Apple-ID anmelden oder ein .p12 mit Profil importieren.",
                       systemImage: "exclamationmark.triangle")
                     .foregroundStyle(.orange)
             } else {

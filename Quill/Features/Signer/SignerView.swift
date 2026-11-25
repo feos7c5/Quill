@@ -114,15 +114,15 @@ struct SignerView: View {
                           detail: signerName ?? String(localized: "Oder unten unter „Eigene Zertifikate“ ein Zertifikat importieren.")) {
                     sheet = .login
                 }
-                setupStep(done: device.udid != nil,
-                          title: "UDID ermitteln",
-                          detail: device.udid?.maskedUDID ?? String(localized: "Wird zum Signieren gebraucht.")) {
-                    sheet = .udid
-                }
+                // Die Kopplung liefert die UDID mit; den Weg über das Safari-Profil braucht es nur ohne Kopplung.
                 setupStep(done: device.isPaired,
                           title: "Gerät koppeln",
-                          detail: String(localized: "Einmalig, ohne Computer. Braucht den Entwicklermodus.")) {
+                          detail: String(localized: "Einmalig, ohne Computer. Liefert auch die UDID.")) {
                     sheet = .pairing
+                }
+                if !device.isPaired && device.udid == nil {
+                    Button("UDID ohne Kopplung ermitteln", systemImage: "number") { sheet = .udid }
+                        .font(.footnote)
                 }
                 if device.isPaired {
                     setupStep(done: device.isReady,

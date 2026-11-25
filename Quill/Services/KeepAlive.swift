@@ -11,12 +11,18 @@ final class KeepAlive {
     private var player: AVAudioPlayer?
     private var users = 0
 
+    var isPlaying: Bool { player?.isPlaying ?? false }
+
     func begin() {
         users += 1
         guard player == nil else { return }
         let session = AVAudioSession.sharedInstance()
-        try? session.setCategory(.playback, options: [.mixWithOthers])
-        try? session.setActive(true)
+        do {
+            try session.setCategory(.playback, options: [.mixWithOthers])
+            try session.setActive(true)
+        } catch {
+            UDIDLog.write("Audio-Sitzung nicht aktiv: \(error.localizedDescription)")
+        }
         let player = try? AVAudioPlayer(data: Self.silence)
         player?.numberOfLoops = -1
         player?.volume = 0

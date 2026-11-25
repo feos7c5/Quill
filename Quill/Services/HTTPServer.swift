@@ -53,6 +53,8 @@ final class HTTPServer {
     private var listener: NWListener?
     /// Meldet Zustandswechsel des Servers (z. B. „ready“, „failed: …“), für Protokolle.
     var onState: (@Sendable (String) -> Void)?
+    /// Diagnose auf Verbindungsebene: auch Verbindungen, aus denen keine gültige Anfrage wird.
+    var onTrace: (@Sendable (String) -> Void)?
 
     init(port: UInt16, identity: SecIdentity? = nil, loopbackOnly: Bool = false, handler: @escaping Handler) {
         self.port = port
@@ -80,8 +82,10 @@ final class HTTPServer {
         let listener = try NWListener(using: parameters, on: nwPort)
         let handler = self.handler
         let queue = self.queue
+        let trace = self.onTrace
         listener.newConnectionHandler = { connection in
-            HTTPConnection(connection: connection, queue: queue, handler: handler).start()
+            trace?("Verbindung von \(connection.endpoint)")
+            HTTPConnection(connection: connection, queue: queue, handler: handler, trace: trace).start()
         }
         let onState = self.onState
         listener.stateUpdateHandler = { state in
@@ -108,6 +112,7 @@ private final class HTTPConnection {
     private let connection: NWConnection
     private let queue: DispatchQueue
     private let handler: HTTPServer.Handler
+    private let trace: (@Sendable (String) -> Void)?
 
     private var buffer = Data()
     private var bodyFile: URL?
@@ -118,10 +123,12 @@ private final class HTTPConnection {
     private static let maxHeaderSize = 64 * 1024
     private static let chunkSize = 256 * 1024
 
-    init(connection: NWConnection, queue: DispatchQueue, handler: @escaping HTTPServer.Handler) {
+    init(connection: NWConnection, queue: DispatchQueue, handler: @escaping HTTPServer.Handler,
+         trace: (@Sendable (String) -> Void)? = nil) {
         self.connection = connection
         self.queue = queue
         self.handler = handler
+        self.trace = trace
     }
 
     func start() {
@@ -138,6 +145,9 @@ private final class HTTPConnection {
                 self.buffer = Data()
                 self.handleHead(head, rest: rest)
             } else if error != nil || isComplete || self.buffer.count > Self.maxHeaderSize {
+                // 0x16 am Anfang wäre ein TLS-Handshake, also ein HTTPS-Versuch auf dem HTTP-Port.
+                let start = self.buffer.prefix(16).map { String(format: "%02x", $0) }.joined(separator: " ")
+                self.trace?("Verbindung ohne gültige Anfrage beendet · \(self.buffer.count) Bytes [\(start)] · \(error.map { "\($0)" } ?? "vom Gegenüber geschlossen")")
                 self.close()
             } else {
                 self.receiveHeader()

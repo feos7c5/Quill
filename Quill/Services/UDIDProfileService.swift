@@ -25,6 +25,7 @@ final class UDIDProfileService {
     @ObservationIgnored private var timeout: Task<Void, Never>?
     @ObservationIgnored private var keepingAlive = false
     @ObservationIgnored var onReceived: ((String) -> Void)?
+    @ObservationIgnored private var lifecycle: [NSObjectProtocol] = []
 
     /// Bevorzugte Ports; ist einer belegt (z. B. von einer anderen App), nimmt Quill den nächsten.
     private nonisolated static let ports: [UInt16] = [8765, 8766, 8767, 8768]
@@ -48,6 +49,7 @@ final class UDIDProfileService {
                                             Task { @MainActor in self?.finish(result) }
                                         })
                 server.onState = { state in UDIDLog.write("Server \(port): \(state)") }
+                server.onTrace = { line in UDIDLog.write(line) }
                 try server.start()
                 started = (server, port)
                 break
@@ -65,6 +67,8 @@ final class UDIDProfileService {
         background = BackgroundTime(name: "Quill-UDID")
         KeepAlive.shared.begin()
         keepingAlive = true
+        UDIDLog.write("Wachhalten: \(KeepAlive.shared.isPlaying ? "aktiv" : "NICHT aktiv")")
+        observeLifecycle()
         timeout = Task { [weak self] in
             try? await Task.sleep(for: .seconds(Self.waitSeconds))
             guard !Task.isCancelled else { return }
@@ -85,7 +89,27 @@ final class UDIDProfileService {
         phase = .idle
     }
 
+    /// Protokolliert, ob Quill im Hintergrund wach bleibt, solange Safari und Einstellungen offen sind.
+    private func observeLifecycle() {
+        let center = NotificationCenter.default
+        let events: [(Notification.Name, String)] = [
+            (UIApplication.didEnterBackgroundNotification, "Quill im Hintergrund"),
+            (UIApplication.willEnterForegroundNotification, "Quill wieder im Vordergrund"),
+        ]
+        lifecycle = events.map { name, text in
+            center.addObserver(forName: name, object: nil, queue: .main) { _ in
+                MainActor.assumeIsolated {
+                    let rest = UIApplication.shared.backgroundTimeRemaining
+                    let restText = rest > 10_000 ? "unbegrenzt" : "\(Int(rest)) s"
+                    UDIDLog.write("\(text) · Wachhalten \(KeepAlive.shared.isPlaying ? "aktiv" : "NICHT aktiv") · Restzeit \(restText)")
+                }
+            }
+        }
+    }
+
     func stop() {
+        lifecycle.forEach(NotificationCenter.default.removeObserver)
+        lifecycle = []
         server?.stop()
         server = nil
         timeout?.cancel()
@@ -226,7 +250,8 @@ final class UDIDProfileService {
         let plist: [String: Any] = [
             "PayloadContent": [
                 "URL": callbackURL,
-                "DeviceAttributes": ["UDID", "PRODUCT", "VERSION", "DEVICE_NAME"],
+                // DEVICE_NAME ist seit iOS 16 eingeschränkt und kann die Installation scheitern lassen.
+                "DeviceAttributes": ["UDID", "PRODUCT", "VERSION", "SERIAL"],
             ],
             "PayloadOrganization": "Quill",
             "PayloadDisplayName": String(localized: "Quill – UDID ermitteln"),

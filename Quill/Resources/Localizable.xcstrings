@@ -5751,6 +5751,40 @@
         }
       }
     },
+    "Einmalig, ohne Computer. Liefert auch die UDID.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "One time, no computer. Also provides the UDID."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Une seule fois, sans ordinateur. Fournit aussi l'UDID."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Una sola vez, sin ordenador. También proporciona el UDID."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Una sola volta, senza computer. Fornisce anche l'UDID."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tek seferlik, bilgisayarsız. UDID'yi de sağlar."
+          }
+        }
+      }
+    },
     "Einrichten (einmal)": {
       "localizations": {
         "en": {
@@ -14241,6 +14275,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "UDID'yi Algıla"
+          }
+        }
+      }
+    },
+    "UDID ohne Kopplung ermitteln": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Detect UDID Without Pairing"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Détecter l'UDID sans jumelage"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Detectar UDID sin emparejar"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Rileva UDID senza abbinamento"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eşlemeden UDID'yi algıla"
           }
         }
       }

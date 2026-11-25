@@ -1,7 +1,7 @@
 #!/bin/sh
-# Baut den Rust-Kern für iPhone (und Simulator) und verpackt ihn als Vendor/QuillCore.xcframework.
-# Voraussetzungen: Xcode, Rust (rustup). Läuft nur auf macOS.
-# QUILL_DEVICE_ONLY=1 baut nur für das iPhone (schneller, z. B. im CI).
+# Builds the Rust core for iPhone (and simulator) and packages it as Vendor/QuillCore.xcframework.
+# Requires Xcode and Rust (rustup). macOS only.
+# QUILL_DEVICE_ONLY=1 builds for the device only (faster, e.g. in CI).
 set -eu
 cd "$(dirname "$0")/../QuillCore"
 
@@ -18,4 +18,4 @@ fi
 OUT=../Vendor/QuillCore.xcframework
 rm -rf "$OUT"
 xcodebuild -create-xcframework "$@" -output "$OUT"
-echo "Fertig: $OUT"
+echo "Done: $OUT"

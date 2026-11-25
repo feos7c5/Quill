@@ -1,5 +1,5 @@
 #!/bin/sh
-# Einmalig auf dem Mac ausführen: holt die Signier-Engine, baut den Rust-Kern und erzeugt das Xcode-Projekt.
+# Run once on a Mac: fetches the signing engine, builds the Rust core and generates the Xcode project.
 set -e
 cd "$(dirname "$0")"
 
@@ -13,17 +13,17 @@ fi
 
 if [ ! -d Vendor/QuillCore.xcframework ] || [ "${REBUILD_CORE:-0}" = "1" ]; then
   if ! command -v cargo >/dev/null 2>&1; then
-    echo "Rust fehlt. Installation: curl https://sh.rustup.rs -sSf | sh"
+    echo "Rust is missing. Install: curl https://sh.rustup.rs -sSf | sh"
     exit 1
   fi
   ./scripts/build-core.sh
 fi
 
 if ! command -v xcodegen >/dev/null 2>&1; then
-  echo "XcodeGen fehlt. Installation: brew install xcodegen"
+  echo "XcodeGen is missing. Install: brew install xcodegen"
   exit 1
 fi
 
 xcodegen generate
-echo "Fertig. Quill.xcodeproj öffnen, unter Signing & Capabilities das eigene Team wählen."
-echo "Nach Änderungen am Rust-Kern: REBUILD_CORE=1 ./setup.sh"
+echo "Done. Open Quill.xcodeproj and pick your team under Signing & Capabilities."
+echo "After changing the Rust core: REBUILD_CORE=1 ./setup.sh"

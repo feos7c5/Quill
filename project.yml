@@ -7,7 +7,7 @@ options:
   developmentLanguage: de
 
 packages:
-  # Lokales Paket (wird von setup.sh nach Vendor/Zsign geklont, MIT-Lizenz).
+  # Local package (cloned to Vendor/Zsign by setup.sh, MIT license).
   Zsign:
     path: Vendor/Zsign
   ZIPFoundation:
@@ -34,21 +34,21 @@ targets:
         product: Zsign
       - package: ZIPFoundation
         product: ZIPFoundation
-      # Rust-Kern (statische Bibliothek), gebaut von scripts/build-core.sh.
+      # Rust core (static library), built by scripts/build-core.sh.
       - framework: Vendor/QuillCore.xcframework
         embed: false
-      # Vom Rust-Kern gebraucht; statische Bibliotheken bringen ihre Framework-Abhängigkeiten nicht mit.
+      # Needed by the Rust core; static libraries do not carry their framework dependencies.
       - sdk: SystemConfiguration.framework
       - sdk: Security.framework
       - sdk: CoreFoundation.framework
-      # Widget und Steuerzentrale
+      # Widget and Control Center
       - target: QuillWidget
     entitlements:
       path: Quill/Resources/Quill.entitlements
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.example.quill
-        # Gemeinsamer Container für Widget-Daten. Bei eigener Bundle-ID mit anpassen.
+        # Shared container for widget data. Adjust together with your bundle ID.
         APP_GROUP: group.com.example.quill
         MARKETING_VERSION: "1.0.0"
         CURRENT_PROJECT_VERSION: "1"

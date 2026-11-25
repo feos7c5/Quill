@@ -1,148 +1,97 @@
 # Quill
 
-SwiftUI-App zum Signieren und Installieren von IPAs direkt auf dem iPhone – mit eigenem
-Zertifikat oder mit der Apple-ID, ohne Rechner. Ab **iOS 27**; ältere Versionen werden
-nicht unterstützt.
+Sign and install IPAs directly on the iPhone, with your own certificate or your Apple ID, no computer required. Requires **iOS 27**.
 
-## Stand
+## Status
 
-| Teil | Zustand |
+| Part | State |
 | --- | --- |
-| Rust-Kern `QuillCore` | baut ohne Warnungen (auch Clippy), 10 Tests grün, C-Schnittstelle aus C und Swift aufgerufen |
-| Swift-Brücke (`Core.swift`, `AppleAccountService`, `DeviceLink`) | Typprüfung gegen den echten Header bestanden (Linux-Swift mit Platzhaltern für UIKit) |
-| Übrige Swift-Dateien | Syntaxprüfung bestanden, **noch nie mit Xcode kompiliert** |
-| Auf dem Gerät | **ungetestet** |
+| Rust core `QuillCore` | builds without warnings, 10 unit tests pass |
+| App and widget | build in CI with Xcode 27, no warnings in project code |
+| On-device behaviour | early testing; pairing, sign-in and installation are not yet verified end to end |
 
-Beim ersten Build in Xcode ist mit einzelnen Compilerfehlern zu rechnen, vor allem in den
-SwiftUI-Ansichten und bei SwiftData.
+## Download
 
-## Bauen
+Every push to `main` builds an unsigned IPA and publishes it as the `latest` release:
+**Releases → Latest build → Quill.ipa**. Sign it with your own account before installing.
 
-Voraussetzungen: macOS mit Xcode 26 oder neuer (iOS-27-SDK), Homebrew, Rust (rustup).
+## Build locally
+
+Requirements: macOS with Xcode 27, Homebrew, Rust (rustup).
 
 ```sh
 brew install xcodegen
-curl https://sh.rustup.rs -sSf | sh   # falls Rust fehlt
-./setup.sh                             # Zsign holen, Rust-Kern bauen, Projekt erzeugen
+./setup.sh            # fetches Zsign, builds the Rust core, generates the project
 open Quill.xcodeproj
 ```
 
-`setup.sh` ruft `scripts/build-core.sh` auf; das baut `QuillCore` für iPhone und
-Simulator und legt `Vendor/QuillCore.xcframework` an. Nach Änderungen am Rust-Kern:
-`REBUILD_CORE=1 ./setup.sh`.
+After changing the Rust core run `REBUILD_CORE=1 ./setup.sh`. In Xcode, pick your team under *Signing & Capabilities* and adjust the bundle ID (`com.example.quill`) and app group.
 
-In Xcode unter *Signing & Capabilities* das eigene Team wählen und die Bundle-ID
-(`com.example.quill`) anpassen.
+## Setup on the iPhone
 
-## Einrichtung auf dem iPhone
+1. Turn on **Developer Mode** (Settings → Privacy & Security).
+2. Install **LocalDevVPN** from the App Store. Quill reaches the device services through it at `10.7.0.1:49152`.
+3. In Quill choose **Koppeln ohne Computer**, then pick Quill in Settings → Privacy & Security → Developer Mode and enter the code Quill shows.
+4. Connect LocalDevVPN. The status row shows the device as paired.
+5. Sign in with your Apple ID, or import a `.p12` with a matching profile.
 
-1. **Entwicklermodus** einschalten (Einstellungen → Datenschutz & Sicherheit).
-2. **LocalDevVPN** aus dem App Store installieren. Darüber erreicht Quill die
-   Gerätedienste des eigenen iPhones unter `10.7.0.1:49152`.
-3. In Quill **Wireless Pair** starten, in Einstellungen → Datenschutz & Sicherheit →
-   Entwicklermodus „Quill auf …“ wählen und den angezeigten Code eingeben. Zügig
-   zurückkehren: Im Hintergrund hat Quill nur begrenzt Zeit.
-4. LocalDevVPN verbinden. Die Statuszeile zeigt „Gekoppelt ✓ • Dev Mode ✓“.
-5. Entweder **mit Apple-ID anmelden** oder ein **.p12 mit Profil importieren**.
+## Features
 
-## Funktionen
-
-| Bereich | Inhalt |
+| Area | What it does |
 | --- | --- |
-| Signer (Start) | Statuszeile, UDID erkennen/kopieren, Pick & Sign aus Dateien, Sign & Install von URL, LiveContainer-Assistent, Protokoll |
-| Installierte Apps | Restlaufzeit mit Ampel, Refresh (Daten bleiben), Refresh All, Entfernen, Erinnerung 24 h vor Ablauf, Hintergrund-Refresh als Versuch |
-| Apple-Account | Anmeldung mit 2FA (Code, SMS, Geräte), Team, Gerät registrieren, App-IDs mit Kontingent, Zertifikat und Profile automatisch, „+RAM“, Zertifikate bei Apple widerrufen |
-| Kopplung | Wireless Pair ohne Rechner (iOS 27), Import einer Remote-Pairing-Datei, `quill://pairing?data=…` mit Bestätigung |
-| Zertifikat | Import .p12 / .mobileprovision / .cer / .zip mit automatischer Zuordnung, Export .p12 (Face ID, neues Passwort, optional mit Profilen als .zip), CSR erzeugen, Reset, Widerrufsprüfung (OCSP) |
-| Signieren | Name, Bundle-ID (Erweiterungen ziehen mit), Version, Icon, Mindest-iOS; Erweiterungen/Watch-App/Gerätebeschränkung/URL-Schemata entfernen; Dateifreigabe; .dylib/.framework einbinden; eigene Entitlements |
-| Kurzbefehle | „Apps erneuern“ (Hintergrund), „Quill öffnen und Apps erneuern“, „Quill-Status“, „Tage bis zum nächsten Ablauf“; Anleitung für die tägliche Automation in der App |
-| Widget | Home-Bildschirm klein/mittel (Resttage, Refresh per Tipp), Sperrbildschirm (rund, rechteckig, Zeile), Steuerzentrale-Schalter „Quill Refresh“ |
-| Ohne Kopplung | UDID per Safari-Profil (wie AirSign), von Hand oder aus Profil; Installation über itms-services, z. B. mit bezahltem Account |
-| Bisher schon | Dateibrowser, Bibliothek, Quellen (AltStore-Format), Downloads, WLAN-Übertragung, Installation per `itms-services` als Rückfall ohne Kopplung |
+| Sign & install | Pick an IPA or load one from a URL; signs and installs in one step with progress and log |
+| Installed apps | Remaining days, refresh (keeps data), refresh all, remove, reminder one day before expiry |
+| Apple account | Sign-in with 2FA, team selection, device registration, app IDs, automatic certificate and profiles |
+| Pairing | On-device pairing (iOS 27), import of a remote pairing file, `quill://pairing?data=…` |
+| UDID | Detected through pairing, a temporary Safari profile, or manual entry |
+| Certificates | Import `.p12` / `.mobileprovision` / `.cer` / `.zip`, export `.p12` behind Face ID, CSR, revocation check |
+| LiveContainer | Downloads the official release, signs it and exports the certificate for JIT-less mode |
+| Automation | App Intents for Shortcuts: refresh apps, status, days until expiry |
+| Widget | Home Screen, Lock Screen and a Control Center button |
+| Other | File browser, app library, AltStore-format sources, Wi-Fi transfer, `itms-services` fallback |
 
-## Automatisch erneuern
+## Automatic refresh
 
-Zuverlässig ist eine persönliche Automation in der Kurzbefehle-App (täglich, „Sofort ausführen“):
+Create a personal automation in Shortcuts (daily, run immediately):
 
-1. „VPN festlegen“ → LocalDevVPN → Verbinden
-2. „Warten“ 3 Sekunden
-3. „Apps erneuern“ (Quill)
-4. optional „VPN festlegen“ → Trennen
+1. *Set VPN* → LocalDevVPN → Connect
+2. *Wait* 3 seconds
+3. *Apps erneuern* (Quill)
+4. optionally *Set VPN* → Disconnect
 
-Voraussetzung: Apple-ID-Passwort für den Refresh gemerkt. Verlangt Apple einen
-Bestätigungscode, bricht die Aktion sofort ab und meldet das, statt zu hängen. Meldet
-die Automation eine Zeitüberschreitung, „Quill öffnen und Apps erneuern“ verwenden.
+The Apple ID password must be saved for refresh. If Apple asks for a verification code, the action stops with a message instead of hanging.
 
-## Widget und App Group
-
-Widget und App teilen Daten über die App Group `group.com.example.quill`
-(Build-Einstellung `APP_GROUP` in `project.yml`, bei eigener Bundle-ID anpassen). Das
-Widget öffnet Quill für den Refresh; die Arbeit läuft in der App, weil nur sie
-Zertifikate und Kopplung hat. Bietet dein Account in Xcode keine App Groups an, die
-Zeile `entitlements:` beider Targets entfernen: Die App läuft dann normal, das Widget
-zeigt nur einen Hinweis. Mit einem kostenlosen Account kostet das Widget eine
-zusätzliche App-ID.
-
-## Aufbau
+## Layout
 
 ```
-QuillCore/          Rust-Kern (staticlib), C-Header in include/
-  src/pairing.rs     iOS 27: Quill als „pairable host“, Code, Pairing-Datei
-  src/device.rs      Remote Pairing → TLS-PSK-Tunnel → RSD → Lockdown, AFC, Installation
-  src/account.rs     Apple-Anmeldung, 2FA, Team, App-IDs, Signieren (isideload)
-  src/crypto.rs      CSR, .p12 bauen/umverschlüsseln/lesen
-Quill/Services      Core (Brücke), DeviceLink + PairingService, AppleAccountService,
-                     IdentityStore, SigningService (Vorbereiten + zsign), SigningPipeline,
-                     RefreshService, LiveContainerService, InstallService (itms-services)
-Quill/App           App-Einstieg, AppServices (gemeinsame Dienste), WidgetPublisher
-Quill/Intents       Kurzbefehle (App Intents)
-Quill/Shared        WidgetSnapshot, auch im Widget-Target
-Quill/Features      Signer-Tab, Apps, Dateien, Quellen, Einstellungen
-QuillWidget/        Widget und Steuerzentrale
+QuillCore/        Rust core (static library), C header in include/
+  src/pairing.rs  pairable host, pairing code, pairing file
+  src/device.rs   remote pairing → TLS-PSK tunnel → RSD → lockdown, AFC, installation
+  src/account.rs  Apple sign-in, 2FA, teams, app IDs, signing (isideload)
+  src/crypto.rs   CSR and PKCS#12 helpers
+Quill/            SwiftUI app (App, Services, Features, Intents, Shared)
+QuillWidget/      widget and Control Center extension
+scripts/          build-core.sh
 ```
 
-Zwei Signierwege, ein Ablauf (`SigningPipeline`):
+## Privacy
 
-- **Apple-Account:** Quill passt die App an, isideload holt Zertifikat, App-IDs und
-  Profile und signiert; installiert wird der `.app`-Ordner als Upgrade.
-- **Eigenes Zertifikat:** Quill passt an, zsign signiert mit .p12 und dem besten
-  passenden Profil (exakte App-ID vor Wildcard, dieses iPhone enthalten).
+Keys, the pairing file and credentials stay on the device (file protection, device-only keychain). During Apple sign-in Quill talks to Apple and to an **anisette server** (default `ani.iloader.app`, configurable in settings) that provides device identifiers an app cannot generate itself. That server sees the IP address, not the password.
 
-## Datenschutz
+## Known limits
 
-Schlüssel, Pairing-Datei und Zugangsdaten bleiben auf dem iPhone (Dateischutz,
-Schlüsselbund „nur dieses Gerät“). Bei der Apple-Anmeldung spricht Quill mit Apple und
-mit einem **Anisette-Server** (Standard `ani.iloader.app`, in den Einstellungen änderbar),
-der Gerätekenndaten liefert, die eine App nicht selbst erzeugen kann. Dieser Server sieht
-die IP-Adresse, nicht das Passwort. Exportierte .p12 landen nie automatisch im
-Dokumente-Ordner, weil die WLAN-Übertragung diesen freigibt.
+- iOS 27 only.
+- LocalDevVPN is required for direct installation.
+- Free Apple IDs: 7 days validity, three active apps, a small weekly app ID quota.
+- Background refresh by iOS is best effort; the Shortcuts automation is the reliable path.
+- While pairing or detecting the UDID, Quill plays silent audio to stay alive in the background.
+- The widget needs an app group; without it the app works and the widget shows a hint.
+- The app UI is German only.
 
-## Bekannte Grenzen
+## Dependencies
 
-- Ab iOS 27; darunter lässt sich Quill nicht installieren.
-- LocalDevVPN ist nötig. Ein eigenes VPN bräuchte eine Berechtigung, die kostenlose
-  Accounts nicht bekommen.
-- Kostenlose Apple-ID: 7 Tage Laufzeit, drei aktive Apps, wenige neue App-IDs pro Woche.
-- Der Hintergrund-Refresh gelingt nur, wenn iOS ihn startet, LocalDevVPN verbunden ist und
-  keine 2FA nötig ist. Verlässlich ist die Erinnerung.
-- Die Kopplung als „pairable host“ ist neu; öffentlich belegt ist sie bisher durch wenige
-  Nutzertests (PhonePair, StikDebug, SideInstaller).
-- „Sample IPA“ aus dem Vorbild fehlt: Es gibt keine geeignete Beispiel-App mit klarer Lizenz.
-- „Detect“ ohne Kopplung nutzt ein temporäres Safari-Profil, das Quill selbst über
-  `http://127.0.0.1:8765` ausliefert. Ungetestet ist, ob iOS 27 diesen Rückweg über HTTP
-  auf dem eigenen Gerät annimmt; sonst bleibt die Eingabe von Hand.
-
-## Bewusst nicht übernommen
-
-- „Permanente Installation“ über die CoreTrust-Lücke
-- Abruf geteilter fremder Enterprise-Zertifikate
-- Werbung und Tracking
-- Code aus SideStore (AGPL) oder SideInstaller (nicht-kommerzielle Lizenz)
-
-## Abhängigkeiten
-
-- [idevice](https://github.com/jkcoxson/idevice) (MIT): Kopplung, Tunnel, Gerätedienste
-- [isideload](https://github.com/nab138/isideload) (MIT): Apple-Account, Entwicklerdienste
-- zsign (MIT) über `khcrysalis/Zsign-Package`, zieht OpenSSL (Apache 2.0)
+- [idevice](https://github.com/jkcoxson/idevice) (MIT): pairing, tunnel, device services
+- [isideload](https://github.com/nab138/isideload) (MIT): Apple account and developer services
+- zsign (MIT) via `khcrysalis/Zsign-Package`, with OpenSSL (Apache 2.0)
 - ZIPFoundation (MIT)
-- Rust-Abhängigkeiten unter MIT/Apache-2.0, siehe `QuillCore/Cargo.lock`
+- Rust crates under MIT/Apache-2.0, see `QuillCore/Cargo.lock`

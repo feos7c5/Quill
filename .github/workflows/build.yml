@@ -12,6 +12,9 @@ concurrency:
   group: build-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: write
+
 jobs:
   ipa:
     runs-on: xcode-27
@@ -78,6 +81,19 @@ jobs:
           name: Quill-ipa
           path: build/Quill.ipa
           if-no-files-found: error
+
+      # Direct .ipa download without a zip wrapper (the Files app fails to unpack artifact zips).
+      - name: Publish IPA as release asset
+        if: github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release delete latest --cleanup-tag --yes || true
+          gh release create latest build/Quill.ipa \
+            --title "Latest build" \
+            --notes "Unsigned IPA built from ${GITHUB_SHA}." \
+            --prerelease \
+            --target "${GITHUB_SHA}"
 
       - name: Upload build log
         if: always()

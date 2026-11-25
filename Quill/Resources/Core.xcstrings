@@ -1,5 +1,5 @@
 {
-  "sourceLanguage": "en",
+  "sourceLanguage": "de",
   "strings": {
     "A free account allows at most three active apps. Remove an app and try again.": {
       "localizations": {
@@ -31,6 +31,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Ücretsiz hesapta en fazla üç uygulama etkin olabilir. Bir uygulamayı kaldırıp yeniden deneyin."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A free account allows at most three active apps. Remove an app and try again."
           }
         }
       }
@@ -66,6 +72,12 @@
             "state": "translated",
             "value": "Apple bir hata bildirdi."
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple reported an error."
+          }
         }
       }
     },
@@ -99,6 +111,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Önce bir ekip seçin."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose a team first."
           }
         }
       }
@@ -134,6 +152,12 @@
             "state": "translated",
             "value": "iPhone'a bağlanılıyor…"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connecting to the iPhone…"
+          }
         }
       }
     },
@@ -167,6 +191,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Geliştirici Modu kapalı. Ayarlar → Gizlilik ve Güvenlik → Geliştirici Modu'ndan açın."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Developer Mode is off. Turn it on in Settings → Privacy & Security → Developer Mode."
           }
         }
       }
@@ -202,6 +232,12 @@
             "state": "translated",
             "value": "Bu kodu Ayarlar'a girin."
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enter this code in Settings."
+          }
         }
       }
     },
@@ -235,6 +271,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Yükleme başarısız oldu."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Installation failed."
           }
         }
       }
@@ -270,6 +312,12 @@
             "state": "translated",
             "value": "Yüklendi."
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Installed."
+          }
         }
       }
     },
@@ -303,6 +351,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Yükleniyor…"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Installing…"
           }
         }
       }
@@ -338,6 +392,12 @@
             "state": "translated",
             "value": "Uygulamadan geçersiz giriş."
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Invalid input from the app."
+          }
         }
       }
     },
@@ -371,6 +431,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Uygulama kimliği kalmadı. Ücretsiz hesaplar haftada yalnızca birkaç yeni uygulama kimliği alır. Uzantıları kaldırın veya daha sonra yeniden deneyin."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No app IDs left. Free accounts get only a few new app IDs per week. Remove extensions or try again later."
           }
         }
       }
@@ -406,6 +472,12 @@
             "state": "translated",
             "value": "Henüz eşleme dosyası yok. Önce bu iPhone'u eşleyin."
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No pairing file yet. Pair this iPhone first."
+          }
         }
       }
     },
@@ -439,6 +511,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Kod bekleyen bir oturum açma işlemi yok."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No sign-in is waiting for a code."
           }
         }
       }
@@ -474,6 +552,12 @@
             "state": "translated",
             "value": "Doğrulama kodu girilmedi."
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No verification code was entered."
+          }
         }
       }
     },
@@ -507,6 +591,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Oturum açılmadı. Apple Kimliğinizle oturum açın."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not signed in. Sign in with your Apple ID."
           }
         }
       }
@@ -542,6 +632,12 @@
             "state": "translated",
             "value": "Eşlendi."
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paired."
+          }
         }
       }
     },
@@ -575,6 +671,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Eşleme iptal edildi."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pairing cancelled."
           }
         }
       }
@@ -610,6 +712,12 @@
             "state": "translated",
             "value": "Eşleme başlatılamadı."
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pairing could not start."
+          }
         }
       }
     },
@@ -643,6 +751,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Eşleme başarısız oldu."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pairing failed."
           }
         }
       }
@@ -678,6 +792,12 @@
             "state": "translated",
             "value": "Eşleme zaten sürüyor."
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pairing is already running."
+          }
         }
       }
     },
@@ -711,6 +831,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Eşleme beş dakika sonra durduruldu. Yeniden başlatın."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pairing stopped after five minutes. Start again."
           }
         }
       }
@@ -746,6 +872,12 @@
             "state": "translated",
             "value": "Sertifika ve uygulama kimlikleri hazırlanıyor…"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preparing certificate and app IDs…"
+          }
         }
       }
     },
@@ -779,6 +911,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Hazır."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ready."
           }
         }
       }
@@ -814,6 +952,12 @@
             "state": "translated",
             "value": "Kayıtlı oturum açma verileri silinemedi."
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saved sign-in data could not be deleted."
+          }
         }
       }
     },
@@ -847,6 +991,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Oturum açma iptal edildi."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign-in was cancelled."
           }
         }
       }
@@ -882,6 +1032,12 @@
             "state": "translated",
             "value": "İmzalandı."
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signed."
+          }
         }
       }
     },
@@ -915,6 +1071,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "İmzalanıyor…"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signing…"
           }
         }
       }
@@ -950,6 +1112,12 @@
             "state": "translated",
             "value": ".p12 dosyası sertifika içermiyor."
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The .p12 file contains no certificate."
+          }
         }
       }
     },
@@ -983,6 +1151,12 @@
           "stringUnit": {
             "state": "translated",
             "value": ".p12 dosyası özel anahtar içermiyor."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The .p12 file contains no private key."
           }
         }
       }
@@ -1018,6 +1192,12 @@
             "state": "translated",
             "value": ".p12 dosyası oluşturulamadı."
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The .p12 file could not be created."
+          }
         }
       }
     },
@@ -1051,6 +1231,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Apple Kimliği veya parola yanlış."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The Apple ID or password is incorrect."
           }
         }
       }
@@ -1086,6 +1272,12 @@
             "state": "translated",
             "value": "Anisette sunucusu beklendiği gibi yanıt vermedi. Ayarlar'daki adresini kontrol edin."
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The anisette server did not respond as expected. Check its address in Settings."
+          }
         }
       }
     },
@@ -1119,6 +1311,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Uygulama kaldırılamadı."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The app could not be removed."
           }
         }
       }
@@ -1154,6 +1352,12 @@
             "state": "translated",
             "value": "iPhone ile bağlantı kurulamadı."
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The connection to the iPhone could not be opened."
+          }
         }
       }
     },
@@ -1187,6 +1391,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Çekirdek başlatılmadı."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The core is not initialized."
           }
         }
       }
@@ -1222,6 +1432,12 @@
             "state": "translated",
             "value": "Veri klasörü kullanılamıyor."
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The data folder cannot be used."
+          }
         }
       }
     },
@@ -1255,6 +1471,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Cihaz adresi geçersiz."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The device address is not valid."
           }
         }
       }
@@ -1290,6 +1512,12 @@
             "state": "translated",
             "value": "Cihaz bilgileri okunamadı."
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The device information could not be read."
+          }
         }
       }
     },
@@ -1323,6 +1551,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Dosya geçerli bir sertifika değil."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The file is not a valid certificate."
           }
         }
       }
@@ -1358,6 +1592,12 @@
             "state": "translated",
             "value": "iPhone'a LocalDevVPN üzerinden ulaşılamıyor. LocalDevVPN'i açın, bağlanın ve yeniden deneyin."
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The iPhone cannot be reached through LocalDevVPN. Open LocalDevVPN, connect and try again."
+          }
         }
       }
     },
@@ -1391,6 +1631,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "iPhone eksiksiz bir eşleme kimliği sağlamadı. Hiçbir şey kaydedilmedi."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The iPhone did not provide a complete pairing identity. Nothing was saved."
           }
         }
       }
@@ -1426,6 +1672,12 @@
             "state": "translated",
             "value": "iPhone beklendiği gibi yanıt vermedi."
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The iPhone did not respond as expected."
+          }
         }
       }
     },
@@ -1459,6 +1711,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "iPhone bu eşlemeyi artık kabul etmiyor. Yeniden eşleyin."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The iPhone no longer accepts this pairing. Pair again."
           }
         }
       }
@@ -1494,6 +1752,12 @@
             "state": "translated",
             "value": "Yükleme hizmetine ulaşılamadı."
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The installation service could not be reached."
+          }
         }
       }
     },
@@ -1527,6 +1791,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Anahtar oluşturulamadı."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The key could not be created."
           }
         }
       }
@@ -1562,6 +1832,12 @@
             "state": "translated",
             "value": "Uygulama listesi okunamadı."
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The list of apps could not be read."
+          }
         }
       }
     },
@@ -1595,6 +1871,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Eşleme için ağ bağlantı noktası açılamadı."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The network port for pairing could not be opened."
           }
         }
       }
@@ -1630,6 +1912,12 @@
             "state": "translated",
             "value": "Eşleme dosyası kaydedilemedi."
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The pairing file could not be saved."
+          }
         }
       }
     },
@@ -1663,6 +1951,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Eşleme dosyası geçersiz."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The pairing file is not valid."
           }
         }
       }
@@ -1698,6 +1992,12 @@
             "state": "translated",
             "value": "Parola yanlış veya .p12 dosyası bozuk."
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The password is wrong or the .p12 file is damaged."
+          }
         }
       }
     },
@@ -1731,6 +2031,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Hazırlama profilinin süresi doldu veya bu cihazı içermiyor."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The provisioning profile has expired or does not include this device."
           }
         }
       }
@@ -1766,6 +2072,12 @@
             "state": "translated",
             "value": "Kayıtlı anahtar bozuk."
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The saved key is damaged."
+          }
         }
       }
     },
@@ -1799,6 +2111,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Oturum açma artık beklemiyor."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The sign-in is no longer waiting."
           }
         }
       }
@@ -1834,6 +2152,12 @@
             "state": "translated",
             "value": "İmza reddedildi. Sertifikayı ve profili kontrol edin."
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The signature was rejected. Check the certificate and profile."
+          }
         }
       }
     },
@@ -1867,6 +2191,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "İmzalı uygulama eksik."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The signed app is missing."
           }
         }
       }
@@ -1902,6 +2232,12 @@
             "state": "translated",
             "value": "Çok fazla geliştirme sertifikası var. Apple'daki Sertifikalar bölümünden birini iptal edip yeniden deneyin."
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "There are too many development certificates. Revoke one under Certificates at Apple and try again."
+          }
         }
       }
     },
@@ -1935,6 +2271,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bu Apple Kimliği kilitli. iforgot.apple.com adresinden kilidini açın."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This Apple ID is locked. Unlock it at iforgot.apple.com."
           }
         }
       }
@@ -1970,6 +2312,12 @@
             "state": "translated",
             "value": "Bu sertifika oluşturulan CSR'ye ait değil."
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This certificate does not belong to the generated CSR."
+          }
         }
       }
     },
@@ -2003,6 +2351,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bu ekip hesapta yok."
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This team does not exist in the account."
           }
         }
       }
@@ -2038,6 +2392,12 @@
             "state": "translated",
             "value": "Aktarılıyor…"
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transferring…"
+          }
         }
       }
     },
@@ -2072,6 +2432,12 @@
             "state": "translated",
             "value": "iPhone'un Ayarlar'da Quill'i seçmesi bekleniyor."
           }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Waiting for the iPhone to select Quill in Settings."
+          }
         }
       }
     },
@@ -2105,6 +2471,12 @@
           "stringUnit": {
             "state": "translated",
             "value": "iPhone bağlandı, eşleniyor…"
+          }
+        },
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone connected, pairing…"
           }
         }
       }

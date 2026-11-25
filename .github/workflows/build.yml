@@ -88,12 +88,19 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release delete latest --cleanup-tag --yes || true
-          gh release create latest build/Quill.ipa \
-            --title "Latest build" \
-            --notes "Unsigned IPA built from ${GITHUB_SHA}." \
-            --prerelease \
-            --target "${GITHUB_SHA}"
+          # Retry: the releases API occasionally answers with HTTP 504.
+          for attempt in 1 2 3; do
+            gh release delete latest --cleanup-tag --yes 2>/dev/null || true
+            if gh release create latest build/Quill.ipa \
+                --title "Latest build" \
+                --notes "Unsigned IPA built from ${GITHUB_SHA}." \
+                --prerelease \
+                --target "${GITHUB_SHA}"; then
+              exit 0
+            fi
+            sleep 15
+          done
+          exit 1
 
       - name: Upload build log
         if: always()

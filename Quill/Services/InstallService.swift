@@ -12,8 +12,8 @@ enum InstallMode: String, CaseIterable, Identifiable {
 
     var label: String {
         switch self {
-        case .localTLS: return "Lokal (eigenes TLS-Zertifikat)"
-        case .manifestService: return "Manifest-Dienst"
+        case .localTLS: return String(localized: "Lokal (eigenes TLS-Zertifikat)")
+        case .manifestService: return String(localized: "Manifest-Dienst")
         }
     }
 }

@@ -110,7 +110,7 @@ struct SourcesView: View {
         Task {
             do {
                 let feed = try await SourceService.fetch(url)
-                context.insert(AppSource(name: feed.name ?? url.host ?? "Quelle", urlString: url.absoluteString))
+                context.insert(AppSource(name: feed.name ?? url.host ?? String(localized: "Quelle"), urlString: url.absoluteString))
                 try context.save()
             } catch {
                 errorText = error.localizedDescription
@@ -220,7 +220,7 @@ struct DownloadsView: View {
                             .font(.caption)
                             .foregroundStyle(.green)
                     case .failed(let reason):
-                        Label(reason, systemImage: "xmark.octagon.fill")
+                        Label(reason, systemImage: "exclamationmark.triangle.fill")
                             .font(.caption)
                             .foregroundStyle(.red)
                     }

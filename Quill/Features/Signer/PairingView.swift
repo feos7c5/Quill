@@ -112,7 +112,7 @@ struct PairingView: View {
                 }
             }
         case .failed(let message):
-            Label(message, systemImage: "xmark.octagon.fill").foregroundStyle(.red)
+            Label(message, systemImage: "exclamationmark.triangle.fill").foregroundStyle(.red)
         }
     }
 

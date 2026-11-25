@@ -68,7 +68,7 @@ final class SigningPipeline {
             return try await perform(input, context: context)
         } catch {
             failed = true
-            status = "Fehlgeschlagen: \(error.localizedDescription)"
+            status = String(localized: "Fehlgeschlagen: \(error.localizedDescription)")
             log.append(status)
             throw error
         }
@@ -78,7 +78,7 @@ final class SigningPipeline {
         let logger: SigningService.Log = { [weak self] line in Task { @MainActor in self?.append(line) } }
         let isLiveContainer = input.source.bundleID == Self.liveContainerBundleID
 
-        step(0.05, "Bereite App vor …")
+        step(0.05, String(localized: "Bereite App vor …"))
         let prepared = try await SigningService.prepare(
             PrepareRequest(ipaURL: input.source.ipaURL, options: input.options, libraries: input.libraries, iconData: input.iconData),
             log: logger
@@ -99,11 +99,11 @@ final class SigningPipeline {
                 throw AppError("Nicht mit der Apple-ID angemeldet oder kein Team gewählt.")
             }
             guard let udid = device.udid else {
-                throw AppError("Quill kennt die UDID dieses iPhones noch nicht. Über „Koppeln ohne Computer“ koppeln oder die UDID unter „Detect“ von Hand eintragen.")
+                throw AppError("Quill kennt die UDID dieses iPhones noch nicht. Im Tab „Signieren“ unter „UDID ermitteln“ automatisch erkennen lassen oder von Hand eintragen.")
             }
-            step(0.15, "Registriere Gerät …")
+            step(0.15, String(localized: "Registriere Gerät …"))
             try await account.registerDevice(udid: udid, name: device.deviceName)
-            step(0.2, "Signiere mit Apple-Account …")
+            step(0.2, String(localized: "Signiere mit Apple-Account …"))
             let result = try await account.sign(appURL: prepared.appURL, options: input.options) { [weak self] fraction, message in
                 Task { @MainActor in self?.step(0.2 + 0.4 * fraction, message) }
             }
@@ -112,7 +112,7 @@ final class SigningPipeline {
             expiration = profile.expirationDate
             teamID = account.team?.id ?? profile.teamID
             bundleID = result.bundleId ?? prepared.bundleID
-            certificateName = "Apple-Account (\(account.team?.displayName ?? teamID))"
+            certificateName = String(localized: "Apple-Account (\(account.team?.displayName ?? teamID))")
             identityID = nil
             signedIPA = try await SigningService.packInBackground(signedApp, log: logger)
             // Ordner statt IPA installieren: idevice installiert Ordner als Upgrade, die Daten bleiben.
@@ -129,7 +129,7 @@ final class SigningPipeline {
             if isLiveContainer, entitlements == nil {
                 entitlements = try Self.liveContainerEntitlements(profile: profile)
             }
-            step(0.2, "Signiere mit „\(identity.name)“ …")
+            step(0.2, String(localized: "Signiere mit „\(identity.name)“ …"))
             signedIPA = try await SigningService.signWithIdentity(
                 prepared, p12URL: identity.p12URL, password: identity.password, profileURL: profile.fileURL,
                 entitlementsURL: entitlements, removeProvision: input.options.excludeProvisioningProfile, log: logger
@@ -142,12 +142,12 @@ final class SigningPipeline {
             installTarget = signedIPA
         }
 
-        step(0.62, "Lege signierte App ab …")
+        step(0.62, String(localized: "Lege signierte App ab …"))
         let signed = try await AppLibrary.importIPA(from: signedIPA, signed: true, certificateName: certificateName,
                                                    move: true, context: context)
         removeOlderSignedCopies(of: signed, context: context)
         guard input.install else {
-            step(1, "Signiert.")
+            step(1, String(localized: "Signiert."))
             return SigningOutcome(signed: signed, installed: nil)
         }
 
@@ -158,7 +158,7 @@ final class SigningPipeline {
         } else if ota.isConfigured {
             // Ohne Kopplung über itms-services. Klappt, wenn dieses iPhone im Profil registriert ist;
             // beim bezahlten Account erledigt das Quill selbst über die UDID.
-            step(0.9, "Übergebe an iOS …")
+            step(0.9, String(localized: "Übergebe an iOS …"))
             try ota.install(ipaURL: signed.ipaURL, bundleID: bundleID, version: signed.version, title: signed.name)
         } else {
             throw AppError("Zum Installieren entweder über „Koppeln ohne Computer“ koppeln oder unter Einstellungen → „Installation ohne Kopplung“ einrichten. Die signierte IPA liegt in der Bibliothek.")
@@ -171,7 +171,7 @@ final class SigningPipeline {
         )
         RefreshService.scheduleReminder(for: installed)
         WidgetPublisher.publish()
-        step(1, "Installiert.")
+        step(1, String(localized: "Installiert."))
         return SigningOutcome(signed: signed, installed: installed)
     }
 
@@ -187,7 +187,7 @@ final class SigningPipeline {
         case .account:
             await account.restoreIfPossible(interactive: interactive)
             guard account.isReady else {
-                throw AppError(account.lastError ?? "Zum Erneuern bitte mit der Apple-ID anmelden.")
+                throw AppError(verbatim: account.lastError ?? String(localized: "Zum Erneuern bitte mit der Apple-ID anmelden."))
             }
             method = .account
         case .identity:

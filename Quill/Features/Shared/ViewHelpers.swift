@@ -2,7 +2,7 @@ import SwiftUI
 
 extension View {
     /// Fehlermeldung als Standard-Alert. Der Text bleibt beim Ausblenden sichtbar.
-    func messageAlert(_ title: String = "Fehler", message: Binding<String?>) -> some View {
+    func messageAlert(_ title: LocalizedStringKey = "Fehler", message: Binding<String?>) -> some View {
         alert(title,
               isPresented: Binding(get: { message.wrappedValue != nil }, set: { if !$0 { message.wrappedValue = nil } }),
               presenting: message.wrappedValue) { _ in
@@ -27,7 +27,7 @@ extension View {
 /// Nummerierter Schritt in einer Anleitung.
 struct StepRow: View {
     let number: Int
-    let text: String
+    let text: LocalizedStringKey
 
     var body: some View {
         Label {

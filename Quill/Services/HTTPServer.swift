@@ -51,6 +51,8 @@ final class HTTPServer {
     private let handler: Handler
     private let queue = DispatchQueue(label: "quill.http-server")
     private var listener: NWListener?
+    /// Meldet Zustandswechsel des Servers (z. B. „ready“, „failed: …“), für Protokolle.
+    var onState: (@Sendable (String) -> Void)?
 
     init(port: UInt16, identity: SecIdentity? = nil, loopbackOnly: Bool = false, handler: @escaping Handler) {
         self.port = port
@@ -73,13 +75,23 @@ final class HTTPServer {
             parameters.requiredInterfaceType = .loopback
         }
         guard let nwPort = NWEndpoint.Port(rawValue: port) else {
-            throw AppError("Ungültiger Port \(port).")
+            throw AppError("Ungültiger Port \(Int(port)).")
         }
         let listener = try NWListener(using: parameters, on: nwPort)
         let handler = self.handler
         let queue = self.queue
         listener.newConnectionHandler = { connection in
             HTTPConnection(connection: connection, queue: queue, handler: handler).start()
+        }
+        let onState = self.onState
+        listener.stateUpdateHandler = { state in
+            switch state {
+            case .ready: onState?("ready")
+            case .failed(let error): onState?("failed: \(error)")
+            case .waiting(let error): onState?("waiting: \(error)")
+            case .cancelled: onState?("cancelled")
+            default: break
+            }
         }
         listener.start(queue: queue)
         self.listener = listener

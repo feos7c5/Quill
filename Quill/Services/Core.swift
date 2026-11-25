@@ -39,23 +39,31 @@ enum Core {
         do {
             return try JSONDecoder.core.decode(T.self, from: data)
         } catch {
-            throw Failure(message: "Unerwartete Antwort des Kerns: \(error.localizedDescription)")
+            throw Failure(message: String(localized: "Unerwartete Antwort des Kerns: \(error.localizedDescription)"))
         }
     }
 
     /// Gibt den Zeiger frei und liefert `data` als JSON-Bytes.
     private static func decodeRaw(_ pointer: UnsafeMutablePointer<CChar>?) throws -> Data {
-        guard let pointer else { throw Failure(message: "Der Kern hat nicht geantwortet.") }
+        guard let pointer else { throw Failure(message: String(localized: "Der Kern hat nicht geantwortet.")) }
         defer { sc_string_free(pointer) }
         let text = Data(String(cString: pointer).utf8)
         guard let object = try JSONSerialization.jsonObject(with: text) as? [String: Any] else {
-            throw Failure(message: "Unlesbare Antwort des Kerns.")
+            throw Failure(message: String(localized: "Unlesbare Antwort des Kerns."))
         }
         if object["ok"] as? Bool != true {
-            throw Failure(message: object["error"] as? String ?? "Unbekannter Fehler im Kern.")
+            let message = object["error"] as? String ?? "Unknown error."
+            throw Failure(message: localized(message, detail: object["detail"] as? String))
         }
         let payload = object["data"] ?? NSNull()
         return try JSONSerialization.data(withJSONObject: payload, options: [.fragmentsAllowed])
+    }
+
+    /// Meldungen des Kerns sind feste englische Sätze; die Übersetzung steht in `Core.xcstrings`.
+    static func localized(_ message: String, detail: String? = nil) -> String {
+        let text = Bundle.main.localizedString(forKey: message, value: message, table: "Core")
+        guard let detail, !detail.isEmpty else { return text }
+        return "\(text) (\(detail))"
     }
 
     struct Ignored: Decodable, Sendable {
@@ -87,7 +95,7 @@ final class CoreProgress: @unchecked Sendable {
     static let callback: sc_progress_cb = { context, fraction, message in
         guard let context else { return }
         let box = Unmanaged<CoreProgress>.fromOpaque(context).takeUnretainedValue()
-        box.handler(fraction, message.map { String(cString: $0) } ?? "")
+        box.handler(fraction, message.map { Core.localized(String(cString: $0)) } ?? "")
     }
 }
 
@@ -108,6 +116,7 @@ struct PairSnapshot: Decodable, Sendable {
     }
     let phase: String
     let message: String
+    let detail: String?
     let pin: String?
     let peer: Peer?
     let running: Bool

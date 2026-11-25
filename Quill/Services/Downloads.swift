@@ -66,7 +66,7 @@ final class DownloadManager: NSObject, URLSessionDownloadDelegate {
 
     func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
         if let http = downloadTask.response as? HTTPURLResponse, !(200..<300).contains(http.statusCode) {
-            update(downloadTask.taskIdentifier) { $0.state = .failed("Server antwortet mit Status \(http.statusCode)") }
+            update(downloadTask.taskIdentifier) { $0.state = .failed(String(localized: "Server antwortet mit Status \(http.statusCode)")) }
             return
         }
         var name = downloadTask.response?.suggestedFilename ?? downloadTask.originalRequest?.url?.lastPathComponent ?? "Download"

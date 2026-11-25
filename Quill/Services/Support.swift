@@ -112,10 +112,17 @@ enum Keychain {
     }
 }
 
+/// Fehler mit lesbarer Meldung. Literale werden über den Sprachkatalog übersetzt.
 struct AppError: LocalizedError {
     let message: String
-    init(_ message: String) { self.message = message }
+    init(_ message: LocalizedStringResource) { self.message = String(localized: message) }
+    init(verbatim message: String) { self.message = message }
     var errorDescription: String? { message }
+}
+
+/// „noch 3 Tage“ mit richtiger Einzahl/Mehrzahl in jeder Sprache.
+func daysLeftText(_ days: Int) -> String {
+    String(localized: "noch \(days) Tage")
 }
 
 extension Int64 {

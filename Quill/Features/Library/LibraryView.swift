@@ -126,7 +126,7 @@ struct AppDetailView: View {
     @State private var showSignSheet = false
     @State private var isInstalling = false
     @State private var installProgress = 0.0
-    @State private var installStatus = "Installiere …"
+    @State private var installStatus = String(localized: "Installiere …")
     @State private var didInstall = false
     @State private var libraries: [String]?
     @State private var isLoadingLibraries = false
@@ -231,7 +231,7 @@ struct AppDetailView: View {
         isInstalling = true
         didInstall = false
         installProgress = 0
-        installStatus = "Verbinde …"
+        installStatus = String(localized: "Verbinde …")
         Task {
             defer { isInstalling = false }
             do {

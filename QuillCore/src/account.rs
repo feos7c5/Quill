@@ -26,7 +26,7 @@ use tokio::sync::oneshot;
 
 use crate::device::Progress;
 use crate::storage::FileStorage;
-use crate::{Context, CoreResult};
+use crate::{Context, CoreError, CoreResult};
 
 /// Name, unter dem das Entwicklungszertifikat bei Apple erscheint.
 /// Muss gleich bleiben, sonst findet Quill sein eigenes Zertifikat nicht wieder.
@@ -65,19 +65,28 @@ fn anisette_storage(dir: &std::path::Path) -> FileStorage {
     FileStorage::new(dir.join("anisette"))
 }
 
-fn message(report: impl std::fmt::Display) -> String {
+const NO_CODE: &str = "No verification code was entered.";
+const CANCELLED: &str = "Sign-in was cancelled.";
+
+fn message(report: impl std::fmt::Display) -> CoreError {
     let text = report.to_string();
     let lower = text.to_lowercase();
     if lower.contains("-22406") || lower.contains("incorrect") && lower.contains("password") {
-        return "Apple-ID oder Passwort ist falsch.".into();
+        return CoreError::new("The Apple ID or password is incorrect.");
     }
     if lower.contains("-20209") || lower.contains("locked") {
-        return "Die Apple-ID ist gesperrt. Bitte auf iforgot.apple.com entsperren.".into();
+        return CoreError::new("This Apple ID is locked. Unlock it at iforgot.apple.com.");
+    }
+    if text.contains(NO_CODE) {
+        return CoreError::new(NO_CODE);
+    }
+    if text.contains(CANCELLED) {
+        return CoreError::new(CANCELLED);
     }
     if lower.contains("anisette") {
-        return format!("Der Anisette-Server antwortet nicht wie erwartet. Adresse in den Einstellungen prüfen. ({text})");
+        return CoreError::with("The anisette server did not respond as expected. Check its address in Settings.", text);
     }
-    text
+    CoreError::with("Apple reported an error.", text)
 }
 
 // MARK: - Anmeldung
@@ -117,8 +126,8 @@ pub async fn login(
         async move {
             let answer = tokio::time::timeout(TWO_FACTOR_WAIT, receiver)
                 .await
-                .map_err(|_| report!("Kein Bestätigungscode eingegeben."))?
-                .map_err(|_| report!("Anmeldung abgebrochen."))?;
+                .map_err(|_| report!("{NO_CODE}"))?
+                .map_err(|_| report!("{CANCELLED}"))?;
             parse_two_factor(&answer)
         }
     };
@@ -141,7 +150,7 @@ pub async fn login(
 }
 
 fn parse_two_factor(answer: &str) -> Result<TwoFactorCallbackResponse, Report> {
-    let value: Value = serde_json::from_str(answer).map_err(|e| report!("Ungültige Antwort: {e}"))?;
+    let value: Value = serde_json::from_str(answer).map_err(|e| report!("Invalid response: {e}"))?;
     if let Some(code) = value.get("code").and_then(Value::as_str) {
         return Ok(TwoFactorCallbackResponse::SubmitCode(code.trim().to_string()));
     }
@@ -162,10 +171,10 @@ pub fn two_factor_respond(answer: &str) -> CoreResult<Value> {
         .lock()
         .unwrap_or_else(|p| p.into_inner())
         .take()
-        .ok_or("Es wartet keine Anmeldung auf einen Code.")?;
+        .ok_or(CoreError::new("No sign-in is waiting for a code."))?;
     sender
         .send(answer.to_string())
-        .map_err(|_| "Die Anmeldung wartet nicht mehr.".to_string())?;
+        .map_err(|_| CoreError::new("The sign-in is no longer waiting."))?;
     Ok(json!({ "accepted": true }))
 }
 
@@ -197,13 +206,13 @@ pub async fn status() -> CoreResult<Value> {
 
 pub async fn select_team(team_id: String) -> CoreResult<Value> {
     let mut guard = account().lock().await;
-    let a = guard.as_mut().ok_or("Nicht angemeldet.")?;
+    let a = guard.as_mut().ok_or(CoreError::new("Not signed in. Sign in with your Apple ID."))?;
     let team = a
         .teams
         .iter()
         .find(|t| t.team_id == team_id)
         .cloned()
-        .ok_or("Dieses Team gibt es im Account nicht.")?;
+        .ok_or(CoreError::new("This team does not exist in the account."))?;
     a.team = Some(team);
     Ok(status_of(Some(a)))
 }
@@ -213,8 +222,8 @@ async fn with_team<T>(
     work: impl AsyncFnOnce(&mut Account, DeveloperTeam) -> CoreResult<T>,
 ) -> CoreResult<T> {
     let mut guard = account().lock().await;
-    let a = guard.as_mut().ok_or("Nicht angemeldet. Bitte mit der Apple-ID anmelden.")?;
-    let team = a.team.clone().ok_or("Bitte zuerst ein Team wählen.")?;
+    let a = guard.as_mut().ok_or(CoreError::new("Not signed in. Sign in with your Apple ID."))?;
+    let team = a.team.clone().ok_or(CoreError::new("Choose a team first."))?;
     work(a, team).await
 }
 
@@ -247,7 +256,7 @@ fn default_true() -> bool {
 
 pub async fn sign(app_path: PathBuf, options: SignOptions, progress: &Progress) -> CoreResult<Value> {
     with_team(async |a, team| {
-        progress.report(0.02, "Zertifikat und App-IDs …");
+        progress.report(0.02, "Preparing certificate and app IDs…");
         let behavior = if options.register_extensions {
             ExtensionsBehavior::RegisterAll
         } else {
@@ -271,18 +280,18 @@ pub async fn sign(app_path: PathBuf, options: SignOptions, progress: &Progress) 
                 Some(team),
                 options.increased_memory_limit,
                 Some(|fraction: f32| async move {
-                    progress.report(f64::from(fraction), "Signiere …");
+                    progress.report(f64::from(fraction), "Signing…");
                 }),
                 None,
                 None,
             )
             .await
-            .map_err(|e| explain_sign_error(&message(e)))?;
+            .map_err(|e| explain_sign_error(message(e)))?;
 
         let bundle_id = plist::Value::from_file(signed.join("Info.plist"))
             .ok()
             .and_then(|v| v.as_dictionary().and_then(|d| d.get("CFBundleIdentifier")).and_then(|v| v.as_string()).map(str::to_owned));
-        progress.report(1.0, "Signiert.");
+        progress.report(1.0, "Signed.");
         Ok(json!({
             "app_path": signed.to_string_lossy(),
             "bundle_id": bundle_id,
@@ -292,19 +301,22 @@ pub async fn sign(app_path: PathBuf, options: SignOptions, progress: &Progress) 
     .await
 }
 
-fn explain_sign_error(text: &str) -> String {
+fn explain_sign_error(error: CoreError) -> CoreError {
+    let text = error.detail.clone().unwrap_or_else(|| error.message.clone());
     let lower = text.to_lowercase();
     if lower.contains("not enough available app ids") {
-        return format!(
-            "Das Kontingent an App-IDs ist aufgebraucht. Kostenlose Accounts bekommen nur wenige neue App-IDs pro Woche. Erweiterungen entfernen oder später erneut versuchen. ({text})"
+        return CoreError::with(
+            "No app IDs left. Free accounts get only a few new app IDs per week. Remove extensions or try again later.",
+            text,
         );
     }
     if lower.contains("maximum") && lower.contains("certificate") {
-        return format!(
-            "Es gibt schon zu viele Entwicklungszertifikate. Unter „Zertifikate bei Apple“ eines widerrufen und erneut versuchen. ({text})"
+        return CoreError::with(
+            "There are too many development certificates. Revoke one under Certificates at Apple and try again.",
+            text,
         );
     }
-    text.to_string()
+    error
 }
 
 // MARK: - Übersicht und Verwaltung
@@ -372,7 +384,7 @@ pub async fn export_p12(password: String) -> CoreResult<Value> {
             &MaxCertsBehavior::<MaxCertsCallbackBox>::Error,
         )
         .await
-        .map_err(|e| explain_sign_error(&message(e)))?;
+        .map_err(|e| explain_sign_error(message(e)))?;
         let p12 = identity.as_p12(&password).await.map_err(message)?;
         use base64::Engine as _;
         Ok(json!({
@@ -397,9 +409,9 @@ pub async fn forget() -> CoreResult<Value> {
         *guard = None;
         dir
     };
-    let dir = dir.or_else(crate::data_dir).ok_or("Kern nicht initialisiert.")?;
-    account_storage(&dir).clear().map_err(|e| e.to_string())?;
-    anisette_storage(&dir).clear().map_err(|e| e.to_string())?;
+    let dir = dir.or_else(crate::data_dir).ok_or(CoreError::new("The core is not initialized."))?;
+    account_storage(&dir).clear().map_err(|e| CoreError::with("Saved sign-in data could not be deleted.", e))?;
+    anisette_storage(&dir).clear().map_err(|e| CoreError::with("Saved sign-in data could not be deleted.", e))?;
     Ok(json!({ "logged_in": false }))
 }
 
@@ -425,7 +437,7 @@ mod tests {
     fn calls_without_login_explain() {
         let rt = tokio::runtime::Builder::new_current_thread().enable_all().build().unwrap();
         let error = rt.block_on(app_ids()).unwrap_err();
-        assert!(error.contains("Nicht angemeldet"), "{error}");
+        assert!(error.message.contains("Not signed in"), "{error}");
         assert_eq!(rt.block_on(status()).unwrap()["logged_in"], false);
     }
 }

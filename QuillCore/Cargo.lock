@@ -2126,6 +2126,34 @@ dependencies = [
 ]
 
 [[package]]
+name = "quill-core"
+version = "0.1.0"
+dependencies = [
+ "base64 0.22.1",
+ "hex",
+ "idevice",
+ "isideload",
+ "isideload-p12-keystore",
+ "plist",
+ "rand 0.8.8",
+ "rcgen",
+ "rootcause",
+ "rsa",
+ "rustls",
+ "rustls-pki-types",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "socket2",
+ "tempfile",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+ "uuid",
+ "x509-cert 0.2.5",
+]
+
+[[package]]
 name = "quote"
 version = "1.0.47"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2708,34 +2736,6 @@ checksum = "77549399552de45a898a580c1b41d445bf730df867cc44e6c0233bbc4b8329de"
 dependencies = [
  "digest 0.10.7",
  "rand_core 0.6.4",
-]
-
-[[package]]
-name = "quill-core"
-version = "0.1.0"
-dependencies = [
- "base64 0.22.1",
- "hex",
- "idevice",
- "isideload",
- "isideload-p12-keystore",
- "plist",
- "rand 0.8.8",
- "rcgen",
- "rootcause",
- "rsa",
- "rustls",
- "rustls-pki-types",
- "serde",
- "serde_json",
- "sha2 0.10.9",
- "socket2",
- "tempfile",
- "tokio",
- "tracing",
- "tracing-subscriber",
- "uuid",
- "x509-cert 0.2.5",
 ]
 
 [[package]]

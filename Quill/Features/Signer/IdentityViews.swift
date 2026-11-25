@@ -60,7 +60,7 @@ private struct IdentityRow: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 3) {
             Text(identity.name).font(.headline).lineLimit(1)
-            Text("\(identity.origin.label) · Team \(identity.teamID) · \(profileCount) Profil\(profileCount == 1 ? "" : "e")")
+            Text(verbatim: "\(identity.origin.label) · Team \(identity.teamID) · \(String(localized: "\(profileCount) Profile"))")
                 .font(.caption)
                 .foregroundStyle(.secondary)
             ExpiryLabel(date: identity.expirationDate, revoked: identity.revocationStatus == 1)
@@ -164,10 +164,10 @@ struct IdentityDetailView: View {
 
     private var statusText: String {
         switch identity.revocationStatus {
-        case 0: return "Gültig"
-        case 1: return "Widerrufen"
-        case 2: return "Unbekannt"
-        default: return "Nicht geprüft"
+        case 0: return String(localized: "Gültig")
+        case 1: return String(localized: "Widerrufen")
+        case 2: return String(localized: "Unbekannt")
+        default: return String(localized: "Nicht geprüft")
         }
     }
 
@@ -295,7 +295,7 @@ struct IdentityImportView: View {
         for file in batch.batch.profiles {
             do {
                 let profile = try IdentityStore.importProfile(file.data, context: context)
-                results.append("✓ Profil „\(profile.name)“ (\(profile.bundlePattern))")
+                results.append(String(localized: "✓ Profil „\(profile.name)“ (\(profile.bundlePattern))"))
             } catch {
                 results.append("✗ \(file.name): \(error.localizedDescription)")
             }
@@ -303,7 +303,7 @@ struct IdentityImportView: View {
         for file in batch.batch.certificates {
             do {
                 let identity = try IdentityStore.importCertificate(file.data, context: context)
-                results.append("✓ Zertifikat „\(identity.name)“ aus CSR")
+                results.append(String(localized: "✓ Zertifikat „\(identity.name)“ aus CSR"))
             } catch {
                 results.append("✗ \(file.name): \(error.localizedDescription)")
             }
@@ -321,7 +321,7 @@ struct IdentityImportView: View {
     private func importP12(_ file: ImportBatch.File) {
         do {
             let identity = try IdentityStore.importP12(file.data, password: passwords[file.name] ?? "", context: context)
-            results.append("✓ Zertifikat „\(identity.name)“ (Team \(identity.teamID))")
+            results.append(String(localized: "✓ Zertifikat „\(identity.name)“ (Team \(identity.teamID))"))
             pending.removeAll { $0.name == file.name }
             errors[file.name] = nil
         } catch {
@@ -365,7 +365,7 @@ struct ExportIdentityView: View {
                     Text("Ohne neues Passwort behält die Datei das Passwort, mit dem sie importiert wurde. Für LiveContainer ein Passwort setzen und dort beim Import eingeben.")
                 }
                 if let errorText {
-                    Section { Label(errorText, systemImage: "xmark.octagon.fill").foregroundStyle(.red) }
+                    Section { Label(errorText, systemImage: "exclamationmark.triangle.fill").foregroundStyle(.red) }
                 }
                 Section {
                     if let exported {
@@ -397,7 +397,7 @@ struct ExportIdentityView: View {
         guard let identity else { return }
         errorText = nil
         if !authorized {
-            authorized = await DeviceOwner.authenticate(reason: "Privaten Schlüssel exportieren")
+            authorized = await DeviceOwner.authenticate(reason: String(localized: "Privaten Schlüssel exportieren"))
             guard authorized else {
                 errorText = "Ohne Face ID oder Gerätecode wird nicht exportiert."
                 return
@@ -408,7 +408,7 @@ struct ExportIdentityView: View {
             exported = try IdentityStore.export(identity, password: useNewPassword ? .new(newPassword) : .original, profiles: profiles)
         } catch {
             errorText = useNewPassword
-                ? "\(error.localizedDescription) Ältere .p12 lassen sich teils nicht umverschlüsseln; dann ohne neues Passwort exportieren."
+                ? error.localizedDescription + " " + String(localized: "Ältere .p12 lassen sich teils nicht umverschlüsseln; dann ohne neues Passwort exportieren.")
                 : error.localizedDescription
         }
     }
@@ -439,7 +439,7 @@ struct CSRView: View {
                     Text("Quill erzeugt einen privaten RSA-2048-Schlüssel, der im Schlüsselbund dieses iPhones bleibt, und eine CSR-Datei für Apple.")
                 }
                 if let errorText {
-                    Section { Label(errorText, systemImage: "xmark.octagon.fill").foregroundStyle(.red) }
+                    Section { Label(errorText, systemImage: "exclamationmark.triangle.fill").foregroundStyle(.red) }
                 }
                 if let csrURL {
                     Section("Weiter") {

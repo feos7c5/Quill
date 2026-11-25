@@ -66,7 +66,7 @@ impl SideloadingStorage for FileStorage {
     fn store(&self, key: &str, value: &str) -> Result<(), Report> {
         let _guard = self.lock.lock().unwrap_or_else(|p| p.into_inner());
         write_private(&self.path(key), value.as_bytes())
-            .map_err(|e| report!("Speichern von {key} fehlgeschlagen: {e}"))?;
+            .map_err(|e| report!("Saving {key} failed: {e}"))?;
         Ok(())
     }
 
@@ -76,7 +76,7 @@ impl SideloadingStorage for FileStorage {
             Ok(value) if value.is_empty() => Ok(None),
             Ok(value) => Ok(Some(value)),
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(None),
-            Err(e) => Err(report!("Lesen von {key} fehlgeschlagen: {e}")),
+            Err(e) => Err(report!("Reading {key} failed: {e}")),
         }
     }
 
@@ -85,7 +85,7 @@ impl SideloadingStorage for FileStorage {
         match fs::remove_file(self.path(key)) {
             Ok(()) => Ok(()),
             Err(e) if e.kind() == std::io::ErrorKind::NotFound => Ok(()),
-            Err(e) => Err(report!("Löschen von {key} fehlgeschlagen: {e}")),
+            Err(e) => Err(report!("Deleting {key} failed: {e}")),
         }
     }
 }

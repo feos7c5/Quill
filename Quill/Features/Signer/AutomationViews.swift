@@ -90,13 +90,18 @@ struct UDIDView: View {
                               systemImage: "hourglass")
                             .font(.footnote)
                     case .received(let udid):
-                        Label("Erkannt: \(udid)", systemImage: "checkmark.seal.fill")
+                        Label("Erkannt: \(udid)", systemImage: "checkmark.circle.fill")
                             .font(.footnote)
-                            .foregroundStyle(.green)
+                            .foregroundStyle(.secondary)
                     case .failed(let message):
-                        Label(message, systemImage: "xmark.octagon.fill")
+                        Label(message, systemImage: "exclamationmark.triangle.fill")
                             .font(.footnote)
                             .foregroundStyle(.red)
+                    }
+                    if profileService.phase != .idle {
+                        NavigationLink("Protokoll") {
+                            LogFileView(url: UDIDProfileService.logURL, title: "UDID-Erkennung")
+                        }
                     }
                 } footer: {
                     Text("Das Profil ist temporär: iOS gibt nur die UDID an Quill auf diesem iPhone weiter und installiert nichts dauerhaft. Nichts geht ins Internet.")
@@ -121,7 +126,7 @@ struct UDIDView: View {
                     }
                 }
                 if let errorText {
-                    Section { Label(errorText, systemImage: "xmark.octagon.fill").foregroundStyle(.red) }
+                    Section { Label(errorText, systemImage: "exclamationmark.triangle.fill").foregroundStyle(.red) }
                 }
             }
             .navigationTitle("UDID")

@@ -85,55 +85,98 @@ struct SignerView: View {
 
     private var signerName: String? {
         if account.isReady, let team = account.team {
-            let who = account.status?.name ?? account.email ?? "Apple-ID"
-            return "\(who) · \(team.isFree ? "7 Tage" : "1 Jahr")"
+            let who = account.status?.name ?? account.email ?? String(localized: "Apple-ID")
+            return "\(who) · \(team.isFree ? String(localized: "7 Tage") : String(localized: "1 Jahr"))"
         }
         return identities.first { !$0.isExpired }?.name
     }
 
+    private var isReady: Bool { signerName != nil && device.udid != nil && device.isReady }
+
     private var statusSection: some View {
         Section {
-            let ready = signerName != nil && device.isReady
             Label {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(ready ? "Bereit" : "Einrichtung nötig")
+                    Text(isReady ? "Bereit" : "Einrichtung nötig")
                         .font(.headline)
                     Text(statusDetail)
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
             } icon: {
-                Image(systemName: ready ? "checkmark.seal.fill" : "exclamationmark.circle.fill")
-                    .foregroundStyle(ready ? .green : .orange)
+                Image(systemName: isReady ? "checkmark.seal.fill" : "exclamationmark.circle.fill")
+                    .foregroundStyle(isReady ? .green : .orange)
                     .imageScale(.large)
             }
-            LabeledContent("Signieren mit", value: signerName ?? "Kein Zertifikat")
-            LabeledContent("Gerät") {
-                switch device.state {
-                case .ready: Text("Gekoppelt")
-                case .checking: ProgressView()
-                case .unpaired: Text("Nicht gekoppelt")
-                case .unreachable: Text("Nicht erreichbar")
+            if !isReady {
+                setupStep(done: signerName != nil,
+                          title: "Mit Apple-ID anmelden",
+                          detail: signerName ?? String(localized: "Oder unten unter „Eigene Zertifikate“ ein Zertifikat importieren.")) {
+                    sheet = .login
                 }
-            }
-            if let mode = device.developerMode {
-                LabeledContent("Entwicklermodus", value: mode ? "Ein" : "Aus")
-            }
-        } footer: {
-            if case .unreachable(let reason) = device.state {
-                Text(reason)
+                setupStep(done: device.udid != nil,
+                          title: "UDID ermitteln",
+                          detail: device.udid?.maskedUDID ?? String(localized: "Wird zum Signieren gebraucht.")) {
+                    sheet = .udid
+                }
+                setupStep(done: device.isPaired,
+                          title: "Gerät koppeln",
+                          detail: String(localized: "Einmalig, ohne Computer. Braucht den Entwicklermodus.")) {
+                    sheet = .pairing
+                }
+                if device.isPaired {
+                    setupStep(done: device.isReady,
+                              title: "LocalDevVPN verbinden",
+                              detail: unreachableReason ?? String(localized: "In LocalDevVPN verbinden, dann hier tippen.")) {
+                        Task { await device.refresh() }
+                    }
+                }
+            } else {
+                LabeledContent("Signieren mit", value: signerName ?? "")
+                if let mode = device.developerMode, !mode {
+                    LabeledContent("Entwicklermodus") { Text("Aus").foregroundStyle(.orange) }
+                }
             }
         }
     }
 
-    private var statusDetail: String {
-        if signerName == nil { return "Mit der Apple-ID anmelden oder ein Zertifikat importieren." }
-        switch device.state {
-        case .ready: return "Apps können signiert und installiert werden."
-        case .checking: return "Verbindung wird geprüft …"
-        case .unpaired: return account.isReady ? "Zum Installieren das Gerät koppeln." : "Signieren möglich. Zum direkten Installieren das Gerät koppeln."
-        case .unreachable: return "LocalDevVPN verbinden, dann zum Aktualisieren nach unten ziehen."
+    private var unreachableReason: String? {
+        if case .unreachable(let reason) = device.state { return reason }
+        return nil
+    }
+
+    /// Ein Schritt der Einrichtung: erledigt mit Häkchen, offen als antippbare Zeile.
+    private func setupStep(done: Bool, title: LocalizedStringKey, detail: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            HStack(spacing: 12) {
+                Image(systemName: done ? "checkmark.circle.fill" : "circle")
+                    .foregroundStyle(done ? Color.green : Color.secondary)
+                    .imageScale(.large)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title)
+                        .foregroundStyle(done ? .secondary : .primary)
+                    Text(detail)
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                        .lineLimit(3)
+                }
+                Spacer(minLength: 0)
+                if !done {
+                    Image(systemName: "chevron.forward")
+                        .font(.footnote.weight(.semibold))
+                        .foregroundStyle(.tertiary)
+                }
+            }
+            .contentShape(Rectangle())
         }
+        .buttonStyle(.plain)
+        .disabled(done)
+    }
+
+    private var statusDetail: String {
+        if isReady { return String(localized: "Apps können signiert und installiert werden.") }
+        if device.state == .checking { return String(localized: "Verbindung wird geprüft …") }
+        return String(localized: "Diese Schritte einmal erledigen:")
     }
 
     // MARK: - Signieren

@@ -102,7 +102,7 @@ struct StatusWidgetView: View {
                     .font(.system(size: 40, weight: .bold, design: .rounded))
                     .foregroundStyle(next.expiration.timeIntervalSince(entry.date) > 2 * 86_400 ? Color.primary : color(next))
                     .contentTransition(.numericText())
-                Text("Tage · \(next.name)")
+                Text(next.name)
                     .font(.caption)
                     .lineLimit(1)
             } else {
@@ -185,7 +185,7 @@ struct StatusWidgetView: View {
     @ViewBuilder
     private func inline(_ snapshot: WidgetSnapshot) -> some View {
         if let next = snapshot.nextApp {
-            Text("\(next.name): \(next.daysLeft(at: entry.date)) Tage")
+            Text("\(next.name): \(next.daysLeft(at: entry.date)) T.")
         } else {
             Text("Quill: keine Apps")
         }
@@ -202,7 +202,7 @@ struct StatusWidgetView: View {
 /// Öffnet Quill und startet „Refresh All“. Aus dem Widget heraus öffnet es nur die App;
 /// die Arbeit läuft dort, weil nur die App Zugriff auf Zertifikate und Kopplung hat.
 struct OpenRefreshIntent: AppIntent {
-    static let title: LocalizedStringResource = "Quill Refresh"
+    static let title: LocalizedStringResource = "Quill: Apps erneuern"
     static let description = IntentDescription("Öffnet Quill und erneuert alle Apps.")
 
     func perform() async throws -> some IntentResult & OpensIntent {
@@ -214,10 +214,10 @@ struct RefreshControl: ControlWidget {
     var body: some ControlWidgetConfiguration {
         StaticControlConfiguration(kind: "QuillRefreshControl") {
             ControlWidgetButton(action: OpenRefreshIntent()) {
-                Label("Quill Refresh", systemImage: "arrow.triangle.2.circlepath")
+                Label("Apps erneuern", systemImage: "arrow.clockwise")
             }
         }
-        .displayName("Quill Refresh")
+        .displayName("Quill: Apps erneuern")
         .description("Öffnet Quill und erneuert alle Apps.")
     }
 }

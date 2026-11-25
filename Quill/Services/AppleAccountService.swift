@@ -68,7 +68,7 @@ final class AppleAccountService {
                     self.state = .needsCode(request)
                 } else {
                     self.abortSignIn()
-                    self.lastError = "Apple verlangt einen Bestätigungscode. Bitte Quill öffnen und anmelden."
+                    self.lastError = String(localized: "Apple verlangt einen Bestätigungscode. Bitte Quill öffnen und anmelden.")
                 }
             }
         }

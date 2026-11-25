@@ -53,7 +53,7 @@ struct LoginView: View {
 
             if let error = account.lastError {
                 Section {
-                    Label(error, systemImage: "xmark.octagon.fill").foregroundStyle(.red)
+                    Label(error, systemImage: "exclamationmark.triangle.fill").foregroundStyle(.red)
                 }
             }
 

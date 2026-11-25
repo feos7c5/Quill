@@ -45,9 +45,9 @@ enum IdentityOrigin: String {
 
     var label: String {
         switch self {
-        case .imported: return "Importiert"
-        case .appleAccount: return "Apple-Account"
-        case .csr: return "Eigene CSR"
+        case .imported: return String(localized: "Importiert")
+        case .appleAccount: return String(localized: "Apple-Account")
+        case .csr: return String(localized: "Eigene CSR")
         }
     }
 }

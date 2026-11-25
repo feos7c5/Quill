@@ -104,7 +104,7 @@ struct ImportBatch {
 /// Zertifikate, Profile, Import/Export und CSR.
 enum IdentityStore {
     struct PasswordRequired: LocalizedError {
-        var errorDescription: String? { "Das Passwort der .p12-Datei ist falsch." }
+        var errorDescription: String? { String(localized: "Das Passwort der .p12-Datei ist falsch.") }
     }
 
     private static let pendingKeyKey = "csr-pending-key"
@@ -179,7 +179,7 @@ enum IdentityStore {
             record = existing
         } else {
             record = SigningIdentity(
-                name: info.commonName ?? "Zertifikat",
+                name: info.commonName ?? String(localized: "Zertifikat"),
                 teamID: info.teamId ?? "",
                 teamName: info.organization ?? "",
                 serial: info.serial,

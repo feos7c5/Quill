@@ -28,7 +28,7 @@ final class DeviceLink {
     private(set) var manualUDID: String? = UserDefaults.standard.string(forKey: DeviceLink.manualUDIDKey)
 
     init() {
-        state = isPaired ? .unreachable("Noch nicht geprüft.") : .unpaired
+        state = isPaired ? .unreachable(String(localized: "Noch nicht geprüft.")) : .unpaired
     }
 
     var isPaired: Bool { FileManager.default.fileExists(atPath: Paths.pairingFile.path) }
@@ -95,7 +95,7 @@ final class DeviceLink {
         switch state {
         case .ready: return
         case .unpaired: throw AppError("Quill ist noch nicht gekoppelt. Unter „Koppeln ohne Computer“ koppeln.")
-        case .unreachable(let reason): throw AppError(reason)
+        case .unreachable(let reason): throw AppError(verbatim: reason)
         case .checking: throw AppError("Die Verbindung wird gerade geprüft.")
         }
     }
@@ -153,14 +153,14 @@ final class DeviceLink {
         }
         try Paths.writeProtected(data, to: Paths.pairingFile)
         info = nil
-        state = .unreachable("Noch nicht geprüft.")
+        state = .unreachable(String(localized: "Noch nicht geprüft."))
     }
 
     func didPair(udid: String, name: String?) {
         UserDefaults.standard.set(udid, forKey: Self.udidKey)
         if let name { UserDefaults.standard.set(name, forKey: Self.nameKey) }
         info = nil
-        state = .unreachable("Noch nicht geprüft.")
+        state = .unreachable(String(localized: "Noch nicht geprüft."))
     }
 
     func unpair() {
@@ -209,7 +209,7 @@ final class PairingService: NSObject, NetServiceDelegate {
         // In eine temporäre Datei schreiben; erst bei Erfolg ersetzt sie eine vorhandene Kopplung.
         let pending = Paths.support.appendingPathComponent("pairing.pending.plist")
         try? FileManager.default.removeItem(at: pending)
-        let hostName = "Quill auf \(UIDevice.current.name)"
+        let hostName = String(localized: "Quill auf \(UIDevice.current.name)")
         do {
             let advert = try hostName.withCString { name in
                 try pending.path.withCString { path in
@@ -218,7 +218,7 @@ final class PairingService: NSObject, NetServiceDelegate {
             }
             publish(advert)
             phase = .listening
-            message = "Jetzt Einstellungen → Datenschutz & Sicherheit → Entwicklermodus öffnen und Quill auswählen."
+            message = String(localized: "Jetzt Einstellungen → Datenschutz & Sicherheit → Entwicklermodus öffnen und Quill auswählen.")
             notifiedPIN = nil
             observeLifecycle()
             KeepAlive.shared.begin()
@@ -259,7 +259,7 @@ final class PairingService: NSObject, NetServiceDelegate {
     }
 
     private func apply(_ snapshot: PairSnapshot, pending: URL) {
-        message = snapshot.message
+        message = Core.localized(snapshot.message, detail: snapshot.detail)
         switch snapshot.phase {
         case "listening": phase = .listening
         case "connected": phase = .connected
@@ -274,14 +274,14 @@ final class PairingService: NSObject, NetServiceDelegate {
                 try Paths.writeProtected(data, to: Paths.pairingFile)
                 try? FileManager.default.removeItem(at: pending)
                 phase = .paired
-                message = "Gekoppelt. Jetzt LocalDevVPN verbinden, dann prüft Quill die Verbindung."
+                message = String(localized: "Gekoppelt. Jetzt LocalDevVPN verbinden, dann prüft Quill die Verbindung.")
                 if let peer = snapshot.peer { onPaired?(peer) }
             } catch {
-                phase = .failed("Die Pairing-Datei konnte nicht gespeichert werden: \(error.localizedDescription)")
+                phase = .failed(String(localized: "Die Pairing-Datei konnte nicht gespeichert werden: \(error.localizedDescription)"))
             }
             finish()
         case "error":
-            phase = .failed(snapshot.message)
+            phase = .failed(Core.localized(snapshot.message, detail: snapshot.detail))
             finish()
         case "stopped":
             phase = .stopped
@@ -295,8 +295,8 @@ final class PairingService: NSObject, NetServiceDelegate {
         guard notifiedPIN != pin else { return }
         notifiedPIN = pin
         let content = UNMutableNotificationContent()
-        content.title = "Quill-Kopplungscode"
-        content.body = "\(pin) in den Einstellungen eingeben."
+        content.title = String(localized: "Quill-Kopplungscode")
+        content.body = String(localized: "\(pin) in den Einstellungen eingeben.")
         content.sound = .default
         content.interruptionLevel = .timeSensitive
         let request = UNNotificationRequest(identifier: Self.pinNotification, content: content, trigger: nil)
@@ -356,7 +356,7 @@ final class PairingService: NSObject, NetServiceDelegate {
         guard UIApplication.shared.applicationState == .background else { return }
         let seconds = UIApplication.shared.backgroundTimeRemaining
         if seconds < 10_000 {
-            backgroundNote = "Noch \(Int(seconds)) Sekunden Hintergrundzeit. Kopplung jetzt abschließen."
+            backgroundNote = String(localized: "Noch \(Int(seconds)) Sekunden Hintergrundzeit. Kopplung jetzt abschließen.")
         }
     }
 
@@ -364,7 +364,7 @@ final class PairingService: NSObject, NetServiceDelegate {
 
     nonisolated func netService(_ sender: NetService, didNotPublish errorDict: [String: NSNumber]) {
         Task { @MainActor in
-            self.phase = .failed("Bonjour-Veröffentlichung fehlgeschlagen. Quill braucht Zugriff auf das lokale Netzwerk (Einstellungen → Quill).")
+            self.phase = .failed(String(localized: "Bonjour-Veröffentlichung fehlgeschlagen. Quill braucht Zugriff auf das lokale Netzwerk (Einstellungen → Quill)."))
             self.cancel()
         }
     }

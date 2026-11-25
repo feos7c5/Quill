@@ -10,21 +10,21 @@ use sha2::{Digest, Sha256};
 use x509_cert::Certificate;
 use x509_cert::der::{Decode, Encode};
 
-use crate::CoreResult;
+use crate::{CoreError, CoreResult};
 
 fn decode(b64: &str, what: &str) -> CoreResult<Vec<u8>> {
-    B64.decode(b64.trim()).map_err(|_| format!("{what} ist kein gültiges Base64."))
+    B64.decode(b64.trim()).map_err(|_| CoreError::with("Invalid input from the app.", format!("{what} is not valid Base64")))
 }
 
 /// RSA-2048-Schlüssel plus CSR (PEM) für developer.apple.com.
 pub fn create_csr(common_name: &str, email: Option<&str>) -> CoreResult<Value> {
     let mut rng = rand::thread_rng();
-    let key = RsaPrivateKey::new(&mut rng, 2048).map_err(|e| format!("Schlüssel: {e}"))?;
-    let pkcs8 = key.to_pkcs8_der().map_err(|e| format!("Schlüssel: {e}"))?;
+    let key = RsaPrivateKey::new(&mut rng, 2048).map_err(|e| CoreError::with("The key could not be created.", e))?;
+    let pkcs8 = key.to_pkcs8_der().map_err(|e| CoreError::with("The key could not be created.", e))?;
 
     let der = rustls_pki_types::PrivatePkcs8KeyDer::from(pkcs8.as_bytes().to_vec());
     let key_pair = rcgen::KeyPair::from_pkcs8_der_and_sign_algo(&der, &rcgen::PKCS_RSA_SHA256)
-        .map_err(|e| format!("Schlüssel: {e}"))?;
+        .map_err(|e| CoreError::with("The key could not be created.", e))?;
 
     let mut params = rcgen::CertificateParams::default();
     let mut dn = rcgen::DistinguishedName::new();
@@ -48,12 +48,12 @@ pub fn create_csr(common_name: &str, email: Option<&str>) -> CoreResult<Value> {
 
 /// Verbindet Zertifikat (DER) und privaten Schlüssel (PKCS#8) zu einer .p12.
 pub fn build_p12(certificate_der_b64: &str, key_pkcs8_b64: &str, password: &str) -> CoreResult<Value> {
-    let cert_der = decode(certificate_der_b64, "Zertifikat")?;
-    let key_der = decode(key_pkcs8_b64, "Schlüssel")?;
+    let cert_der = decode(certificate_der_b64, "certificate")?;
+    let key_der = decode(key_pkcs8_b64, "key")?;
 
     // Passen Zertifikat und Schlüssel zusammen?
-    let certificate = Certificate::from_der(&cert_der).map_err(|_| "Die Datei ist kein gültiges Zertifikat (.cer).".to_string())?;
-    let key = RsaPrivateKey::from_pkcs8_der(&key_der).map_err(|_| "Der gespeicherte Schlüssel ist beschädigt.".to_string())?;
+    let certificate = Certificate::from_der(&cert_der).map_err(|_| CoreError::new("The file is not a valid certificate."))?;
+    let key = RsaPrivateKey::from_pkcs8_der(&key_der).map_err(|_| CoreError::new("The saved key is damaged."))?;
     let public = rsa::pkcs8::EncodePublicKey::to_public_key_der(&key.to_public_key()).map_err(|e| e.to_string())?;
     let cert_public = certificate
         .tbs_certificate
@@ -61,7 +61,7 @@ pub fn build_p12(certificate_der_b64: &str, key_pkcs8_b64: &str, password: &str)
         .to_der()
         .map_err(|e| e.to_string())?;
     if public.as_bytes() != cert_public.as_slice() {
-        return Err("Dieses Zertifikat gehört nicht zur erzeugten CSR.".into());
+        return Err("This certificate does not belong to the generated CSR.".into());
     }
 
     let p12 = write_p12(&cert_der, &key_der, password)?;
@@ -69,23 +69,23 @@ pub fn build_p12(certificate_der_b64: &str, key_pkcs8_b64: &str, password: &str)
 }
 
 fn write_p12(cert_der: &[u8], key_der: &[u8], password: &str) -> CoreResult<Vec<u8>> {
-    let cert = p12_keystore::Certificate::from_der(cert_der).map_err(|e| format!("Zertifikat: {e:?}"))?;
-    let key = p12_keystore::PrivateKey::from_der(key_der).map_err(|e| format!("Schlüssel: {e:?}"))?;
+    let cert = p12_keystore::Certificate::from_der(cert_der).map_err(|e| CoreError::with("The .p12 file could not be created.", format!("{e:?}")))?;
+    let key = p12_keystore::PrivateKey::from_der(key_der).map_err(|e| CoreError::with("The .p12 file could not be created.", format!("{e:?}")))?;
     let local_key_id = Sha256::digest(key_der)[..8].to_vec();
     let chain = PrivateKeyChain::new(local_key_id, key, vec![cert]);
     let mut store = KeyStore::new();
     store.add_entry("quill", KeyStoreEntry::PrivateKeyChain(chain));
-    store.writer(password).write().map_err(|e| format!(".p12 schreiben: {e:?}"))
+    store.writer(password).write().map_err(|e| CoreError::with("The .p12 file could not be created.", format!("{e:?}")))
 }
 
 fn open(p12_b64: &str, password: &str) -> CoreResult<(Vec<u8>, Vec<u8>)> {
     let data = decode(p12_b64, ".p12")?;
     let store = KeyStore::from_pkcs12(&data, password, Pkcs12ImportPolicy::Relaxed)
-        .map_err(|_| "Das Passwort ist falsch oder die .p12 ist beschädigt.".to_string())?;
+        .map_err(|_| CoreError::new("The password is wrong or the .p12 file is damaged."))?;
     let (_, chain) = store
         .private_key_chain()
-        .ok_or("Die .p12 enthält keinen privaten Schlüssel.")?;
-    let cert = chain.certs().first().ok_or("Die .p12 enthält kein Zertifikat.")?;
+        .ok_or(CoreError::new("The .p12 file contains no private key."))?;
+    let cert = chain.certs().first().ok_or(CoreError::new("The .p12 file contains no certificate."))?;
     Ok((cert.as_der().to_vec(), chain.key().as_der().to_vec()))
 }
 
@@ -102,11 +102,11 @@ pub fn inspect_p12(p12_b64: &str, password: &str) -> CoreResult<Value> {
 
 /// Liest ein einzelnes Zertifikat (DER, Base64).
 pub fn inspect_certificate(der_b64: &str) -> CoreResult<Value> {
-    describe_certificate(&decode(der_b64, "Zertifikat")?)
+    describe_certificate(&decode(der_b64, "certificate")?)
 }
 
 fn describe_certificate(cert_der: &[u8]) -> CoreResult<Value> {
-    let certificate = Certificate::from_der(cert_der).map_err(|_| "Die Datei ist kein gültiges Zertifikat.".to_string())?;
+    let certificate = Certificate::from_der(cert_der).map_err(|_| CoreError::new("The file is not a valid certificate."))?;
     let tbs = &certificate.tbs_certificate;
 
     let mut common_name = None;
@@ -182,6 +182,6 @@ mod tests {
         let second = create_csr("B", None).unwrap();
         let cert = self_signed(first["key_pkcs8"].as_str().unwrap());
         let error = build_p12(&cert, second["key_pkcs8"].as_str().unwrap(), "").unwrap_err();
-        assert!(error.contains("gehört nicht"), "{error}");
+        assert!(error.message.contains("does not belong"), "{error}");
     }
 }

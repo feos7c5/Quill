@@ -100,7 +100,7 @@ struct QuillShortcuts: AppShortcutsProvider {
             intent: RefreshAppsIntent(),
             phrases: [
                 "Apps mit \(.applicationName) erneuern",
-                "\(.applicationName) Refresh",
+                "\(.applicationName) erneuern",
             ],
             shortTitle: "Apps erneuern",
             systemImageName: "arrow.triangle.2.circlepath"

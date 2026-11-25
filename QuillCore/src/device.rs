@@ -20,7 +20,7 @@ use serde_json::{Value, json};
 use tokio::net::TcpStream;
 use tokio::time::timeout;
 
-use crate::{Context, CoreResult, read_opt, read_str};
+use crate::{Context, CoreError, CoreResult, read_opt, read_str};
 
 /// Standardadresse des Remote-Pairing-Dienstes über LocalDevVPN.
 pub const DEFAULT_ADDRESS: &str = "10.7.0.1:49152";
@@ -58,12 +58,12 @@ impl Target {
     /// # Safety
     /// `pairing_path` muss eine gültige Zeichenkette sein, `address` darf NULL sein.
     pub unsafe fn read(pairing_path: *const c_char, address: *const c_char) -> CoreResult<Self> {
-        let path = unsafe { read_str(pairing_path, "Pairing-Datei") }?;
-        let pairing = std::fs::read(&path).map_err(|_| "Keine Pairing-Datei vorhanden. Bitte zuerst koppeln.".to_string())?;
+        let path = unsafe { read_str(pairing_path, "pairing file") }?;
+        let pairing = std::fs::read(&path).map_err(|_| CoreError::new("No pairing file yet. Pair this iPhone first."))?;
         let address = unsafe { read_opt(address) }.unwrap_or_else(|| DEFAULT_ADDRESS.into());
         let address = address
             .parse()
-            .map_err(|_| format!("Ungültige Geräteadresse: {address}"))?;
+            .map_err(|_| CoreError::with("The device address is not valid.", &address))?;
         Ok(Self { pairing, address })
     }
 
@@ -81,62 +81,60 @@ struct Session {
 
 async fn connect(target: &Target) -> CoreResult<Session> {
     let mut pairing = RpPairingFile::from_bytes(&target.pairing)
-        .map_err(|e| format!("Die Pairing-Datei ist ungültig: {e}"))?;
+        .map_err(|e| CoreError::with("The pairing file is not valid.", e))?;
 
     let stream = timeout(CONNECT_TIMEOUT, TcpStream::connect(target.address))
         .await
-        .map_err(|_| vpn_hint("Zeitüberschreitung"))?
+        .map_err(|_| vpn_hint("timeout"))?
         .map_err(|e| vpn_hint(&e.to_string()))?;
 
     let mut client = RemotePairingClient::new(RpPairingSocket::new(stream), HOST_NAME);
     client
         .attempt_pair_verify()
         .await
-        .map_err(|e| format!("Das iPhone antwortet nicht wie erwartet: {e}"))?;
+        .map_err(|e| CoreError::with("The iPhone did not respond as expected.", e))?;
     // Nur prüfen, nie neu koppeln: Eine neue Kopplung braucht den Code-Dialog.
     client
         .validate_pairing(&mut pairing)
         .await
-        .map_err(|_| "Das iPhone erkennt die Kopplung nicht mehr. Bitte neu koppeln.".to_string())?;
+        .map_err(|_| CoreError::new("The iPhone no longer accepts this pairing. Pair again."))?;
 
     let tunnel_port = client
         .create_tcp_listener()
         .await
-        .map_err(|e| format!("Tunnel konnte nicht geöffnet werden: {e}"))?;
+        .map_err(|e| CoreError::with("The connection to the iPhone could not be opened.", e))?;
     let mut tunnel_address = target.address;
     tunnel_address.set_port(tunnel_port);
     let tunnel_stream = timeout(CONNECT_TIMEOUT, TcpStream::connect(tunnel_address))
         .await
-        .map_err(|_| "Tunnel: Zeitüberschreitung.".to_string())?
-        .map_err(|e| format!("Tunnel: {e}"))?;
+        .map_err(|_| CoreError::with("The connection to the iPhone could not be opened.", "timeout"))?
+        .map_err(|e| CoreError::with("The connection to the iPhone could not be opened.", e))?;
     let tunnel = connect_tls_psk_tunnel_native(tunnel_stream, client.encryption_key())
         .await
-        .map_err(|e| format!("Tunnel-Verschlüsselung: {e}"))?;
+        .map_err(|e| CoreError::with("The connection to the iPhone could not be opened.", e))?;
 
-    let client_ip = tunnel.info.client_address.parse().map_err(|e| format!("Tunnel: {e}"))?;
-    let server_ip = tunnel.info.server_address.parse().map_err(|e| format!("Tunnel: {e}"))?;
+    let client_ip = tunnel.info.client_address.parse().map_err(|e| CoreError::with("The connection to the iPhone could not be opened.", e))?;
+    let server_ip = tunnel.info.server_address.parse().map_err(|e| CoreError::with("The connection to the iPhone could not be opened.", e))?;
     let mtu = tunnel.info.mtu as usize;
     let rsd_port = tunnel.info.server_rsd_port;
 
     let mut adapter = idevice::tcp::adapter::Adapter::new(Box::new(tunnel.into_inner()), client_ip, server_ip);
     adapter.set_mss(mtu.clamp(1280, 8192) - 60);
     let mut adapter = adapter.to_async_handle();
-    let rsd = adapter.connect(rsd_port).await.map_err(|e| format!("RSD: {e}"))?;
-    let handshake = RsdHandshake::new(rsd).await.map_err(|e| format!("RSD: {e}"))?;
+    let rsd = adapter.connect(rsd_port).await.map_err(|e| CoreError::with("The connection to the iPhone could not be opened.", e))?;
+    let handshake = RsdHandshake::new(rsd).await.map_err(|e| CoreError::with("The connection to the iPhone could not be opened.", e))?;
     Ok(Session { adapter, handshake })
 }
 
-fn vpn_hint(detail: &str) -> String {
-    format!(
-        "Das iPhone ist über LocalDevVPN nicht erreichbar ({detail}). LocalDevVPN öffnen, verbinden und erneut versuchen."
-    )
+fn vpn_hint(detail: &str) -> CoreError {
+    CoreError::with("The iPhone cannot be reached through LocalDevVPN. Open LocalDevVPN, connect and try again.", detail)
 }
 
 pub async fn info(target: &Target) -> CoreResult<Value> {
     let mut session = connect(target).await?;
     let mut lockdown = LockdownClient::connect_rsd(&mut session.adapter, &mut session.handshake)
         .await
-        .map_err(|e| format!("Lockdown: {e}"))?;
+        .map_err(|e| CoreError::with("The device information could not be read.", e))?;
 
     async fn text(lockdown: &mut LockdownClient, key: &str) -> Option<String> {
         lockdown
@@ -177,11 +175,11 @@ pub async fn info(target: &Target) -> CoreResult<Value> {
 
 pub async fn install(target: &Target, package: &Path, progress: &Progress) -> CoreResult<Value> {
     if !package.exists() {
-        return Err("Das signierte Paket fehlt.".into());
+        return Err("The signed app is missing.".into());
     }
-    progress.report(0.02, "Verbinde mit dem iPhone …");
+    progress.report(0.02, "Connecting to the iPhone…");
     let mut session = connect(target).await?;
-    progress.report(0.05, "Übertrage …");
+    progress.report(0.05, "Transferring…");
 
     // idevice meldet 0–100; der Upload-Anteil läuft vorher ohne eigene Meldung.
     let result = idevice::utils::installation::install_package_with_callback_rsd(
@@ -194,7 +192,7 @@ pub async fn install(target: &Target, package: &Path, progress: &Progress) -> Co
                 .collect(),
         )),
         |(percent, ()): (u64, ())| async move {
-            progress.report(0.1 + 0.9 * (percent as f64 / 100.0), "Installiere …");
+            progress.report(0.1 + 0.9 * (percent as f64 / 100.0), "Installing…");
         },
         (),
     )
@@ -202,7 +200,7 @@ pub async fn install(target: &Target, package: &Path, progress: &Progress) -> Co
 
     match result {
         Ok(()) => {
-            progress.report(1.0, "Installiert.");
+            progress.report(1.0, "Installed.");
             Ok(json!({ "installed": true }))
         }
         Err(e) => Err(explain_install_error(&e.to_string())),
@@ -210,23 +208,23 @@ pub async fn install(target: &Target, package: &Path, progress: &Progress) -> Co
 }
 
 /// Übersetzt häufige Fehler der Installation in verständliche Hinweise.
-fn explain_install_error(raw: &str) -> String {
+fn explain_install_error(raw: &str) -> CoreError {
     let lower = raw.to_lowercase();
     let hint = if lower.contains("maximum number of apps") || lower.contains("applicationverificationfailed") && lower.contains("limit") {
-        "Mit einem kostenlosen Account sind höchstens drei Apps gleichzeitig aktiv. Eine App entfernen und erneut versuchen."
+        "A free account allows at most three active apps. Remove an app and try again."
     } else if lower.contains("developer mode") || lower.contains("developermode") {
-        "Der Entwicklermodus ist aus. Einstellungen → Datenschutz & Sicherheit → Entwicklermodus einschalten."
+        "Developer Mode is off. Turn it on in Settings → Privacy & Security → Developer Mode."
     } else if lower.contains("profile") && (lower.contains("expired") || lower.contains("not valid")) {
-        "Das Provisioning Profile ist abgelaufen oder passt nicht zum Gerät."
+        "The provisioning profile has expired or does not include this device."
     } else if lower.contains("signature") || lower.contains("codesign") {
-        "Die Signatur wird nicht akzeptiert. Zertifikat und Profil prüfen."
+        "The signature was rejected. Check the certificate and profile."
     } else {
         ""
     };
     if hint.is_empty() {
-        format!("Installation fehlgeschlagen: {raw}")
+        CoreError::with("Installation failed.", raw)
     } else {
-        format!("{hint} ({raw})")
+        CoreError::with(hint, raw)
     }
 }
 
@@ -234,11 +232,11 @@ pub async fn uninstall(target: &Target, bundle_id: &str) -> CoreResult<Value> {
     let mut session = connect(target).await?;
     let mut proxy = InstallationProxyClient::connect_rsd(&mut session.adapter, &mut session.handshake)
         .await
-        .map_err(|e| format!("Installationsdienst: {e}"))?;
+        .map_err(|e| CoreError::with("The installation service could not be reached.", e))?;
     proxy
         .uninstall(bundle_id, None)
         .await
-        .map_err(|e| format!("Deinstallation fehlgeschlagen: {e}"))?;
+        .map_err(|e| CoreError::with("The app could not be removed.", e))?;
     Ok(json!({ "removed": true }))
 }
 
@@ -246,11 +244,11 @@ pub async fn user_apps(target: &Target) -> CoreResult<Value> {
     let mut session = connect(target).await?;
     let mut proxy = InstallationProxyClient::connect_rsd(&mut session.adapter, &mut session.handshake)
         .await
-        .map_err(|e| format!("Installationsdienst: {e}"))?;
+        .map_err(|e| CoreError::with("The installation service could not be reached.", e))?;
     let apps = proxy
         .get_apps(Some("User"), None)
         .await
-        .map_err(|e| format!("App-Liste: {e}"))?;
+        .map_err(|e| CoreError::with("The list of apps could not be read.", e))?;
 
     let mut list: Vec<Value> = apps
         .into_iter()
@@ -284,7 +282,7 @@ mod tests {
         // Port 9 auf localhost ist geschlossen: schneller Verbindungsfehler.
         let target = Target::new(pairing, "127.0.0.1:9".parse().unwrap());
         let error = rt.block_on(info(&target)).unwrap_err();
-        assert!(error.contains("LocalDevVPN"), "{error}");
+        assert!(error.message.contains("LocalDevVPN"), "{error}");
     }
 
     #[test]
@@ -292,12 +290,14 @@ mod tests {
         let rt = tokio::runtime::Builder::new_current_thread().enable_all().build().unwrap();
         let target = Target::new(b"kaputt".to_vec(), "127.0.0.1:9".parse().unwrap());
         let error = rt.block_on(info(&target)).unwrap_err();
-        assert!(error.contains("ungültig"), "{error}");
+        assert!(error.message.contains("not valid"), "{error}");
     }
 
     #[test]
     fn install_error_hints() {
-        assert!(explain_install_error("ApplicationVerificationFailed: maximum number of apps").contains("drei Apps"));
-        assert!(explain_install_error("whatever").starts_with("Installation fehlgeschlagen"));
+        assert!(explain_install_error("ApplicationVerificationFailed: maximum number of apps").message.contains("three active apps"));
+        let other = explain_install_error("whatever");
+        assert_eq!(other.message, "Installation failed.");
+        assert_eq!(other.detail.as_deref(), Some("whatever"));
     }
 }

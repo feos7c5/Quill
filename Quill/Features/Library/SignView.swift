@@ -98,7 +98,7 @@ struct SignView: View {
                 PipelineProgressView()
             }
             if let errorText {
-                Label(errorText, systemImage: "xmark.octagon.fill").foregroundStyle(.red)
+                Label(errorText, systemImage: "exclamationmark.triangle.fill").foregroundStyle(.red)
             }
             if let signedApp {
                 if let installedApp {

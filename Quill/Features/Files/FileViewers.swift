@@ -13,10 +13,10 @@ struct PlistNode: Identifiable {
         switch value {
         case let dictionary as [String: Any]:
             let children = dictionary.keys.sorted().map { make(key: $0, value: dictionary[$0]!) }
-            return PlistNode(key: key, value: "\(children.count) Einträge", type: "Dictionary", children: children)
+            return PlistNode(key: key, value: String(localized: "\(children.count) Einträge"), type: "Dictionary", children: children)
         case let array as [Any]:
             let children = array.enumerated().map { make(key: "[\($0.offset)]", value: $0.element) }
-            return PlistNode(key: key, value: "\(children.count) Einträge", type: "Array", children: children)
+            return PlistNode(key: key, value: String(localized: "\(children.count) Einträge"), type: "Array", children: children)
         case let string as String:
             return PlistNode(key: key, value: string, type: "String")
         case let date as Date:

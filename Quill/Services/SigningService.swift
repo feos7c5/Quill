@@ -46,7 +46,7 @@ enum SigningService {
         let fm = FileManager.default
         let work = try Paths.workDirectory("sign")
         do {
-            log("Entpacke IPA …")
+            log(String(localized: "Entpacke IPA …"))
             try fm.unzipItem(at: request.ipaURL, to: work)
 
             let payload = work.appendingPathComponent("Payload", isDirectory: true)
@@ -74,7 +74,7 @@ enum SigningService {
             removeComponents(options, in: appURL, log: log)
 
             if let iconData = request.iconData {
-                log("Ersetze App-Icon …")
+                log(String(localized: "Ersetze App-Icon …"))
                 try replaceIcon(iconData, in: appURL, plist: plist)
             }
             guard plist.write(to: plistURL, atomically: true) else {
@@ -105,7 +105,7 @@ enum SigningService {
     static func signWithIdentity(_ app: PreparedApp, p12URL: URL, password: String, profileURL: URL,
                                  entitlementsURL: URL?, removeProvision: Bool, log: @escaping Log) async throws -> URL {
         try await Task.detached(priority: .userInitiated) {
-            log("Signiere …")
+            log(String(localized: "Signiere …"))
             let outcome = SignOutcomeBox()
             let result = Zsign.sign(
                 appPath: app.appURL.path,
@@ -134,7 +134,7 @@ enum SigningService {
 
     /// Packt einen Payload-Ordner (oder einen .app-Ordner) als IPA in tmp.
     static func pack(_ folder: URL, log: Log) throws -> URL {
-        log("Packe IPA …")
+        log(String(localized: "Packe IPA …"))
         let fm = FileManager.default
         var payload = folder
         var temporaryPayload: URL?
@@ -148,7 +148,7 @@ enum SigningService {
         defer { if let temporaryPayload { try? fm.removeItem(at: temporaryPayload) } }
         let output = Paths.temporary.appendingPathComponent("signed-\(UUID().uuidString).ipa")
         try fm.zipItem(at: payload, to: output, shouldKeepParent: true, compressionMethod: .deflate)
-        log("Fertig.")
+        log(String(localized: "Fertig."))
         return output
     }
 
@@ -158,36 +158,36 @@ enum SigningService {
     private static func applyIdentityOptions(_ options: SignOptions, to plist: NSMutableDictionary, log: Log) {
         if !options.displayName.trimmed.isEmpty {
             plist["CFBundleDisplayName"] = options.displayName.trimmed
-            log("Name → \(options.displayName.trimmed)")
+            log(String(localized: "Name → \(options.displayName.trimmed)"))
         }
         if !options.version.trimmed.isEmpty {
             plist["CFBundleShortVersionString"] = options.version.trimmed
-            log("Version → \(options.version.trimmed)")
+            log(String(localized: "Version → \(options.version.trimmed)"))
         }
         let newID = options.bundleID.trimmed
         if !newID.isEmpty, let oldID = plist["CFBundleIdentifier"] as? String, oldID != newID {
             plist["CFBundleIdentifier"] = newID
-            log("Bundle-ID → \(newID)")
+            log(String(localized: "Bundle-ID → \(newID)"))
         }
     }
 
     private static func applyPlistOptions(_ options: SignOptions, to plist: NSMutableDictionary, log: Log) {
         if !options.minimumOSVersion.trimmed.isEmpty {
             plist["MinimumOSVersion"] = options.minimumOSVersion.trimmed
-            log("MinimumOSVersion → \(options.minimumOSVersion.trimmed)")
+            log(String(localized: "MinimumOSVersion → \(options.minimumOSVersion.trimmed)"))
         }
         if options.removeSupportedDevices, plist["UISupportedDevices"] != nil {
             plist.removeObject(forKey: "UISupportedDevices")
-            log("UISupportedDevices entfernt")
+            log(String(localized: "UISupportedDevices entfernt"))
         }
         if options.removeURLSchemes, plist["CFBundleURLTypes"] != nil {
             plist.removeObject(forKey: "CFBundleURLTypes")
-            log("URL-Schemata entfernt")
+            log(String(localized: "URL-Schemata entfernt"))
         }
         if options.enableFileSharing {
             plist["UIFileSharingEnabled"] = true
             plist["LSSupportsOpeningDocumentsInPlace"] = true
-            log("Dateifreigabe aktiviert")
+            log(String(localized: "Dateifreigabe aktiviert"))
         }
     }
 
@@ -216,7 +216,7 @@ enum SigningService {
                 changed = true
             }
             if changed, plist.write(to: url, atomically: true) {
-                log("Bundle-ID angepasst: \(bundle.lastPathComponent)")
+                log(String(localized: "Bundle-ID angepasst: \(bundle.lastPathComponent)"))
             }
         }
     }
@@ -230,7 +230,7 @@ enum SigningService {
             let url = appURL.appendingPathComponent(folder)
             if fm.fileExists(atPath: url.path) {
                 try? fm.removeItem(at: url)
-                log("\(folder) entfernt")
+                log(String(localized: "\(folder) entfernt"))
             }
         }
     }
@@ -292,7 +292,7 @@ enum SigningService {
             guard Zsign.injectDyLib(appExecutable: executable.path, with: loadPath, weak: true) else {
                 throw AppError("„\(name)“ konnte nicht in die App eingebunden werden.")
             }
-            log("Eingebunden: \(name)")
+            log(String(localized: "Eingebunden: \(name)"))
         }
     }
 

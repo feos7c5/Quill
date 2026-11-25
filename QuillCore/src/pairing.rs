@@ -17,7 +17,7 @@ use serde_json::{Value, json};
 use tokio::net::TcpListener;
 use tokio::time::{sleep, timeout};
 
-use crate::{CoreResult, storage};
+use crate::{CoreError, CoreResult, storage};
 
 /// So lange bleibt der Port offen, danach gilt die Kopplung als abgebrochen.
 const SESSION: Duration = Duration::from_secs(300);
@@ -34,7 +34,7 @@ fn state() -> &'static Mutex<State> {
     static STATE: OnceLock<Mutex<State>> = OnceLock::new();
     STATE.get_or_init(|| {
         Mutex::new(State {
-            snapshot: json!({ "phase": "idle", "message": "Bereit.", "pin": null, "peer": null }),
+            snapshot: json!({ "phase": "idle", "message": "Ready.", "detail": null, "pin": null, "peer": null }),
             cancel: None,
             running: false,
         })
@@ -49,13 +49,16 @@ fn update(phase: &str, message: &str, pin: Option<String>) {
     let mut s = lock();
     s.snapshot["phase"] = phase.into();
     s.snapshot["message"] = message.into();
+    s.snapshot["detail"] = Value::Null;
     s.snapshot["pin"] = pin.map(Value::String).unwrap_or(Value::Null);
 }
 
-fn finish(phase: &str, message: impl Into<String>, peer: Option<Value>) {
+fn finish(phase: &str, message: impl Into<CoreError>, peer: Option<Value>) {
+    let error = message.into();
     let mut s = lock();
     s.snapshot["phase"] = phase.into();
-    s.snapshot["message"] = message.into().into();
+    s.snapshot["message"] = error.message.into();
+    s.snapshot["detail"] = error.detail.map(Value::String).unwrap_or(Value::Null);
     s.snapshot["pin"] = Value::Null;
     if let Some(peer) = peer {
         s.snapshot["peer"] = peer;
@@ -80,7 +83,7 @@ pub fn cancel() {
 pub fn start(host_name: String, output: PathBuf) -> CoreResult<Value> {
     let mut s = lock();
     if s.running {
-        return Err("Eine Kopplung läuft bereits.".into());
+        return Err("Pairing is already running.".into());
     }
 
     let listener = bind_listener()?;
@@ -106,7 +109,8 @@ pub fn start(host_name: String, output: PathBuf) -> CoreResult<Value> {
     let cancel = Arc::new(AtomicBool::new(false));
     s.snapshot = json!({
         "phase": "listening",
-        "message": "Warte darauf, dass das iPhone Quill in den Einstellungen auswählt.",
+        "message": "Waiting for the iPhone to select Quill in Settings.",
+        "detail": null,
         "pin": null,
         "peer": null,
     });
@@ -117,22 +121,22 @@ pub fn start(host_name: String, output: PathBuf) -> CoreResult<Value> {
     let spawned = std::thread::Builder::new().name("quill-pairing".into()).spawn(move || {
         let rt = match tokio::runtime::Builder::new_current_thread().enable_all().build() {
             Ok(rt) => rt,
-            Err(e) => return finish("error", format!("Laufzeit: {e}"), None),
+            Err(e) => return finish("error", CoreError::with("Pairing could not start.", e), None),
         };
         rt.block_on(async move {
             tokio::select! {
                 result = timeout(SESSION, accept(listener, file, info, output)) => match result {
-                    Ok(Ok(peer)) => finish("paired", "Gekoppelt.", Some(peer)),
+                    Ok(Ok(peer)) => finish("paired", "Paired.", Some(peer)),
                     Ok(Err(e)) => finish("error", e, None),
-                    Err(_) => finish("error", "Nach fünf Minuten abgebrochen. Bitte erneut starten.", None),
+                    Err(_) => finish("error", "Pairing stopped after five minutes. Start again.", None),
                 },
-                _ = cancelled(cancel) => finish("stopped", "Kopplung abgebrochen.", None),
+                _ = cancelled(cancel) => finish("stopped", "Pairing cancelled.", None),
             }
         });
     });
     if let Err(e) = spawned {
-        finish("error", format!("Hintergrund-Thread: {e}"), None);
-        return Err(e.to_string());
+        finish("error", CoreError::with("Pairing could not start.", &e), None);
+        return Err(CoreError::with("Pairing could not start.", e));
     }
     Ok(advert)
 }
@@ -150,16 +154,20 @@ fn bind_listener() -> CoreResult<std::net::TcpListener> {
     let socket = match dual() {
         Ok(socket) => socket,
         Err(_) => {
-            let socket = Socket::new(Domain::IPV4, Type::STREAM, Some(Protocol::TCP)).map_err(|e| format!("Socket: {e}"))?;
+            let socket = Socket::new(Domain::IPV4, Type::STREAM, Some(Protocol::TCP)).map_err(port_error)?;
             socket
                 .bind(&std::net::SocketAddr::from(([0, 0, 0, 0], 0)).into())
-                .map_err(|e| format!("Port konnte nicht geöffnet werden: {e}"))?;
+                .map_err(port_error)?;
             socket
         }
     };
-    socket.set_nonblocking(true).map_err(|e| format!("Socket: {e}"))?;
-    socket.listen(4).map_err(|e| format!("Port konnte nicht geöffnet werden: {e}"))?;
+    socket.set_nonblocking(true).map_err(port_error)?;
+    socket.listen(4).map_err(port_error)?;
     Ok(socket.into())
+}
+
+fn port_error(e: std::io::Error) -> CoreError {
+    CoreError::with("The network port for pairing could not be opened.", e)
 }
 
 async fn cancelled(flag: Arc<AtomicBool>) {
@@ -173,23 +181,23 @@ async fn accept(
     mut file: RpPairingFile,
     info: PairableHostInfo,
     output: PathBuf,
-) -> Result<Value, String> {
-    let listener = TcpListener::from_std(listener).map_err(|e| e.to_string())?;
-    let (stream, _) = listener.accept().await.map_err(|e| e.to_string())?;
-    update("connected", "iPhone verbunden, Kopplung läuft.", None);
+) -> CoreResult<Value> {
+    let listener = TcpListener::from_std(listener).map_err(port_error)?;
+    let (stream, _) = listener.accept().await.map_err(port_error)?;
+    update("connected", "iPhone connected, pairing…", None);
 
     let mut host = PairableHost::new(RpPairingSocket::new_device(stream), info);
     let peer = host
         .accept(&mut file, |pin| async move {
-            update("pin", "Diesen Code in den Einstellungen eingeben.", Some(pin));
+            update("pin", "Enter this code in Settings.", Some(pin));
         })
         .await
-        .map_err(|e| format!("Kopplung fehlgeschlagen: {e}"))?;
+        .map_err(|e| CoreError::with("Pairing failed.", e))?;
 
     if file.alt_irk().map(<[u8]>::len) != Some(16) || peer.remotepairing_udid.is_empty() {
-        return Err("Das iPhone hat keine vollständige Kopplungs-Identität geliefert. Es wurde nichts gespeichert.".into());
+        return Err("The iPhone did not provide a complete pairing identity. Nothing was saved.".into());
     }
-    storage::write_private(&output, &file.to_bytes()).map_err(|e| format!("Pairing-Datei: {e}"))?;
+    storage::write_private(&output, &file.to_bytes()).map_err(|e| CoreError::with("The pairing file could not be saved.", e))?;
     Ok(json!({
         "udid": peer.remotepairing_udid,
         "name": peer.name,
@@ -223,7 +231,7 @@ mod tests {
         // Ein Gegenüber, das kein Remote Pairing spricht, beendet die Sitzung mit Fehler.
         let port = advert["port"].as_u64().unwrap();
         let mut stream = std::net::TcpStream::connect(format!("127.0.0.1:{port}")).unwrap();
-        std::io::Write::write_all(&mut stream, b"kein pairing").unwrap();
+        std::io::Write::write_all(&mut stream, b"not pairing").unwrap();
         drop(stream);
         wait_finished();
         assert_eq!(snapshot()["phase"], "error");

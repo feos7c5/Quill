@@ -56,7 +56,7 @@ struct RootView: View {
                 .tag(AppTab.library)
 
             NavigationStack {
-                FileBrowserView(directory: Paths.documents, title: "Dateien")
+                FileBrowserView(directory: Paths.documents, title: String(localized: "Dateien"))
             }
             .tabItem { Label("Dateien", systemImage: "folder") }
             .tag(AppTab.files)

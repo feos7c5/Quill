@@ -80,8 +80,8 @@ final class RefreshService {
         let fireDate = app.expirationDate.addingTimeInterval(-24 * 3600)
         guard fireDate > .now else { return }
         let content = UNMutableNotificationContent()
-        content.title = "„\(app.name)“ läuft morgen ab"
-        content.body = "In Quill auf „Erneuern“ tippen, damit die App weiter startet. Die Daten bleiben erhalten."
+        content.title = String(localized: "„\(app.name)“ läuft morgen ab")
+        content.body = String(localized: "In Quill auf „Erneuern“ tippen, damit die App weiter startet. Die Daten bleiben erhalten.")
         content.sound = .default
         let components = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: fireDate)
         let trigger = UNCalendarNotificationTrigger(dateMatching: components, repeats: false)

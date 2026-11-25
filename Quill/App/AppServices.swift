@@ -43,11 +43,11 @@ final class AppServices {
         var text: String {
             if total == 0 {
                 if let nextExpiry {
-                    return "Nichts fällig. Nächster Ablauf: \(nextExpiry.formatted(date: .abbreviated, time: .shortened))."
+                    return String(localized: "Nichts fällig. Nächster Ablauf: \(nextExpiry.formatted(date: .abbreviated, time: .shortened)).")
                 }
-                return "Keine Apps zum Erneuern."
+                return String(localized: "Keine Apps zum Erneuern.")
             }
-            var text = "\(refreshed) von \(total) App\(total == 1 ? "" : "s") erneuert."
+            var text = String(localized: "Erneuert: \(refreshed) von \(total)")
             if !failures.isEmpty { text += "\n" + failures.joined(separator: "\n") }
             return text
         }
@@ -85,13 +85,13 @@ final class AppServices {
         await device.refresh()
         let apps = (try? context.fetch(FetchDescriptor<InstalledApp>(sortBy: [SortDescriptor(\.expirationDate)]))) ?? []
         var lines = apps.map { app in
-            app.isExpired ? "\(app.name): abgelaufen" : "\(app.name): noch \(app.daysLeft) Tag\(app.daysLeft == 1 ? "" : "e")"
+            app.isExpired ? String(localized: "\(app.name): abgelaufen") : "\(app.name): \(daysLeftText(app.daysLeft))"
         }
-        if lines.isEmpty { lines.append("Keine Apps über Quill installiert.") }
+        if lines.isEmpty { lines.append(String(localized: "Keine Apps über Quill installiert.")) }
         switch device.state {
-        case .ready: lines.append("Gekoppelt, LocalDevVPN verbunden.")
-        case .unpaired: lines.append("Nicht gekoppelt.")
-        case .unreachable: lines.append("Gekoppelt, aber nicht erreichbar (LocalDevVPN?).")
+        case .ready: lines.append(String(localized: "Gekoppelt, LocalDevVPN verbunden."))
+        case .unpaired: lines.append(String(localized: "Nicht gekoppelt."))
+        case .unreachable: lines.append(String(localized: "Gekoppelt, aber nicht erreichbar (LocalDevVPN?)."))
         case .checking: break
         }
         WidgetPublisher.publish()

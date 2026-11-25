@@ -1,11 +1,19 @@
 import SwiftUI
 
 struct SettingsView: View {
+    @Environment(\.openURL) private var openURL
     @Environment(WiFiTransferService.self) private var transfer
     @Environment(DeviceLink.self) private var device
     @AppStorage("downloads.autoImport") private var autoImport = true
     @AppStorage(DeviceLink.addressKey) private var deviceAddress = ""
     @AppStorage(AppleAccountService.anisetteKey) private var anisetteURL = ""
+
+    /// Sprache, in der Quill gerade angezeigt wird, in dieser Sprache benannt.
+    private var currentLanguage: String {
+        let code = Bundle.main.preferredLocalizations.first ?? "de"
+        let locale = Locale(identifier: code)
+        return locale.localizedString(forLanguageCode: code)?.capitalized(with: locale) ?? code
+    }
 
     @State private var defaults = SignOptions.loadDefaults()
     @State private var cacheSize: Int64 = 0
@@ -14,6 +22,17 @@ struct SettingsView: View {
     var body: some View {
         Form {
             Section {
+                LabeledContent("Sprache", value: currentLanguage)
+                Button("Sprache ändern") {
+                    if let url = URL(string: UIApplication.openSettingsURLString) { openURL(url) }
+                }
+            } header: {
+                Text("Sprache")
+            } footer: {
+                Text("Quill folgt der Sprache des iPhones. Eine eigene Sprache nur für Quill lässt sich in den iOS-Einstellungen unter Quill → Sprache wählen.")
+            }
+
+            Section {
                 LabeledContent("Adresse") {
                     TextField(DeviceLink.defaultAddress, text: $deviceAddress)
                         .multilineTextAlignment(.trailing)
@@ -21,7 +40,8 @@ struct SettingsView: View {
                         .autocorrectionDisabled()
                         .keyboardType(.numbersAndPunctuation)
                 }
-                NavigationLink("Protokoll des Kerns") { CoreLogView() }
+                NavigationLink("Protokoll des Kerns") { LogFileView(url: Paths.core.appendingPathComponent("core.log"), title: "Protokoll") }
+                NavigationLink("Protokoll der UDID-Erkennung") { LogFileView(url: UDIDProfileService.logURL, title: "UDID-Erkennung") }
                 if device.isPaired {
                     Button("Kopplung entfernen", role: .destructive) { device.unpair() }
                 }
@@ -224,25 +244,26 @@ struct InstallSettingsView: View {
     }
 }
 
-/// Zeigt das Protokoll des Rust-Kerns (ohne Passwörter und Codes).
-struct CoreLogView: View {
+/// Zeigt eine Protokolldatei (Kern, UDID-Erkennung) zum Lesen und Teilen.
+struct LogFileView: View {
+    let url: URL
+    let title: LocalizedStringKey
     @State private var text = ""
 
     var body: some View {
         ScrollView {
-            Text(text.isEmpty ? "Leer." : text)
-                .font(.system(.caption2, design: .monospaced))
+            Text(text.isEmpty ? String(localized: "Leer.") : text)
+                .font(.footnote.monospaced())
                 .textSelection(.enabled)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding()
         }
-        .navigationTitle("Protokoll")
+        .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ShareLink(item: text)
         }
         .onAppear {
-            let url = Paths.core.appendingPathComponent("core.log")
             text = (try? String(contentsOf: url, encoding: .utf8)).map { String($0.suffix(60_000)) } ?? ""
         }
     }

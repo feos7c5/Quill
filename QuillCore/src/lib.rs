@@ -38,7 +38,7 @@ fn runtime() -> &'static tokio::runtime::Runtime {
             .enable_all()
             .thread_name("quill-core")
             .build()
-            .expect("Tokio-Laufzeit konnte nicht starten")
+            .expect("Tokio runtime could not start")
     })
 }
 
@@ -49,14 +49,54 @@ fn data_dir() -> Option<PathBuf> {
 
 static DATA_DIR: OnceLock<PathBuf> = OnceLock::new();
 
-pub(crate) type CoreResult<T> = Result<T, String>;
+/// Fehler des Kerns. `message` ist ein fester englischer Satz, den die App über ihren
+/// Sprachkatalog übersetzt; `detail` ist technischer Zusatz (z. B. die Originalmeldung von iOS).
+#[derive(Debug, Clone, PartialEq)]
+pub(crate) struct CoreError {
+    pub message: String,
+    pub detail: Option<String>,
+}
+
+impl CoreError {
+    pub fn new(message: impl Into<String>) -> Self {
+        Self { message: message.into(), detail: None }
+    }
+
+    pub fn with(message: impl Into<String>, detail: impl std::fmt::Display) -> Self {
+        Self { message: message.into(), detail: Some(detail.to_string()) }
+    }
+}
+
+impl From<&str> for CoreError {
+    fn from(message: &str) -> Self {
+        Self::new(message)
+    }
+}
+
+impl From<String> for CoreError {
+    fn from(message: String) -> Self {
+        Self::new(message)
+    }
+}
+
+impl std::fmt::Display for CoreError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match &self.detail {
+            Some(detail) => write!(f, "{} ({detail})", self.message),
+            None => f.write_str(&self.message),
+        }
+    }
+}
+
+pub(crate) type CoreResult<T> = Result<T, CoreError>;
 
 fn ok<T: Serialize>(value: T) -> *mut c_char {
     into_c(json!({ "ok": true, "data": value }))
 }
 
-fn fail(message: impl Into<String>) -> *mut c_char {
-    into_c(json!({ "ok": false, "error": message.into() }))
+fn fail(error: impl Into<CoreError>) -> *mut c_char {
+    let error = error.into();
+    into_c(json!({ "ok": false, "error": error.message, "detail": error.detail }))
 }
 
 fn respond<T: Serialize>(result: CoreResult<T>) -> *mut c_char {
@@ -68,7 +108,7 @@ fn respond<T: Serialize>(result: CoreResult<T>) -> *mut c_char {
 
 fn into_c(value: Value) -> *mut c_char {
     let text = value.to_string().replace('\0', "");
-    CString::new(text).expect("NUL wurde entfernt").into_raw()
+    CString::new(text).expect("NUL bytes were removed").into_raw()
 }
 
 /// Liest eine C-Zeichenkette. NULL oder ungültiges UTF-8 ergibt einen Fehler.
@@ -77,12 +117,12 @@ fn into_c(value: Value) -> *mut c_char {
 /// `ptr` muss NULL sein oder auf eine gültige, NUL-terminierte Zeichenkette zeigen.
 unsafe fn read_str(ptr: *const c_char, what: &str) -> CoreResult<String> {
     if ptr.is_null() {
-        return Err(format!("{what} fehlt."));
+        return Err(CoreError::with("Invalid input from the app.", format!("{what} missing")));
     }
     unsafe { CStr::from_ptr(ptr) }
         .to_str()
         .map(str::to_owned)
-        .map_err(|_| format!("{what} ist kein gültiger Text."))
+        .map_err(|_| CoreError::with("Invalid input from the app.", format!("{what} is not valid UTF-8")))
 }
 
 /// Wie [`read_str`], aber NULL oder leer ergibt `None`.
@@ -124,12 +164,12 @@ impl Context {
 /// `data_dir` muss eine gültige, NUL-terminierte Zeichenkette sein.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sc_init(data_dir: *const c_char) -> *mut c_char {
-    let dir = match unsafe { read_str(data_dir, "Datenverzeichnis") } {
+    let dir = match unsafe { read_str(data_dir, "data directory") } {
         Ok(d) => PathBuf::from(d),
         Err(e) => return fail(e),
     };
     if let Err(e) = storage::ensure_private_dir(&dir) {
-        return fail(format!("Datenverzeichnis nicht nutzbar: {e}"));
+        return fail(CoreError::with("The data folder cannot be used.", e));
     }
     let _ = DATA_DIR.set(dir.clone());
     let _ = rustls::crypto::ring::default_provider().install_default();
@@ -163,8 +203,8 @@ pub unsafe extern "C" fn sc_string_free(ptr: *mut c_char) {
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sc_pair_start(host_name: *const c_char, output_path: *const c_char) -> *mut c_char {
     let result = (|| {
-        let name = unsafe { read_str(host_name, "Hostname") }?;
-        let output = PathBuf::from(unsafe { read_str(output_path, "Zielpfad") }?);
+        let name = unsafe { read_str(host_name, "host name") }?;
+        let output = PathBuf::from(unsafe { read_str(output_path, "output path") }?);
         pairing::start(name, output)
     })();
     respond(result)
@@ -215,7 +255,7 @@ pub unsafe extern "C" fn sc_device_install(
 ) -> *mut c_char {
     let result = (|| {
         let target = unsafe { device::Target::read(pairing_path, address) }?;
-        let package = PathBuf::from(unsafe { read_str(package_path, "Paketpfad") }?);
+        let package = PathBuf::from(unsafe { read_str(package_path, "package path") }?);
         let reporter = device::Progress::new(progress, Context(context));
         runtime().block_on(device::install(&target, &package, &reporter))
     })();
@@ -234,7 +274,7 @@ pub unsafe extern "C" fn sc_device_uninstall(
 ) -> *mut c_char {
     let result = (|| {
         let target = unsafe { device::Target::read(pairing_path, address) }?;
-        let bundle_id = unsafe { read_str(bundle_id, "Bundle-ID") }?;
+        let bundle_id = unsafe { read_str(bundle_id, "bundle ID") }?;
         runtime().block_on(device::uninstall(&target, &bundle_id))
     })();
     respond(result)
@@ -271,10 +311,10 @@ pub unsafe extern "C" fn sc_account_login(
     context: *mut c_void,
 ) -> *mut c_char {
     let result = (|| {
-        let email = unsafe { read_str(email, "Apple-ID") }?;
-        let password = unsafe { read_str(password, "Passwort") }?;
+        let email = unsafe { read_str(email, "Apple ID") }?;
+        let password = unsafe { read_str(password, "password") }?;
         let anisette = unsafe { read_opt(anisette_url) };
-        let dir = data_dir().ok_or("Kern nicht initialisiert.")?;
+        let dir = data_dir().ok_or(CoreError::new("The core is not initialized."))?;
         runtime().block_on(account::login(dir, email, password, anisette, two_factor, Context(context)))
     })();
     respond(result)
@@ -287,7 +327,7 @@ pub unsafe extern "C" fn sc_account_login(
 /// `response` muss eine gültige Zeichenkette sein.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sc_account_two_factor_respond(response: *const c_char) -> *mut c_char {
-    let result = unsafe { read_str(response, "Antwort") }.and_then(|r| account::two_factor_respond(&r));
+    let result = unsafe { read_str(response, "response") }.and_then(|r| account::two_factor_respond(&r));
     respond(result)
 }
 
@@ -303,7 +343,7 @@ pub extern "C" fn sc_account_status() -> *mut c_char {
 /// `team_id` muss eine gültige Zeichenkette sein.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sc_account_select_team(team_id: *const c_char) -> *mut c_char {
-    let result = unsafe { read_str(team_id, "Team-ID") }.and_then(|t| runtime().block_on(account::select_team(t)));
+    let result = unsafe { read_str(team_id, "team ID") }.and_then(|t| runtime().block_on(account::select_team(t)));
     respond(result)
 }
 
@@ -315,7 +355,7 @@ pub unsafe extern "C" fn sc_account_select_team(team_id: *const c_char) -> *mut 
 pub unsafe extern "C" fn sc_account_register_device(udid: *const c_char, name: *const c_char) -> *mut c_char {
     let result = (|| {
         let udid = unsafe { read_str(udid, "UDID") }?;
-        let name = unsafe { read_str(name, "Gerätename") }?;
+        let name = unsafe { read_str(name, "device name") }?;
         runtime().block_on(account::register_device(udid, name))
     })();
     respond(result)
@@ -336,10 +376,10 @@ pub unsafe extern "C" fn sc_account_sign(
     context: *mut c_void,
 ) -> *mut c_char {
     let result = (|| {
-        let path = PathBuf::from(unsafe { read_str(app_path, "App-Pfad") }?);
+        let path = PathBuf::from(unsafe { read_str(app_path, "app path") }?);
         let options = unsafe { read_opt(options) }.unwrap_or_else(|| "{}".into());
         let options: account::SignOptions =
-            serde_json::from_str(&options).map_err(|e| format!("Signieroptionen ungültig: {e}"))?;
+            serde_json::from_str(&options).map_err(|e| CoreError::with("Invalid input from the app.", e))?;
         let reporter = device::Progress::new(progress, Context(context));
         runtime().block_on(account::sign(path, options, &reporter))
     })();
@@ -364,7 +404,7 @@ pub extern "C" fn sc_account_certificates() -> *mut c_char {
 /// `serial` muss eine gültige Zeichenkette sein.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sc_account_revoke_certificate(serial: *const c_char) -> *mut c_char {
-    let result = unsafe { read_str(serial, "Seriennummer") }.and_then(|s| runtime().block_on(account::revoke(s)));
+    let result = unsafe { read_str(serial, "serial number") }.and_then(|s| runtime().block_on(account::revoke(s)));
     respond(result)
 }
 
@@ -375,7 +415,7 @@ pub unsafe extern "C" fn sc_account_revoke_certificate(serial: *const c_char) ->
 /// `password` muss eine gültige Zeichenkette sein (leer ist erlaubt).
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sc_account_export_p12(password: *const c_char) -> *mut c_char {
-    let result = unsafe { read_str(password, "Passwort") }.and_then(|p| runtime().block_on(account::export_p12(p)));
+    let result = unsafe { read_str(password, "password") }.and_then(|p| runtime().block_on(account::export_p12(p)));
     respond(result)
 }
 
@@ -401,7 +441,7 @@ pub extern "C" fn sc_account_forget() -> *mut c_char {
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sc_csr_create(common_name: *const c_char, email: *const c_char) -> *mut c_char {
     let result = (|| {
-        let name = unsafe { read_str(common_name, "Name") }?;
+        let name = unsafe { read_str(common_name, "name") }?;
         let email = unsafe { read_opt(email) };
         crypto::create_csr(&name, email.as_deref())
     })();
@@ -419,9 +459,9 @@ pub unsafe extern "C" fn sc_p12_build(
     password: *const c_char,
 ) -> *mut c_char {
     let result = (|| {
-        let cert = unsafe { read_str(certificate_der, "Zertifikat") }?;
-        let key = unsafe { read_str(key_pkcs8, "Schlüssel") }?;
-        let password = unsafe { read_str(password, "Passwort") }?;
+        let cert = unsafe { read_str(certificate_der, "certificate") }?;
+        let key = unsafe { read_str(key_pkcs8, "key") }?;
+        let password = unsafe { read_str(password, "password") }?;
         crypto::build_p12(&cert, &key, &password)
     })();
     respond(result)
@@ -439,8 +479,8 @@ pub unsafe extern "C" fn sc_p12_rewrap(
 ) -> *mut c_char {
     let result = (|| {
         let p12 = unsafe { read_str(p12, ".p12") }?;
-        let old = unsafe { read_str(old_password, "altes Passwort") }?;
-        let new = unsafe { read_str(new_password, "neues Passwort") }?;
+        let old = unsafe { read_str(old_password, "old password") }?;
+        let new = unsafe { read_str(new_password, "new password") }?;
         crypto::rewrap_p12(&p12, &old, &new)
     })();
     respond(result)
@@ -454,7 +494,7 @@ pub unsafe extern "C" fn sc_p12_rewrap(
 pub unsafe extern "C" fn sc_p12_inspect(p12: *const c_char, password: *const c_char) -> *mut c_char {
     let result = (|| {
         let p12 = unsafe { read_str(p12, ".p12") }?;
-        let password = unsafe { read_str(password, "Passwort") }?;
+        let password = unsafe { read_str(password, "password") }?;
         crypto::inspect_p12(&p12, &password)
     })();
     respond(result)
@@ -466,6 +506,6 @@ pub unsafe extern "C" fn sc_p12_inspect(p12: *const c_char, password: *const c_c
 /// `certificate_der` muss eine gültige Zeichenkette sein.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sc_certificate_inspect(certificate_der: *const c_char) -> *mut c_char {
-    let result = unsafe { read_str(certificate_der, "Zertifikat") }.and_then(|c| crypto::inspect_certificate(&c));
+    let result = unsafe { read_str(certificate_der, "certificate") }.and_then(|c| crypto::inspect_certificate(&c));
     respond(result)
 }

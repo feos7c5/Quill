@@ -79,9 +79,9 @@ struct FileBrowserView: View {
         }
         var title: String {
             switch self {
-            case .newFolder: return "Neuer Ordner"
-            case .newFile: return "Neue Datei"
-            case .rename: return "Umbenennen"
+            case .newFolder: return String(localized: "Neuer Ordner")
+            case .newFile: return String(localized: "Neue Datei")
+            case .rename: return String(localized: "Umbenennen")
             }
         }
     }
@@ -300,7 +300,7 @@ struct FileBrowserView: View {
         Task {
             do {
                 let app = try await AppLibrary.importIPA(from: item.url, context: context)
-                message = "„\(app.name)“ wurde in die Apps importiert."
+                message = String(localized: "„\(app.name)“ wurde in die Apps importiert.")
             } catch {
                 message = error.localizedDescription
             }

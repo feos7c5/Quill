@@ -1,0 +1,120 @@
+{
+  "sourceLanguage": "de",
+  "strings": {
+    "CFBundleDisplayName": {
+      "shouldTranslate": false
+    },
+    "CFBundleName": {
+      "shouldTranslate": false
+    },
+    "NSLocalNetworkUsageDescription": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill pairs with this iPhone over the local network to install apps and provides Wi‑Fi file transfer."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill se jumelle avec cet iPhone via le réseau local pour installer des apps et propose le transfert de fichiers par Wi‑Fi."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill se empareja con este iPhone a través de la red local para instalar apps y ofrece transferencia de archivos por Wi‑Fi."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill si abbina a questo iPhone tramite la rete locale per installare app e offre il trasferimento file via Wi‑Fi."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill, uygulama yüklemek için yerel ağ üzerinden bu iPhone ile eşlenir ve Wi‑Fi dosya aktarımı sağlar."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill koppelt sich über das lokale Netzwerk mit diesem iPhone, um Apps zu installieren, und stellt die WLAN-Dateiübertragung bereit."
+          }
+        }
+      }
+    },
+    "Provisioning Profile": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Provisioning Profile"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Profil d'approvisionnement"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Perfil de aprovisionamiento"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Profilo di provisioning"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hazırlama profili"
+          }
+        }
+      }
+    },
+    "iOS App": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS App"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App iOS"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App de iOS"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App iOS"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS uygulaması"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

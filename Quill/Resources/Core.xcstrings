@@ -1,0 +1,2114 @@
+{
+  "sourceLanguage": "en",
+  "strings": {
+    "A free account allows at most three active apps. Remove an app and try again.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mit einem kostenlosen Account sind höchstens drei Apps gleichzeitig aktiv. Eine App entfernen und erneut versuchen."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un compte gratuit permet au maximum trois apps actives. Supprimez une app et réessayez."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Una cuenta gratuita permite como máximo tres apps activas. Elimina una app e inténtalo de nuevo."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un account gratuito consente al massimo tre app attive. Rimuovi un'app e riprova."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ücretsiz hesapta en fazla üç uygulama etkin olabilir. Bir uygulamayı kaldırıp yeniden deneyin."
+          }
+        }
+      }
+    },
+    "Apple reported an error.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple hat einen Fehler gemeldet."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple a signalé une erreur."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple ha informado de un error."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple ha segnalato un errore."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple bir hata bildirdi."
+          }
+        }
+      }
+    },
+    "Choose a team first.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bitte zuerst ein Team wählen."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choisissez d'abord une équipe."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Elige primero un equipo."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Scegli prima un team."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Önce bir ekip seçin."
+          }
+        }
+      }
+    },
+    "Connecting to the iPhone…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verbinde mit dem iPhone …"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connexion à l'iPhone…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Conectando con el iPhone…"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connessione all'iPhone…"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone'a bağlanılıyor…"
+          }
+        }
+      }
+    },
+    "Developer Mode is off. Turn it on in Settings → Privacy & Security → Developer Mode.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Entwicklermodus ist aus. Einstellungen → Datenschutz & Sicherheit → Entwicklermodus einschalten."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le mode développeur est désactivé. Activez-le dans Réglages → Confidentialité et sécurité → Mode développeur."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El modo de desarrollador está desactivado. Actívalo en Ajustes → Privacidad y seguridad → Modo de desarrollador."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La modalità sviluppatore è disattivata. Attivala in Impostazioni → Privacy e sicurezza → Modalità sviluppatore."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Geliştirici Modu kapalı. Ayarlar → Gizlilik ve Güvenlik → Geliştirici Modu'ndan açın."
+          }
+        }
+      }
+    },
+    "Enter this code in Settings.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Diesen Code in den Einstellungen eingeben."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saisissez ce code dans Réglages."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduce este código en Ajustes."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inserisci questo codice in Impostazioni."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu kodu Ayarlar'a girin."
+          }
+        }
+      }
+    },
+    "Installation failed.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Installation fehlgeschlagen."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L'installation a échoué."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La instalación ha fallado."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Installazione non riuscita."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yükleme başarısız oldu."
+          }
+        }
+      }
+    },
+    "Installed.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Installiert."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Installée."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Instalada."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Installata."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yüklendi."
+          }
+        }
+      }
+    },
+    "Installing…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Installiere …"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Installation…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Instalando…"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Installazione…"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yükleniyor…"
+          }
+        }
+      }
+    },
+    "Invalid input from the app.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ungültige Eingabe aus der App."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Entrée non valide de l'app."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Entrada no válida de la app."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Input non valido dall'app."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uygulamadan geçersiz giriş."
+          }
+        }
+      }
+    },
+    "No app IDs left. Free accounts get only a few new app IDs per week. Remove extensions or try again later.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keine App-IDs mehr frei. Kostenlose Accounts bekommen nur wenige neue App-IDs pro Woche. Erweiterungen entfernen oder später erneut versuchen."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Plus d'identifiants d'app disponibles. Les comptes gratuits n'en obtiennent que quelques-uns par semaine. Supprimez des extensions ou réessayez plus tard."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No quedan ID de app. Las cuentas gratuitas solo reciben unas pocas ID nuevas por semana. Elimina extensiones o inténtalo más tarde."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessun ID app disponibile. Gli account gratuiti ricevono solo pochi nuovi ID app a settimana. Rimuovi le estensioni o riprova più tardi."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uygulama kimliği kalmadı. Ücretsiz hesaplar haftada yalnızca birkaç yeni uygulama kimliği alır. Uzantıları kaldırın veya daha sonra yeniden deneyin."
+          }
+        }
+      }
+    },
+    "No pairing file yet. Pair this iPhone first.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Noch keine Pairing-Datei. Bitte zuerst dieses iPhone koppeln."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucun fichier de jumelage. Jumelez d'abord cet iPhone."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aún no hay archivo de emparejamiento. Empareja primero este iPhone."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessun file di abbinamento. Abbina prima questo iPhone."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Henüz eşleme dosyası yok. Önce bu iPhone'u eşleyin."
+          }
+        }
+      }
+    },
+    "No sign-in is waiting for a code.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Es wartet keine Anmeldung auf einen Code."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucune connexion n'attend de code."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ningún inicio de sesión espera un código."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nessun accesso è in attesa di un codice."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kod bekleyen bir oturum açma işlemi yok."
+          }
+        }
+      }
+    },
+    "No verification code was entered.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Es wurde kein Bestätigungscode eingegeben."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aucun code de validation n'a été saisi."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se ha introducido ningún código de verificación."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non è stato inserito alcun codice di verifica."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Doğrulama kodu girilmedi."
+          }
+        }
+      }
+    },
+    "Not signed in. Sign in with your Apple ID.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nicht angemeldet. Bitte mit der Apple-ID anmelden."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non connecté. Connectez-vous avec votre identifiant Apple."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No has iniciado sesión. Inicia sesión con tu Apple ID."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Accesso non effettuato. Accedi con il tuo Apple ID."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oturum açılmadı. Apple Kimliğinizle oturum açın."
+          }
+        }
+      }
+    },
+    "Paired.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gekoppelt."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jumelé."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Emparejado."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abbinato."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eşlendi."
+          }
+        }
+      }
+    },
+    "Pairing cancelled.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kopplung abgebrochen."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jumelage annulé."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Emparejamiento cancelado."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abbinamento annullato."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eşleme iptal edildi."
+          }
+        }
+      }
+    },
+    "Pairing could not start.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Kopplung konnte nicht starten."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le jumelage n'a pas pu démarrer."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se ha podido iniciar el emparejamiento."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossibile avviare l'abbinamento."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eşleme başlatılamadı."
+          }
+        }
+      }
+    },
+    "Pairing failed.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kopplung fehlgeschlagen."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le jumelage a échoué."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El emparejamiento ha fallado."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abbinamento non riuscito."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eşleme başarısız oldu."
+          }
+        }
+      }
+    },
+    "Pairing is already running.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eine Kopplung läuft bereits."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un jumelage est déjà en cours."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ya hay un emparejamiento en curso."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Un abbinamento è già in corso."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eşleme zaten sürüyor."
+          }
+        }
+      }
+    },
+    "Pairing stopped after five minutes. Start again.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nach fünf Minuten abgebrochen. Bitte erneut starten."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jumelage arrêté après cinq minutes. Recommencez."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Emparejamiento detenido tras cinco minutos. Vuelve a empezar."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abbinamento interrotto dopo cinque minuti. Ricomincia."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eşleme beş dakika sonra durduruldu. Yeniden başlatın."
+          }
+        }
+      }
+    },
+    "Preparing certificate and app IDs…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bereite Zertifikat und App-IDs vor …"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Préparation du certificat et des identifiants d'app…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preparando certificado e ID de app…"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preparazione di certificato e ID app…"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sertifika ve uygulama kimlikleri hazırlanıyor…"
+          }
+        }
+      }
+    },
+    "Ready.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bereit."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prêt."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Listo."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pronto."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hazır."
+          }
+        }
+      }
+    },
+    "Saved sign-in data could not be deleted.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gespeicherte Anmeldedaten konnten nicht gelöscht werden."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les données de connexion enregistrées n'ont pas pu être supprimées."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se han podido eliminar los datos de inicio de sesión guardados."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossibile eliminare i dati di accesso salvati."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kayıtlı oturum açma verileri silinemedi."
+          }
+        }
+      }
+    },
+    "Sign-in was cancelled.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Anmeldung wurde abgebrochen."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La connexion a été annulée."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Se ha cancelado el inicio de sesión."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L'accesso è stato annullato."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oturum açma iptal edildi."
+          }
+        }
+      }
+    },
+    "Signed.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signiert."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signée."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Firmada."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Firmata."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İmzalandı."
+          }
+        }
+      }
+    },
+    "Signing…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signiere …"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signature…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Firmando…"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Firma in corso…"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İmzalanıyor…"
+          }
+        }
+      }
+    },
+    "The .p12 file contains no certificate.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die .p12-Datei enthält kein Zertifikat."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le fichier .p12 ne contient aucun certificat."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El archivo .p12 no contiene ningún certificado."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il file .p12 non contiene alcun certificato."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": ".p12 dosyası sertifika içermiyor."
+          }
+        }
+      }
+    },
+    "The .p12 file contains no private key.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die .p12-Datei enthält keinen privaten Schlüssel."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le fichier .p12 ne contient aucune clé privée."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El archivo .p12 no contiene ninguna clave privada."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il file .p12 non contiene alcuna chiave privata."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": ".p12 dosyası özel anahtar içermiyor."
+          }
+        }
+      }
+    },
+    "The .p12 file could not be created.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die .p12-Datei konnte nicht erstellt werden."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le fichier .p12 n'a pas pu être créé."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se ha podido crear el archivo .p12."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossibile creare il file .p12."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": ".p12 dosyası oluşturulamadı."
+          }
+        }
+      }
+    },
+    "The Apple ID or password is incorrect.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple-ID oder Passwort ist falsch."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L'identifiant Apple ou le mot de passe est incorrect."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El Apple ID o la contraseña son incorrectos."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L'Apple ID o la password non sono corretti."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Kimliği veya parola yanlış."
+          }
+        }
+      }
+    },
+    "The anisette server did not respond as expected. Check its address in Settings.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Anisette-Server antwortet nicht wie erwartet. Adresse in den Einstellungen prüfen."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le serveur anisette n'a pas répondu comme prévu. Vérifiez son adresse dans les réglages."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El servidor anisette no ha respondido como se esperaba. Comprueba su dirección en Ajustes."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il server anisette non ha risposto come previsto. Controlla il suo indirizzo nelle impostazioni."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anisette sunucusu beklendiği gibi yanıt vermedi. Ayarlar'daki adresini kontrol edin."
+          }
+        }
+      }
+    },
+    "The app could not be removed.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die App konnte nicht entfernt werden."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L'app n'a pas pu être supprimée."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se ha podido eliminar la app."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossibile rimuovere l'app."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uygulama kaldırılamadı."
+          }
+        }
+      }
+    },
+    "The connection to the iPhone could not be opened.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Verbindung zum iPhone konnte nicht geöffnet werden."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La connexion à l'iPhone n'a pas pu être établie."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se ha podido abrir la conexión con el iPhone."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossibile aprire la connessione con l'iPhone."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone ile bağlantı kurulamadı."
+          }
+        }
+      }
+    },
+    "The core is not initialized.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Kern ist nicht initialisiert."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le noyau n'est pas initialisé."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El núcleo no está inicializado."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il core non è inizializzato."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Çekirdek başlatılmadı."
+          }
+        }
+      }
+    },
+    "The data folder cannot be used.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Datenordner ist nicht nutzbar."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le dossier de données est inutilisable."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se puede usar la carpeta de datos."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossibile usare la cartella dei dati."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Veri klasörü kullanılamıyor."
+          }
+        }
+      }
+    },
+    "The device address is not valid.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Geräteadresse ist ungültig."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L'adresse de l'appareil n'est pas valide."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La dirección del dispositivo no es válida."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L'indirizzo del dispositivo non è valido."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cihaz adresi geçersiz."
+          }
+        }
+      }
+    },
+    "The device information could not be read.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Geräteinformationen konnten nicht gelesen werden."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Les informations de l'appareil n'ont pas pu être lues."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se ha podido leer la información del dispositivo."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossibile leggere le informazioni del dispositivo."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cihaz bilgileri okunamadı."
+          }
+        }
+      }
+    },
+    "The file is not a valid certificate.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Datei ist kein gültiges Zertifikat."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le fichier n'est pas un certificat valide."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El archivo no es un certificado válido."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il file non è un certificato valido."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dosya geçerli bir sertifika değil."
+          }
+        }
+      }
+    },
+    "The iPhone cannot be reached through LocalDevVPN. Open LocalDevVPN, connect and try again.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das iPhone ist über LocalDevVPN nicht erreichbar. LocalDevVPN öffnen, verbinden und erneut versuchen."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L'iPhone est injoignable via LocalDevVPN. Ouvrez LocalDevVPN, connectez-vous et réessayez."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se puede acceder al iPhone a través de LocalDevVPN. Abre LocalDevVPN, conéctate e inténtalo de nuevo."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L'iPhone non è raggiungibile tramite LocalDevVPN. Apri LocalDevVPN, connettiti e riprova."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone'a LocalDevVPN üzerinden ulaşılamıyor. LocalDevVPN'i açın, bağlanın ve yeniden deneyin."
+          }
+        }
+      }
+    },
+    "The iPhone did not provide a complete pairing identity. Nothing was saved.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das iPhone hat keine vollständige Kopplungsidentität geliefert. Es wurde nichts gespeichert."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L'iPhone n'a pas fourni d'identité de jumelage complète. Rien n'a été enregistré."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El iPhone no ha proporcionado una identidad de emparejamiento completa. No se ha guardado nada."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L'iPhone non ha fornito un'identità di abbinamento completa. Non è stato salvato nulla."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone eksiksiz bir eşleme kimliği sağlamadı. Hiçbir şey kaydedilmedi."
+          }
+        }
+      }
+    },
+    "The iPhone did not respond as expected.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das iPhone antwortet nicht wie erwartet."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L'iPhone n'a pas répondu comme prévu."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El iPhone no ha respondido como se esperaba."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L'iPhone non ha risposto come previsto."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone beklendiği gibi yanıt vermedi."
+          }
+        }
+      }
+    },
+    "The iPhone no longer accepts this pairing. Pair again.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das iPhone erkennt die Kopplung nicht mehr. Bitte neu koppeln."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L'iPhone n'accepte plus ce jumelage. Jumelez-le à nouveau."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El iPhone ya no acepta este emparejamiento. Vuelve a emparejarlo."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L'iPhone non accetta più questo abbinamento. Abbinalo di nuovo."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone bu eşlemeyi artık kabul etmiyor. Yeniden eşleyin."
+          }
+        }
+      }
+    },
+    "The installation service could not be reached.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Installationsdienst ist nicht erreichbar."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le service d'installation est injoignable."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se puede acceder al servicio de instalación."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il servizio di installazione non è raggiungibile."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yükleme hizmetine ulaşılamadı."
+          }
+        }
+      }
+    },
+    "The key could not be created.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Schlüssel konnte nicht erzeugt werden."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La clé n'a pas pu être créée."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se ha podido crear la clave."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossibile creare la chiave."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anahtar oluşturulamadı."
+          }
+        }
+      }
+    },
+    "The list of apps could not be read.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die App-Liste konnte nicht gelesen werden."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La liste des apps n'a pas pu être lue."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se ha podido leer la lista de apps."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossibile leggere l'elenco delle app."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uygulama listesi okunamadı."
+          }
+        }
+      }
+    },
+    "The network port for pairing could not be opened.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der Netzwerkport für die Kopplung konnte nicht geöffnet werden."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le port réseau pour le jumelage n'a pas pu être ouvert."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se ha podido abrir el puerto de red para el emparejamiento."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossibile aprire la porta di rete per l'abbinamento."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eşleme için ağ bağlantı noktası açılamadı."
+          }
+        }
+      }
+    },
+    "The pairing file could not be saved.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Pairing-Datei konnte nicht gespeichert werden."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le fichier de jumelage n'a pas pu être enregistré."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se ha podido guardar el archivo de emparejamiento."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossibile salvare il file di abbinamento."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eşleme dosyası kaydedilemedi."
+          }
+        }
+      }
+    },
+    "The pairing file is not valid.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Pairing-Datei ist ungültig."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le fichier de jumelage n'est pas valide."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El archivo de emparejamiento no es válido."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il file di abbinamento non è valido."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eşleme dosyası geçersiz."
+          }
+        }
+      }
+    },
+    "The password is wrong or the .p12 file is damaged.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Passwort ist falsch oder die .p12-Datei ist beschädigt."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le mot de passe est incorrect ou le fichier .p12 est endommagé."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La contraseña es incorrecta o el archivo .p12 está dañado."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La password è errata o il file .p12 è danneggiato."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Parola yanlış veya .p12 dosyası bozuk."
+          }
+        }
+      }
+    },
+    "The provisioning profile has expired or does not include this device.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Das Provisioning Profile ist abgelaufen oder enthält dieses Gerät nicht."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le profil d'approvisionnement a expiré ou n'inclut pas cet appareil."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El perfil de aprovisionamiento ha caducado o no incluye este dispositivo."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il profilo di provisioning è scaduto o non include questo dispositivo."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hazırlama profilinin süresi doldu veya bu cihazı içermiyor."
+          }
+        }
+      }
+    },
+    "The saved key is damaged.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Der gespeicherte Schlüssel ist beschädigt."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La clé enregistrée est endommagée."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La clave guardada está dañada."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La chiave salvata è danneggiata."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kayıtlı anahtar bozuk."
+          }
+        }
+      }
+    },
+    "The sign-in is no longer waiting.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Anmeldung wartet nicht mehr."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La connexion n'attend plus."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El inicio de sesión ya no está esperando."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L'accesso non è più in attesa."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oturum açma artık beklemiyor."
+          }
+        }
+      }
+    },
+    "The signature was rejected. Check the certificate and profile.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Signatur wird nicht akzeptiert. Zertifikat und Profil prüfen."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La signature a été refusée. Vérifiez le certificat et le profil."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Se ha rechazado la firma. Comprueba el certificado y el perfil."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La firma è stata rifiutata. Controlla certificato e profilo."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İmza reddedildi. Sertifikayı ve profili kontrol edin."
+          }
+        }
+      }
+    },
+    "The signed app is missing.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die signierte App fehlt."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L'app signée est introuvable."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Falta la app firmada."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "L'app firmata non è presente."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İmzalı uygulama eksik."
+          }
+        }
+      }
+    },
+    "There are too many development certificates. Revoke one under Certificates at Apple and try again.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Es gibt zu viele Entwicklungszertifikate. Unter „Zertifikate bei Apple“ eines widerrufen und erneut versuchen."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il y a trop de certificats de développement. Révoquez-en un sous Certificats chez Apple et réessayez."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hay demasiados certificados de desarrollo. Revoca uno en Certificados en Apple e inténtalo de nuevo."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ci sono troppi certificati di sviluppo. Revocane uno in Certificati presso Apple e riprova."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Çok fazla geliştirme sertifikası var. Apple'daki Sertifikalar bölümünden birini iptal edip yeniden deneyin."
+          }
+        }
+      }
+    },
+    "This Apple ID is locked. Unlock it at iforgot.apple.com.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Die Apple-ID ist gesperrt. Bitte auf iforgot.apple.com entsperren."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cet identifiant Apple est verrouillé. Déverrouillez-le sur iforgot.apple.com."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este Apple ID está bloqueado. Desbloquéalo en iforgot.apple.com."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questo Apple ID è bloccato. Sbloccalo su iforgot.apple.com."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu Apple Kimliği kilitli. iforgot.apple.com adresinden kilidini açın."
+          }
+        }
+      }
+    },
+    "This certificate does not belong to the generated CSR.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieses Zertifikat gehört nicht zur erzeugten CSR."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ce certificat ne correspond pas à la CSR générée."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este certificado no corresponde a la CSR generada."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questo certificato non corrisponde alla CSR generata."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu sertifika oluşturulan CSR'ye ait değil."
+          }
+        }
+      }
+    },
+    "This team does not exist in the account.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dieses Team gibt es im Account nicht."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cette équipe n'existe pas dans le compte."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Este equipo no existe en la cuenta."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questo team non esiste nell'account."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu ekip hesapta yok."
+          }
+        }
+      }
+    },
+    "Transferring…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Übertrage …"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transfert…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transfiriendo…"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trasferimento…"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Aktarılıyor…"
+          }
+        }
+      }
+    },
+    "Waiting for the iPhone to select Quill in Settings.": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Warte darauf, dass das iPhone Quill in den Einstellungen auswählt."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "En attente de la sélection de Quill dans les réglages de l'iPhone."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esperando a que el iPhone seleccione Quill en Ajustes."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "In attesa che l'iPhone selezioni Quill nelle impostazioni."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone'un Ayarlar'da Quill'i seçmesi bekleniyor."
+          }
+        }
+      }
+    },
+    "iPhone connected, pairing…": {
+      "localizations": {
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone verbunden, Kopplung läuft …"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone connecté, jumelage en cours…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone conectado, emparejando…"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone connesso, abbinamento in corso…"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone bağlandı, eşleniyor…"
+          }
+        }
+      }
+    }
+  },
+  "version": "1.0"
+}

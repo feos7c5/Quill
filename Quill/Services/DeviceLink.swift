@@ -185,6 +185,13 @@ final class PairingService: NSObject, NetServiceDelegate {
     private(set) var message = ""
     /// Hinweis zur Restzeit im Hintergrund.
     private(set) var backgroundNote: String?
+    /// Ergebnis des Selbsttests (nil = kein Test gelaufen).
+    private(set) var selfTestPassed: Bool?
+    /// Name, unter dem Quill per Bonjour für die Einstellungen sichtbar ist.
+    private(set) var advertisedName: String?
+    /// Bonjour hat die Veröffentlichung bestätigt.
+    private(set) var published = false
+    @ObservationIgnored private var selfTesting = false
 
     @ObservationIgnored private var service: NetService?
     @ObservationIgnored private var poller: Task<Void, Never>?
@@ -219,6 +226,9 @@ final class PairingService: NSObject, NetServiceDelegate {
             }
             PairingLog.reset()
             PairingLog.write("Start, iOS \(UIDevice.current.systemVersion), Port \(advert.port), Dienst \(advert.serviceType)")
+            advertisedName = advert.name
+            published = false
+            selfTestPassed = nil
             publish(advert)
             phase = .listening
             message = String(localized: "Jetzt Einstellungen → Datenschutz & Sicherheit → Entwicklermodus öffnen und Quill auswählen. Der Code erscheint erst danach, als Mitteilung und oben in der Systemanzeige.")
@@ -241,6 +251,23 @@ final class PairingService: NSObject, NetServiceDelegate {
 
     func cancel() {
         sc_pair_cancel()
+    }
+
+    /// Startet eine Kopplung und lässt Quill selbst ein iPhone nachspielen, das Quill auswählt.
+    /// Zeigt so ohne die Einstellungen, ob Code, Mitteilung und Live-Aktivität erscheinen.
+    func startSelfTest(showSeconds: UInt32 = 8) {
+        start()
+        guard isRunning else { return }
+        selfTesting = true
+        PairingLog.write("Selbsttest gestartet")
+        do {
+            _ = try Core.now(Core.Ignored.self, sc_pair_selftest(showSeconds))
+        } catch {
+            PairingLog.write("Selbsttest nicht möglich: \(error.localizedDescription)")
+            selfTesting = false
+            selfTestPassed = false
+            cancel()
+        }
     }
 
     private func publish(_ advert: PairAdvert) {
@@ -301,7 +328,17 @@ final class PairingService: NSObject, NetServiceDelegate {
             }
             finish()
         case "error":
-            phase = .failed(Core.localized(snapshot.message, detail: snapshot.detail))
+            // Der Selbsttest endet planmäßig hier: Der nachgespielte Client hat keine UDID.
+            if selfTesting, snapshot.detail?.contains("remotepairing_udid") == true {
+                selfTestPassed = true
+                phase = .stopped
+                message = String(localized: "Selbsttest bestanden: Quill hat den Code angezeigt und geprüft.")
+                PairingLog.write("Selbsttest bestanden")
+            } else {
+                if selfTesting { selfTestPassed = false }
+                phase = .failed(Core.localized(snapshot.message, detail: snapshot.detail))
+            }
+            selfTesting = false
             finish()
         case "stopped":
             phase = .stopped
@@ -391,7 +428,10 @@ final class PairingService: NSObject, NetServiceDelegate {
     // MARK: - NetServiceDelegate
 
     nonisolated func netServiceDidPublish(_ sender: NetService) {
-        Task { @MainActor in PairingLog.write("Bonjour veröffentlicht: \(sender.name)") }
+        Task { @MainActor in
+            self.published = true
+            PairingLog.write("Bonjour veröffentlicht: \(sender.name)")
+        }
     }
 
     nonisolated func netService(_ sender: NetService, didNotPublish errorDict: [String: NSNumber]) {

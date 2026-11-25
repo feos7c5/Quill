@@ -28,6 +28,7 @@ struct State {
     snapshot: Value,
     cancel: Option<Arc<AtomicBool>>,
     running: bool,
+    port: Option<u16>,
 }
 
 fn state() -> &'static Mutex<State> {
@@ -37,6 +38,7 @@ fn state() -> &'static Mutex<State> {
             snapshot: json!({ "phase": "idle", "message": "Ready.", "detail": null, "pin": null, "peer": null }),
             cancel: None,
             running: false,
+            port: None,
         })
     })
 }
@@ -115,6 +117,7 @@ pub fn start(host_name: String, output: PathBuf) -> CoreResult<Value> {
         "peer": null,
     });
     s.running = true;
+    s.port = Some(port);
     s.cancel = Some(cancel.clone());
     drop(s);
 
@@ -235,6 +238,54 @@ async fn accept(
     }))
 }
 
+/// Selbsttest auf dem Gerät: Spielt über 127.0.0.1 ein iPhone nach, das Quill in den
+/// Einstellungen auswählt. Quill zeigt dann den Code wie bei einer echten Kopplung an
+/// (App, Mitteilung, Live-Aktivität). Nach `show_for` gibt der nachgespielte Client den Code
+/// ein. Weil er kein echtes iPhone ist, endet die Sitzung danach mit einem Fehler zu
+/// `remotepairing_udid`; daran erkennt die App, dass der Test bis zum Schluss gelaufen ist.
+pub fn self_test(show_for: Duration) -> CoreResult<Value> {
+    use idevice::remote_pairing::{RemotePairingClient, RpPairingSocketProvider};
+    let port = {
+        let s = lock();
+        if !s.running {
+            return Err("No pairing is running.".into());
+        }
+        s.port.ok_or(CoreError::new("No pairing is running."))?
+    };
+    std::thread::Builder::new()
+        .name("quill-pairing-selftest".into())
+        .spawn(move || {
+            let Ok(rt) = tokio::runtime::Builder::new_current_thread().enable_all().build() else { return };
+            rt.block_on(async move {
+                let result = timeout(Duration::from_secs(60), async {
+                    let stream = tokio::net::TcpStream::connect(("127.0.0.1", port)).await?;
+                    let mut socket = RpPairingSocket::new(stream);
+                    socket
+                        .send_plain(
+                            json!({"request":{"_0":{"handshake":{"_0":{
+                                "hostOptions":{"attemptPairVerify":false}, "wireProtocolVersion":26
+                            }}}}}),
+                            0,
+                        )
+                        .await?;
+                    socket.recv_plain().await?;
+                    let mut client = RemotePairingClient::new(socket, "Quill-Selbsttest");
+                    let mut file = RpPairingFile::generate("Quill-Selbsttest");
+                    client
+                        .pair(&mut file, || async move {
+                            sleep(show_for).await;
+                            snapshot()["pin"].as_str().unwrap_or_default().to_owned()
+                        })
+                        .await
+                })
+                .await;
+                tracing::info!("pairing self-test client finished: {result:?}");
+            });
+        })
+        .map_err(|e| CoreError::with("Pairing could not start.", e))?;
+    Ok(json!({ "port": port }))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -276,6 +327,55 @@ mod tests {
         cancel();
         wait_finished();
         assert_eq!(snapshot()["phase"], "stopped");
+        assert!(!output.exists());
+    }
+
+    /// Spielt die Einstellungen eines iPhones nach: erst eine stumme Verbindung, dann der echte
+    /// Kopplungsversuch mit dem Code, den Quill anzeigt. Am Ende muss eine Pairing-Datei entstehen.
+    #[test]
+    fn pairs_with_simulated_iphone() {
+        use idevice::remote_pairing::{RemotePairingClient, RpPairingSocketProvider};
+        let dir = tempfile::tempdir().unwrap();
+        let output = dir.path().join("pairing.plist");
+        wait_finished();
+        let advert = start("Quill Test".into(), output.clone()).unwrap();
+        let port = advert["port"].as_u64().unwrap();
+        let runtime = tokio::runtime::Builder::new_current_thread().enable_all().build().unwrap();
+        let result = runtime.block_on(async {
+            timeout(Duration::from_secs(20), async {
+                let _silent = tokio::net::TcpStream::connect(format!("127.0.0.1:{port}")).await.unwrap();
+                let stream = tokio::net::TcpStream::connect(format!("127.0.0.1:{port}")).await.unwrap();
+                let mut socket = RpPairingSocket::new(stream);
+                socket
+                    .send_plain(
+                        json!({"request":{"_0":{"handshake":{"_0":{
+                            "hostOptions":{"attemptPairVerify":false}, "wireProtocolVersion":26
+                        }}}}}),
+                        0,
+                    )
+                    .await
+                    .unwrap();
+                socket.recv_plain().await.unwrap();
+                let mut client = RemotePairingClient::new(socket, "Simuliertes iPhone");
+                let mut file = RpPairingFile::generate("Simuliertes iPhone");
+                client
+                    .pair(&mut file, || async {
+                        // Wie ein Mensch: den Code ablesen, den Quill gerade anzeigt.
+                        assert_eq!(snapshot()["phase"], "pin");
+                        snapshot()["pin"].as_str().unwrap().to_owned()
+                    })
+                    .await
+                    .map_err(|e| format!("{e:?}"))
+            })
+            .await
+            .expect("Kopplung hängt")
+        });
+        wait_finished();
+        // Der nachgespielte Client ist kein iPhone und schickt keine UDID mit. Kommt Quill bis zu
+        // dieser Stelle, waren Code-Anzeige und Code-Prüfung (SRP) erfolgreich.
+        assert!(result.is_err());
+        let detail = snapshot()["detail"].as_str().unwrap_or_default().to_owned();
+        assert!(detail.contains("remotepairing_udid"), "{}", snapshot());
         assert!(!output.exists());
     }
 }

@@ -19,6 +19,8 @@ void sc_string_free(char *ptr);
 char *sc_pair_start(const char *host_name, const char *output_path);
 char *sc_pair_snapshot(void);
 void sc_pair_cancel(void);
+/// Selbsttest: spielt über 127.0.0.1 ein iPhone nach. Eine Kopplung muss laufen.
+char *sc_pair_selftest(unsigned int show_seconds);
 
 // Gerätedienste (address NULL = "10.7.0.1:49152")
 char *sc_device_info(const char *pairing_path, const char *address);

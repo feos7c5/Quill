@@ -1,3 +1,4 @@
+import UserNotifications
 import SwiftData
 import SwiftUI
 
@@ -7,6 +8,8 @@ struct QuillApp: App {
 
     init() {
         RefreshService.registerBackgroundTask()
+        // Mitteilungen (z. B. der Kopplungscode) auch zeigen, während Quill offen ist.
+        UNUserNotificationCenter.current().delegate = NotificationPresenter.shared
     }
 
     var body: some Scene {
@@ -196,5 +199,14 @@ struct RootView: View {
                 errorMessage = error.localizedDescription
             }
         }
+    }
+}
+
+
+final class NotificationPresenter: NSObject, UNUserNotificationCenterDelegate {
+    static let shared = NotificationPresenter()
+
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {
+        [.banner, .sound, .list]
     }
 }

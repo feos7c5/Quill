@@ -46,6 +46,11 @@ struct PairingView: View {
                     Button("Einstellungen öffnen", systemImage: "gear") {
                         SystemSettings.open()
                     }
+                    NavigationLink {
+                        PairingDiagnosticsView()
+                    } label: {
+                        Label("Kopplung prüfen", systemImage: "stethoscope")
+                    }
                     if pairing.phase != .idle {
                         NavigationLink("Protokoll") { LogFileView(url: PairingLog.url, title: "Kopplung") }
                     }

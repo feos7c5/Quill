@@ -14,7 +14,7 @@ final class RefreshService {
 
     static var taskIdentifier: String { (Bundle.main.bundleIdentifier ?? "quill") + ".refresh" }
     /// Ab so vielen Tagen Restlaufzeit gilt eine App als „bald ablaufend“.
-    static let dueWithinDays = 3
+    nonisolated static let dueWithinDays = 3
 
     func refresh(_ app: InstalledApp, pipeline: SigningPipeline, context: ModelContext, interactive: Bool = true) async {
         guard !refreshing.contains(app.id) else { return }
@@ -113,6 +113,6 @@ final class RefreshService {
         let request = BGProcessingTaskRequest(identifier: taskIdentifier)
         request.requiresNetworkConnectivity = true
         request.earliestBeginDate = .now.addingTimeInterval(12 * 3600)
-        try? BGTaskScheduler.shared.submit(request)
+        Task { try? await BGTaskScheduler.shared.submitTaskRequest(request) }
     }
 }

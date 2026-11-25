@@ -75,7 +75,7 @@ final class SigningPipeline {
     }
 
     private func perform(_ input: SigningInput, context: ModelContext) async throws -> SigningOutcome {
-        let logger: SigningService.Log = { line in Task { @MainActor [weak self] in self?.append(line) } }
+        let logger: SigningService.Log = { [weak self] line in Task { @MainActor in self?.append(line) } }
         let isLiveContainer = input.source.bundleID == Self.liveContainerBundleID
 
         step(0.05, "Bereite App vor …")

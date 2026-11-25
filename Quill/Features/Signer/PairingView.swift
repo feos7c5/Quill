@@ -40,9 +40,8 @@ struct PairingView: View {
                         Button {
                             pairing.start()
                         } label: {
-                            Label("Kopplung starten", systemImage: "link").frame(maxWidth: .infinity)
+                            Label("Kopplung starten", systemImage: "link")
                         }
-                        .primaryActionRow()
                     }
                     Button("Einstellungen öffnen", systemImage: "gear") {
                         openURL(URL(string: UIApplication.openSettingsURLString)!)

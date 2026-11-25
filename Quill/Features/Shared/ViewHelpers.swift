@@ -13,17 +13,6 @@ extension View {
     }
 }
 
-extension View {
-    /// Die eine Hauptaktion eines Bildschirms: volle Breite, Glas-Stil, ohne Zeilenhintergrund.
-    func primaryActionRow() -> some View {
-        frame(maxWidth: .infinity)
-            .buttonStyle(.glassProminent)
-            .controlSize(.large)
-            .listRowInsets(EdgeInsets())
-            .listRowBackground(Color.clear)
-    }
-}
-
 /// Nummerierter Schritt in einer Anleitung.
 struct StepRow: View {
     let number: Int

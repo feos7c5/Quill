@@ -78,6 +78,13 @@ final class UDIDProfileService {
         }
     }
 
+    /// Bricht das Warten ab, ohne einen Fehler zu melden.
+    func cancel() {
+        UDIDLog.write("Vom Nutzer abgebrochen")
+        stop()
+        phase = .idle
+    }
+
     func stop() {
         server?.stop()
         server = nil

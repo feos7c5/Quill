@@ -187,9 +187,7 @@ struct SignerView: View {
                 present(.ipa)
             } label: {
                 Label("IPA wählen und installieren", systemImage: "plus.app")
-                    .frame(maxWidth: .infinity)
             }
-            .primaryActionRow()
             .disabled(isBusy)
 
             Button {

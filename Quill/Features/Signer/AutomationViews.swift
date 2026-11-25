@@ -74,14 +74,22 @@ struct UDIDView: View {
         NavigationStack {
             Form {
                 Section {
+                    // Nie gesperrt: Schlägt die Profilinstallation fehl, meldet iOS das Quill nicht,
+                    // deshalb muss ein neuer Versuch jederzeit möglich sein.
                     Button {
                         profileService.start()
                     } label: {
-                        Label("Automatisch erkennen", systemImage: "sparkle.magnifyingglass")
-                            .frame(maxWidth: .infinity)
+                        if profileService.phase == .idle {
+                            Label("Automatisch erkennen", systemImage: "sparkle.magnifyingglass")
+                        } else {
+                            Label("Erneut versuchen", systemImage: "arrow.clockwise")
+                        }
                     }
-                    .primaryActionRow()
-                    .disabled(profileService.phase == .waiting)
+                    if profileService.phase == .waiting {
+                        Button("Abbrechen", systemImage: "xmark", role: .cancel) {
+                            profileService.cancel()
+                        }
+                    }
                     switch profileService.phase {
                     case .idle:
                         EmptyView()

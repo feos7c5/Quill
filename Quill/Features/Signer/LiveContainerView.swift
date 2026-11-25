@@ -51,9 +51,7 @@ struct LiveContainerView: View {
                     } label: {
                         Label(current == nil ? "Laden und installieren" : "Aktualisieren",
                               systemImage: "arrow.down.app")
-                            .frame(maxWidth: .infinity)
                     }
-                    .primaryActionRow()
                     .disabled(working || pipeline.isRunning)
                 } header: {
                     Text("1. Laden und installieren")

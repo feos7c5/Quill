@@ -3065,6 +3065,40 @@
         }
       }
     },
+    "Bericht teilen": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share Report"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partager le rapport"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Compartir informe"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Condividi rapporto"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Raporu paylaş"
+          }
+        }
+      }
+    },
     "Bestätigen": {
       "localizations": {
         "en": {
@@ -3473,6 +3507,40 @@
         }
       }
     },
+    "Code angezeigt": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Code shown"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Code affiché"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Código mostrado"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Codice mostrato"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kod gösterildi"
+          }
+        }
+      }
+    },
     "Code erneut senden": {
       "localizations": {
         "en": {
@@ -3503,6 +3571,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Kodu yeniden gönder"
+          }
+        }
+      }
+    },
+    "Code geprüft (wie in den Einstellungen)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Code checked (as in Settings)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Code vérifié (comme dans Réglages)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Código comprobado (como en Ajustes)"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Codice verificato (come in Impostazioni)"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kod doğrulandı (Ayarlar'daki gibi)"
           }
         }
       }
@@ -4693,6 +4795,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Dosya bir Remote Pairing dosyası değil."
+          }
+        }
+      }
+    },
+    "Die Einstellungen finden Quill nur über WLAN.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Settings can only find Quill over Wi‑Fi."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Réglages ne trouve Quill que via le Wi‑Fi."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ajustes solo encuentra Quill por Wi‑Fi."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impostazioni trova Quill solo tramite Wi‑Fi."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ayarlar, Quill'i yalnızca Wi‑Fi üzerinden bulur."
           }
         }
       }
@@ -6057,6 +6193,74 @@
         }
       }
     },
+    "Einstellungen → Apps → Quill → Live-Aktivitäten einschalten.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn on Settings → Apps → Quill → Live Activities."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activez Réglages → Apps → Quill → Activités en direct."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activa Ajustes → Apps → Quill → Actividades en directo."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Attiva Impostazioni → App → Quill → Attività dal vivo."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ayarlar → Uygulamalar → Quill → Canlı Etkinlikler'i açın."
+          }
+        }
+      }
+    },
+    "Einstellungen → Apps → Quill → Mitteilungen einschalten.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn on Settings → Apps → Quill → Notifications."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activez Réglages → Apps → Quill → Notifications."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activa Ajustes → Apps → Quill → Notificaciones."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Attiva Impostazioni → App → Quill → Notifiche."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ayarlar → Uygulamalar → Quill → Bildirimler'i açın."
+          }
+        }
+      }
+    },
     "Einstellungen → Datenschutz & Sicherheit → Entwicklermodus öffnen und „Quill auf …“ auswählen.": {
       "localizations": {
         "en": {
@@ -6909,6 +7113,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Kullanılabilir uygulama kimlikleri"
+          }
+        }
+      }
+    },
+    "Für die Einstellungen sichtbar (Bonjour)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visible to Settings (Bonjour)"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visible pour Réglages (Bonjour)"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visible para Ajustes (Bonjour)"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Visibile per Impostazioni (Bonjour)"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ayarlar'a görünür (Bonjour)"
           }
         }
       }
@@ -9497,6 +9735,74 @@
         }
       }
     },
+    "Kopplung gestartet": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pairing started"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Jumelage démarré"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Emparejamiento iniciado"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Abbinamento avviato"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eşleme başlatıldı"
+          }
+        }
+      }
+    },
+    "Kopplung prüfen": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check Pairing"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Vérifier le jumelage"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Comprobar emparejamiento"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verifica abbinamento"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eşlemeyi denetle"
+          }
+        }
+      }
+    },
     "Kopplung starten": {
       "localizations": {
         "en": {
@@ -10003,6 +10309,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Süresi ilk dolacak uygulamanın kalan süresini verir. Uygulama yoksa: 99."
+          }
+        }
+      }
+    },
+    "Live-Aktivitäten erlaubt": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Live Activities allowed"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Activités en direct autorisées"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Actividades en directo permitidas"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Attività dal vivo consentite"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Canlı Etkinliklere izin verildi"
           }
         }
       }
@@ -10720,6 +11060,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "“Hatırla” ile parola bu iPhone'un anahtar zincirinde saklanır; böylece Quill uygulamaları yeniden sormadan yenileyebilir. En iyisi yalnızca geliştirme için ayrı bir Apple Kimliği kullanmaktır."
+          }
+        }
+      }
+    },
+    "Mitteilungen erlaubt": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notifications allowed"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notifications autorisées"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notificaciones permitidas"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Notifiche consentite"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bildirimlere izin verildi"
           }
         }
       }
@@ -12984,6 +13358,40 @@
         }
       }
     },
+    "Quill spielt dabei selbst ein iPhone nach, das Quill in den Einstellungen auswählt. Der Code muss in Quill, als Mitteilung und in der Live-Aktivität erscheinen. Dauert etwa 20 Sekunden.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill simulates an iPhone selecting Quill in Settings. The code must appear in Quill, as a notification and in the Live Activity. Takes about 20 seconds."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill simule un iPhone qui sélectionne Quill dans Réglages. Le code doit apparaître dans Quill, en notification et dans l'activité en direct. Environ 20 secondes."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill simula un iPhone que selecciona Quill en Ajustes. El código debe aparecer en Quill, como notificación y en la actividad en directo. Tarda unos 20 segundos."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill simula un iPhone che seleziona Quill in Impostazioni. Il codice deve apparire in Quill, come notifica e nell'attività dal vivo. Circa 20 secondi."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill, Ayarlar'da Quill'i seçen bir iPhone'u taklit eder. Kod Quill'de, bildirimde ve Canlı Etkinlik'te görünmelidir. Yaklaşık 20 saniye sürer."
+          }
+        }
+      }
+    },
     "Quill spricht direkt mit Apple. Zusätzlich holt es Gerätekenndaten („Anisette“) vom Server aus den Einstellungen (Standard: ani.iloader.app). Dieser Server sieht deine IP-Adresse, nicht dein Passwort.": {
       "localizations": {
         "en": {
@@ -13082,6 +13490,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Quill UDID'yi bekliyor"
+          }
+        }
+      }
+    },
+    "Quill wurde im Netzwerk nicht gefunden. Lokales Netzwerk für Quill erlauben (Einstellungen → Apps → Quill).": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill was not found on the network. Allow Local Network for Quill (Settings → Apps → Quill)."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill est introuvable sur le réseau. Autorisez le réseau local pour Quill (Réglages → Apps → Quill)."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se encontró Quill en la red. Permite la red local para Quill (Ajustes → Apps → Quill)."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill non è stato trovato in rete. Consenti la rete locale per Quill (Impostazioni → App → Quill)."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill ağda bulunamadı. Quill için Yerel Ağ'a izin verin (Ayarlar → Uygulamalar → Quill)."
           }
         }
       }
@@ -13388,6 +13830,74 @@
           "stringUnit": {
             "state": "translated",
             "value": "Kapat"
+          }
+        }
+      }
+    },
+    "Selbsttest bestanden: Quill hat den Code angezeigt und geprüft.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Self-test passed: Quill showed and checked the code."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Autotest réussi : Quill a affiché et vérifié le code."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Autoprueba superada: Quill mostró y comprobó el código."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Autotest superato: Quill ha mostrato e verificato il codice."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kendi kendine test başarılı: Quill kodu gösterdi ve doğruladı."
+          }
+        }
+      }
+    },
+    "Selbsttest starten": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Start Self-Test"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lancer l'autotest"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Iniciar autoprueba"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Avvia autotest"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kendi kendine testi başlat"
           }
         }
       }
@@ -14446,6 +14956,40 @@
         }
       }
     },
+    "Test läuft …": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Test running…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Test en cours…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Prueba en curso…"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Test in corso…"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Test sürüyor…"
+          }
+        }
+      }
+    },
     "UDID": {
       "shouldTranslate": false
     },
@@ -15437,6 +15981,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Gereksinimler"
+          }
+        }
+      }
+    },
+    "WLAN verbunden": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wi‑Fi connected"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wi‑Fi connecté"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wi‑Fi conectado"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wi‑Fi connesso"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wi‑Fi bağlı"
           }
         }
       }

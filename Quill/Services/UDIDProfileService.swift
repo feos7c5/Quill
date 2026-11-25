@@ -289,7 +289,19 @@ final class UDIDProfileService {
             "PayloadVersion": 1,
             "PayloadType": "Profile Service",
         ]
-        return try PropertyListSerialization.data(fromPropertyList: plist, format: .xml, options: 0)
+        let xml = try PropertyListSerialization.data(fromPropertyList: plist, format: .xml, options: 0)
+        // Signieren wie ESign: iOS 27 bricht die UDID-Abfrage bei unsignierten Profilen
+        // mit „Ein unbekannter Fehler“ ab, ohne die Rückmeldeadresse aufzurufen.
+        struct Signed: Decodable { let profile: String }
+        do {
+            let signed = try Core.now(Signed.self, xml.base64EncodedString().withCString { sc_profile_sign($0) })
+            guard let data = Data(base64Encoded: signed.profile) else { throw AppError("Ungültige Antwort.") }
+            UDIDLog.write("Profil signiert (\(data.count) Bytes)")
+            return data
+        } catch {
+            UDIDLog.write("Profil NICHT signiert: \(error.localizedDescription)")
+            return xml
+        }
     }
 }
 

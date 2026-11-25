@@ -23,6 +23,7 @@ mod account;
 mod crypto;
 mod device;
 mod pairing;
+mod profile;
 mod storage;
 
 pub use account::TwoFactorCallback;
@@ -507,5 +508,20 @@ pub unsafe extern "C" fn sc_p12_inspect(p12: *const c_char, password: *const c_c
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sc_certificate_inspect(certificate_der: *const c_char) -> *mut c_char {
     let result = unsafe { read_str(certificate_der, "certificate") }.and_then(|c| crypto::inspect_certificate(&c));
+    respond(result)
+}
+
+/// Signiert ein Konfigurationsprofil (XML, Base64) mit Quills eigener Profil-Identität:
+/// `{"profile": "<CMS, Base64>"}`.
+///
+/// # Safety
+/// `profile` muss eine gültige Zeichenkette sein.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn sc_profile_sign(profile: *const c_char) -> *mut c_char {
+    let result = (|| {
+        let profile = unsafe { read_str(profile, "profile") }?;
+        let dir = data_dir().ok_or(CoreError::new("The core is not initialized."))?;
+        profile::sign_b64(&dir, &profile)
+    })();
     respond(result)
 }

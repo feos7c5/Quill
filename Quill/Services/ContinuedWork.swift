@@ -49,11 +49,10 @@ final class ContinuedWork {
         }
         let request = BGContinuedProcessingTaskRequest(identifier: identifier, title: title, subtitle: subtitle)
         request.strategy = .fail
-        do {
-            try BGTaskScheduler.shared.submit(request)
-            log("Hintergrundaufgabe angefordert (\(identifier))")
-        } catch {
-            log("Hintergrundaufgabe abgelehnt: \(error.localizedDescription)")
+        BGTaskScheduler.shared.submitTaskRequest(request) { error in
+            let line = error.map { "Hintergrundaufgabe abgelehnt: \($0.localizedDescription)" }
+                ?? "Hintergrundaufgabe angefordert (\(identifier))"
+            DispatchQueue.main.async { log(line) }
         }
     }
 

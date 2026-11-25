@@ -17,7 +17,7 @@ jobs:
     runs-on: xcode-27
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Werkzeuge anzeigen
         run: |
@@ -73,7 +73,7 @@ jobs:
           ls -lh ../Quill.ipa
 
       - name: IPA hochladen
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: Quill-ipa
           path: build/Quill.ipa
@@ -81,7 +81,7 @@ jobs:
 
       - name: Build-Log hochladen
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: build-log
           path: build.log

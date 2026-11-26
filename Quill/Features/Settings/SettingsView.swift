@@ -41,7 +41,6 @@ struct SettingsView: View {
                         .keyboardType(.numbersAndPunctuation)
                 }
                 NavigationLink("Protokoll des Kerns") { LogFileView(url: Paths.core.appendingPathComponent("core.log"), title: "Protokoll") }
-                NavigationLink("Protokoll der UDID-Erkennung") { LogFileView(url: UDIDProfileService.logURL, title: "UDID-Erkennung") }
                 NavigationLink("Protokoll der Kopplung") { LogFileView(url: PairingLog.url, title: "Kopplung") }
                 ShareLink(item: LogBundle(), preview: SharePreview("Quill-logs.txt")) {
                     Label("Alle Protokolle teilen", systemImage: "square.and.arrow.up")

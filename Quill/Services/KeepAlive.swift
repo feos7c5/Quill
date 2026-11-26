@@ -21,7 +21,7 @@ final class KeepAlive {
             try session.setCategory(.playback, options: [.mixWithOthers])
             try session.setActive(true)
         } catch {
-            UDIDLog.write("Audio session not active: \(error)")
+            AppLog.write("Audio session not active: \(error)")
         }
         let player = try? AVAudioPlayer(data: Self.silence)
         player?.numberOfLoops = -1

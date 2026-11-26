@@ -50,10 +50,6 @@ char *sc_p12_rewrap(const char *p12_b64, const char *old_password, const char *n
 char *sc_p12_inspect(const char *p12_b64, const char *password);
 char *sc_certificate_inspect(const char *certificate_der_b64);
 
-/// Signiert ein Konfigurationsprofil (Base64) mit einer .p12 (leer = eigene Identität):
-/// {"profile": "<CMS, Base64>", "developer_certificate": bool}.
-char *sc_profile_sign(const char *profile, const char *p12, const char *password);
-
 #ifdef __cplusplus
 }
 #endif

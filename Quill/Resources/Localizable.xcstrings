@@ -2963,40 +2963,6 @@
         }
       }
     },
-    "Aus importierten Profilen": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "From imported profiles"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Depuis les profils importés"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "De los perfiles importados"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dai profili importati"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "İçe aktarılan profillerden"
-          }
-        }
-      }
-    },
     "Ausschneiden": {
       "localizations": {
         "en": {
@@ -4051,74 +4017,6 @@
         }
       }
     },
-    "Das Profil ist temporär: iOS gibt nur die UDID an Quill auf diesem iPhone weiter und installiert nichts dauerhaft. Nichts geht ins Internet.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The profile is temporary: iOS only passes the UDID to Quill on this iPhone and installs nothing permanently. Nothing goes to the internet."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Le profil est temporaire : iOS transmet seulement l'UDID à Quill sur cet iPhone et n'installe rien durablement. Rien ne part sur Internet."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "El perfil es temporal: iOS solo pasa el UDID a Quill en este iPhone y no instala nada de forma permanente. Nada sale a internet."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Il profilo è temporaneo: iOS passa solo l'UDID a Quill su questo iPhone e non installa nulla in modo permanente. Nulla va su internet."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Profil geçicidir: iOS yalnızca UDID'yi bu iPhone'daki Quill'e iletir ve kalıcı bir şey yüklemez. İnternete hiçbir şey gitmez."
-          }
-        }
-      }
-    },
-    "Das Profil wird mit deinem Apple-Zertifikat signiert.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "The profile is signed with your Apple certificate."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Le profil est signé avec votre certificat Apple."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "El perfil se firma con tu certificado de Apple."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Il profilo viene firmato con il tuo certificato Apple."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Profil, Apple sertifikanızla imzalanır."
-          }
-        }
-      }
-    },
     "Das Provisioning Profile ist beschädigt.": {
       "localizations": {
         "en": {
@@ -4353,40 +4251,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Bu bir lockdown eşleme dosyası. iOS 27'de Quill yalnızca Remote Pairing kullanır; “Bilgisayarsız Eşle”yi kullanın veya bir Remote Pairing dosyası seçin."
-          }
-        }
-      }
-    },
-    "Das ist keine gültige UDID (Format 00008130-001C…).": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "This is not a valid UDID (format 00008130-001C…)."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ce n'est pas un UDID valide (format 00008130-001C…)."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No es un UDID válido (formato 00008130-001C…)."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Non è un UDID valido (formato 00008130-001C…)."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Geçerli bir UDID değil (biçim 00008130-001C…)."
           }
         }
       }
@@ -6431,40 +6295,6 @@
         }
       }
     },
-    "Einstellungen › Profil geladen › Installieren": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Settings › Profile Downloaded › Install"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Réglages › Profil téléchargé › Installer"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ajustes › Perfil descargado › Instalar"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Impostazioni › Profilo scaricato › Installa"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ayarlar › Profil İndirildi › Yükle"
-          }
-        }
-      }
-    },
     "Einstellungen → Datenschutz & Sicherheit → Entwicklermodus → „Pair with Quill“ tippen.": {
       "localizations": {
         "en": {
@@ -7045,40 +6875,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Dışa aktar"
-          }
-        }
-      }
-    },
-    "Falls die Profilinstallation scheitert: LocalDevVPN kurz trennen und erneut versuchen.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "If the profile installation fails, briefly disconnect LocalDevVPN and try again."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Si l'installation du profil échoue, déconnectez brièvement LocalDevVPN et réessayez."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Si falla la instalación del perfil, desconecta LocalDevVPN un momento e inténtalo de nuevo."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Se l'installazione del profilo non riesce, disconnetti brevemente LocalDevVPN e riprova."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Profil yüklemesi başarısız olursa LocalDevVPN'i kısa süre kesip yeniden deneyin."
           }
         }
       }
@@ -8579,40 +8375,6 @@
         }
       }
     },
-    "In Safari „Zulassen“ tippen, dann Einstellungen → „Profil geladen“ → Installieren. Danach öffnet Safari eine Seite, die zu Quill zurückführt.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tap “Allow” in Safari, then Settings → “Profile Downloaded” → Install. Safari then opens a page that leads back to Quill."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Touchez « Autoriser » dans Safari, puis Réglages → « Profil téléchargé » → Installer. Safari ouvre ensuite une page qui ramène à Quill."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Toca «Permitir» en Safari y luego Ajustes → «Perfil descargado» → Instalar. Después Safari abre una página que vuelve a Quill."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Tocca «Consenti» in Safari, poi Impostazioni → «Profilo scaricato» → Installa. Safari aprirà poi una pagina che riporta a Quill."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Safari'de “İzin Ver”e dokunun, sonra Ayarlar → “Profil İndirildi” → Yükle. Ardından Safari, Quill'e geri götüren bir sayfa açar."
-          }
-        }
-      }
-    },
     "In den Einstellungen eingeben": {
       "localizations": {
         "en": {
@@ -9289,40 +9051,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Yok"
-          }
-        }
-      }
-    },
-    "Keine Antwort aus den Einstellungen. Erneut versuchen oder die UDID von Hand eintragen.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No response from Settings. Try again or enter the UDID manually."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aucune réponse de Réglages. Réessayez ou saisissez l'UDID manuellement."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No hay respuesta de Ajustes. Inténtalo de nuevo o introduce el UDID a mano."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nessuna risposta da Impostazioni. Riprova o inserisci l'UDID a mano."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ayarlar'dan yanıt yok. Yeniden deneyin veya UDID'yi elle girin."
           }
         }
       }
@@ -11206,6 +10934,40 @@
         }
       }
     },
+    "Nach der Kopplung": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "After pairing"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Après le jumelage"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tras emparejar"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dopo l'abbinamento"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eşlemeden sonra"
+          }
+        }
+      }
+    },
     "Name": {
       "localizations": {
         "en": {
@@ -12022,40 +11784,6 @@
         }
       }
     },
-    "Oder von Hand: Die UDID steht z. B. in der Bestätigung deines UDID-Registrierungsdienstes. Mit Kopplung erkennt Quill sie ohnehin automatisch.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Or manually: the UDID appears e.g. in the confirmation from your UDID registration service. When paired, Quill detects it automatically anyway."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ou manuellement : l'UDID figure p. ex. dans la confirmation de votre service d'enregistrement d'UDID. Une fois jumelé, Quill le détecte de toute façon automatiquement."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "O a mano: el UDID aparece p. ej. en la confirmación de tu servicio de registro de UDID. Con emparejamiento, Quill lo detecta automáticamente."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Oppure a mano: l'UDID si trova ad es. nella conferma del tuo servizio di registrazione UDID. Con l'abbinamento, Quill lo rileva comunque automaticamente."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ya da elle: UDID ör. UDID kayıt hizmetinizin onayında yer alır. Eşlendiğinde Quill onu zaten otomatik algılar."
-          }
-        }
-      }
-    },
     "Ohne JIT signiert LiveContainer jede App selbst, und zwar mit demselben Zertifikat, mit dem LiveContainer signiert wurde. Wer Datei und Passwort hat, kann damit signieren.": {
       "localizations": {
         "en": {
@@ -12667,40 +12395,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Eşleme günlüğü"
-          }
-        }
-      }
-    },
-    "Protokoll der UDID-Erkennung": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "UDID Detection Log"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Journal de détection de l'UDID"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Registro de detección del UDID"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Registro rilevamento UDID"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "UDID algılama günlüğü"
           }
         }
       }
@@ -13490,40 +13184,6 @@
         }
       }
     },
-    "Quill wartet auf die UDID": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quill is waiting for the UDID"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quill attend l'UDID"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quill espera el UDID"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quill attende l'UDID"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quill UDID'yi bekliyor"
-          }
-        }
-      }
-    },
     "Quill öffnen und Apps erneuern": {
       "localizations": {
         "en": {
@@ -13554,40 +13214,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "Quill'i Aç ve Uygulamaları Yenile"
-          }
-        }
-      }
-    },
-    "Quill – UDID ermitteln": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quill – Detect UDID"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quill – Détecter l'UDID"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quill – Detectar UDID"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quill – Rileva UDID"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quill – UDID'yi Algıla"
           }
         }
       }
@@ -14850,40 +14476,6 @@
         }
       }
     },
-    "Temporäres Profil: Liest einmalig die UDID dieses iPhones und gibt sie an Quill auf diesem Gerät. Es wird nichts dauerhaft installiert und nichts ins Internet gesendet.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Temporary profile: reads this iPhone's UDID once and passes it to Quill on this device. Nothing is installed permanently and nothing is sent to the internet."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Profil temporaire : lit une fois l'UDID de cet iPhone et le transmet à Quill sur cet appareil. Rien n'est installé durablement ni envoyé sur Internet."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Perfil temporal: lee una vez el UDID de este iPhone y lo pasa a Quill en este dispositivo. No se instala nada de forma permanente ni se envía nada a internet."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Profilo temporaneo: legge una volta l'UDID di questo iPhone e lo passa a Quill su questo dispositivo. Non viene installato nulla in modo permanente né inviato nulla su internet."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Geçici profil: bu iPhone'un UDID'sini bir kez okur ve bu cihazdaki Quill'e verir. Kalıcı bir şey yüklenmez, internete hiçbir şey gönderilmez."
-          }
-        }
-      }
-    },
     "UDID": {
       "shouldTranslate": false
     },
@@ -14921,40 +14513,6 @@
         }
       }
     },
-    "UDID erkannt": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "UDID Detected"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "UDID détecté"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "UDID detectado"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "UDID rilevato"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "UDID algılandı"
-          }
-        }
-      }
-    },
     "UDID ermitteln": {
       "localizations": {
         "en": {
@@ -14985,40 +14543,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "UDID'yi Algıla"
-          }
-        }
-      }
-    },
-    "UDID ohne Kopplung ermitteln": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Detect UDID Without Pairing"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Détecter l'UDID sans jumelage"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Detectar UDID sin emparejar"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Rileva UDID senza abbinamento"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Eşlemeden UDID'yi algıla"
           }
         }
       }
@@ -16876,74 +16400,6 @@
     },
     "https://…?url={ipa}": {
       "shouldTranslate": false
-    },
-    "iOS hat das Profil geladen, Quill danach aber nicht erreicht. Zuverlässiger: im Tab „Signieren“ das Gerät koppeln, das liefert die UDID automatisch.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iOS downloaded the profile but never reached Quill afterwards. More reliable: pair the device in the “Sign” tab, which provides the UDID automatically."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iOS a téléchargé le profil mais n'a ensuite pas joint Quill. Plus fiable : jumelez l'appareil dans l'onglet « Signer », ce qui fournit l'UDID automatiquement."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iOS descargó el perfil pero después no contactó con Quill. Más fiable: empareja el dispositivo en la pestaña «Firmar», que proporciona el UDID automáticamente."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iOS ha scaricato il profilo ma poi non ha raggiunto Quill. Più affidabile: abbina il dispositivo nella scheda «Firma», che fornisce l'UDID automaticamente."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iOS profili indirdi ama ardından Quill'e ulaşmadı. Daha güvenilir: “İmzala” sekmesinde cihazı eşleyin, UDID otomatik gelir."
-          }
-        }
-      }
-    },
-    "iOS hat keine UDID geliefert.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iOS did not provide a UDID."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iOS n'a fourni aucun UDID."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iOS no ha proporcionado ningún UDID."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iOS non ha fornito alcun UDID."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "iOS bir UDID vermedi."
-          }
-        }
-      }
     },
     "iOS installiert Apps nur über ein Manifest, das per HTTPS mit einem vertrauenswürdigen Zertifikat ausgeliefert wird. Ohne Einrichtung lässt sich eine signierte IPA jederzeit über „Teilen“ exportieren, etwa per AirDrop an den Mac.": {
       "localizations": {

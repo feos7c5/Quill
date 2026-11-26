@@ -18,14 +18,11 @@ final class DeviceLink {
     static let addressKey = "device.address"
     static let defaultAddress = "10.7.0.1:49152"
     private static let udidKey = "device.udid"
-    static let manualUDIDKey = "device.manualUDID"
     private static let nameKey = "device.name"
 
     private(set) var state: State = .unpaired
     private(set) var info: DeviceInfo?
     private(set) var lastChecked: Date?
-    /// Beobachtet, damit die Anzeige nach dem Eintragen sofort aktualisiert.
-    private(set) var manualUDID: String? = UserDefaults.standard.string(forKey: DeviceLink.manualUDIDKey)
 
     init() {
         state = isPaired ? .unreachable(String(localized: "Noch nicht geprüft.")) : .unpaired
@@ -34,28 +31,11 @@ final class DeviceLink {
     var isPaired: Bool { FileManager.default.fileExists(atPath: Paths.pairingFile.path) }
     var isReady: Bool { state == .ready }
 
-    /// UDID aus der letzten Prüfung, der Kopplung oder von Hand eingetragen.
+    /// UDID aus der letzten Prüfung oder der Kopplung.
     var udid: String? {
-        info?.udid ?? UserDefaults.standard.string(forKey: Self.udidKey) ?? manualUDID
+        info?.udid ?? UserDefaults.standard.string(forKey: Self.udidKey)
     }
 
-    /// Von Hand eingetragene UDID, z. B. für einen bezahlten Account ohne Kopplung.
-    func setManualUDID(_ value: String?) throws {
-        guard let raw = value?.trimmed, !raw.isEmpty else {
-            UserDefaults.standard.removeObject(forKey: Self.manualUDIDKey)
-            manualUDID = nil
-            return
-        }
-        let udid = raw.uppercased()
-        // iPhone-UDIDs seit 2018: 8 Hex, Bindestrich, 16 Hex. Ältere: 40 Hex.
-        let modern = udid.range(of: #"^[0-9A-F]{8}-[0-9A-F]{16}$"#, options: .regularExpression) != nil
-        let legacy = udid.range(of: #"^[0-9A-F]{40}$"#, options: .regularExpression) != nil
-        guard modern || legacy else {
-            throw AppError("Das ist keine gültige UDID (Format 00008130-001C…).")
-        }
-        UserDefaults.standard.set(udid, forKey: Self.manualUDIDKey)
-        manualUDID = udid
-    }
     var deviceName: String { info?.name ?? UserDefaults.standard.string(forKey: Self.nameKey) ?? UIDevice.current.name }
     var developerMode: Bool? { info?.developerMode }
 

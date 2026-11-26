@@ -48,7 +48,6 @@ struct SignerView: View {
             case .export: ExportIdentityView()
             case .csr: CSRView()
             case .liveContainer: LiveContainerView()
-            case .udid: UDIDView()
             }
         }
         .onChange(of: account.wantsLogin) { _, wants in
@@ -123,15 +122,10 @@ struct SignerView: View {
                               : signerName ?? String(localized: "Oder unten unter „Eigene Zertifikate“ ein Zertifikat importieren.")) {
                     sheet = .login
                 }
-                // Die Kopplung liefert die UDID mit; den Weg über das Safari-Profil braucht es nur ohne Kopplung.
                 setupStep(done: device.isPaired,
                           title: "Gerät koppeln",
                           detail: String(localized: "Einmalig, ohne Computer. Liefert auch die UDID.")) {
                     sheet = .pairing
-                }
-                if !device.isPaired && device.udid == nil {
-                    Button("UDID ohne Kopplung ermitteln", systemImage: "number") { sheet = .udid }
-                        .font(.footnote)
                 }
                 if device.isPaired {
                     setupStep(done: device.isReady,
@@ -290,14 +284,10 @@ struct SignerView: View {
             } label: {
                 Label("Pairing-Datei importieren", systemImage: "square.and.arrow.down")
             }
-            Button {
-                sheet = .udid
+            LabeledContent {
+                Text(device.udid?.maskedUDID ?? "Nach der Kopplung")
             } label: {
-                LabeledContent {
-                    Text(device.udid?.maskedUDID ?? "Unbekannt")
-                } label: {
-                    Label("UDID", systemImage: "number")
-                }
+                Label("UDID", systemImage: "number")
             }
             .contextMenu {
                 if let udid = device.udid {
@@ -466,7 +456,7 @@ struct SignerView: View {
 // MARK: - Hilfstypen
 
 enum SignerSheet: Identifiable {
-    case pairing, login, export, csr, liveContainer, udid
+    case pairing, login, export, csr, liveContainer
     case identityImport(IdentifiedBatch)
 
     var id: String {
@@ -476,7 +466,6 @@ enum SignerSheet: Identifiable {
         case .export: return "export"
         case .csr: return "csr"
         case .liveContainer: return "lc"
-        case .udid: return "udid"
         case .identityImport(let batch): return "import-\(batch.id)"
         }
     }

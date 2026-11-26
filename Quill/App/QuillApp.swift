@@ -29,7 +29,6 @@ struct QuillApp: App {
                 .environment(services.pipeline)
                 .environment(services.refresher)
                 .environment(services.liveContainer)
-                .environment(services.udidProfile)
         }
         .modelContainer(services.container)
     }
@@ -114,14 +113,6 @@ struct RootView: View {
 
     /// Dateien über „Öffnen mit“/AirDrop und `quill://pairing?data=<Base64>`.
     private func handleIncoming(_ url: URL) {
-        if url.scheme == "quill", url.host == "udid" {
-            // Rückkehr aus den Einstellungen nach dem UDID-Profil; gespeichert hat der Dienst schon.
-            selection = .signer
-            if let value = URLComponents(url: url, resolvingAgainstBaseURL: false)?.queryItems?.first(where: { $0.name == "value" })?.value {
-                do { try device.setManualUDID(value) } catch { errorMessage = error.localizedDescription }
-            }
-            return
-        }
         if url.scheme == "quill", url.host == "refresh-all" || url.host == "refresh" {
             selection = .signer
             startRefresh(bundleID: URLComponents(url: url, resolvingAgainstBaseURL: false)?

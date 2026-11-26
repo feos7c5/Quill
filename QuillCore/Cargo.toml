@@ -41,8 +41,6 @@ rand = "0.8"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", default-features = false, features = ["fmt", "std"] }
 rootcause = "0.12"
-signature = "2"
-cms = { version = "0.2.3", features = ["builder"] }
 
 [dev-dependencies]
 tempfile = "3"

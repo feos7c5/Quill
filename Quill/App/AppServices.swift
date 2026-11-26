@@ -17,7 +17,6 @@ final class AppServices {
     let account = AppleAccountService()
     let refresher = RefreshService()
     let liveContainer = LiveContainerService()
-    let udidProfile = UDIDProfileService()
     let pipeline: SigningPipeline
 
     private init() {
@@ -29,7 +28,6 @@ final class AppServices {
             fatalError("Datenbank konnte nicht geöffnet werden: \(error)")
         }
         pipeline = SigningPipeline(device: device, account: account, ota: installer)
-        udidProfile.onReceived = { [device] udid in try? device.setManualUDID(udid) }
     }
 
     var context: ModelContext { container.mainContext }

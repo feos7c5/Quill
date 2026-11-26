@@ -685,40 +685,6 @@
         }
       }
     },
-    "3. In LiveContainer importieren": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "3. Import into LiveContainer"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "3. Importer dans LiveContainer"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "3. Importar en LiveContainer"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "3. Importa in LiveContainer"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "3. LiveContainer'a aktar"
-          }
-        }
-      }
-    },
     "7 Tage": {
       "localizations": {
         "en": {
@@ -5445,6 +5411,40 @@
         }
       }
     },
+    "Die Übergabe-Adresse für LiveContainer ließ sich nicht erzeugen.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The LiveContainer handover link couldn't be created."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible de créer le lien de transfert pour LiveContainer."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo crear el enlace de traspaso para LiveContainer."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossibile creare il link di passaggio per LiveContainer."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LiveContainer aktarım bağlantısı oluşturulamadı."
+          }
+        }
+      }
+    },
     "Diese App": {
       "localizations": {
         "en": {
@@ -8273,40 +8273,6 @@
         }
       }
     },
-    "In LiveContainer: Einstellungen → „Import Certificate“ → die gesicherte Datei wählen → Passwort einfügen. Danach unter „JIT-Less Mode Diagnose“ den Test starten.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "In LiveContainer: Settings → “Import Certificate” → choose the saved file → paste the password. Then run the test under “JIT-Less Mode Diagnose”."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Dans LiveContainer : Réglages → « Import Certificate » → choisissez le fichier enregistré → collez le mot de passe. Lancez ensuite le test sous « JIT-Less Mode Diagnose »."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "En LiveContainer: Ajustes → «Import Certificate» → elige el archivo guardado → pega la contraseña. Después inicia la prueba en «JIT-Less Mode Diagnose»."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "In LiveContainer: Impostazioni → «Import Certificate» → scegli il file salvato → incolla la password. Poi avvia il test in «JIT-Less Mode Diagnose»."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "LiveContainer'da: Ayarlar → “Import Certificate” → kaydedilen dosyayı seçin → parolayı yapıştırın. Ardından “JIT-Less Mode Diagnose” altında testi başlatın."
-          }
-        }
-      }
-    },
     "In LocalDevVPN verbinden, dann hier tippen.": {
       "localizations": {
         "en": {
@@ -10186,6 +10152,40 @@
         }
       }
     },
+    "LiveContainer ließ sich nicht öffnen. Ist es installiert?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LiveContainer couldn't be opened. Is it installed?"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossible d'ouvrir LiveContainer. Est-il installé ?"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No se pudo abrir LiveContainer. ¿Está instalado?"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Impossibile aprire LiveContainer. È installato?"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "LiveContainer açılamadı. Yüklü mü?"
+          }
+        }
+      }
+    },
     "LiveContainer startet Apps in einer Art Container. So zählt nur LiveContainer selbst zu den drei Apps eines kostenlosen Accounts.": {
       "localizations": {
         "en": {
@@ -10250,40 +10250,6 @@
           "stringUnit": {
             "state": "translated",
             "value": "LiveContainer, tek bir yüklü uygulama içinde istediğiniz kadar uygulama çalıştırır."
-          }
-        }
-      }
-    },
-    "LiveContainer öffnen": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Open LiveContainer"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ouvrir LiveContainer"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Abrir LiveContainer"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Apri LiveContainer"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "LiveContainer'ı aç"
           }
         }
       }
@@ -11784,40 +11750,6 @@
         }
       }
     },
-    "Ohne JIT signiert LiveContainer jede App selbst, und zwar mit demselben Zertifikat, mit dem LiveContainer signiert wurde. Wer Datei und Passwort hat, kann damit signieren.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Without JIT, LiveContainer signs every app itself using the same certificate LiveContainer was signed with. Anyone with the file and password can sign with it."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sans JIT, LiveContainer signe chaque app lui-même avec le certificat ayant servi à signer LiveContainer. Quiconque possède le fichier et le mot de passe peut signer avec."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sin JIT, LiveContainer firma cada app con el mismo certificado con el que se firmó LiveContainer. Quien tenga el archivo y la contraseña puede firmar con él."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Senza JIT, LiveContainer firma ogni app da sé con lo stesso certificato usato per firmare LiveContainer. Chi ha file e password può firmare con esso."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "JIT olmadan LiveContainer her uygulamayı, kendisini imzalayan sertifikayla kendisi imzalar. Dosyaya ve parolaya sahip olan herkes onunla imzalayabilir."
-          }
-        }
-      }
-    },
     "Ohne neues Passwort behält die Datei das Passwort, mit dem sie importiert wurde. Für LiveContainer ein Passwort setzen und dort beim Import eingeben.": {
       "localizations": {
         "en": {
@@ -12123,40 +12055,6 @@
           "stringUnit": {
             "state": "translated",
             "value": ".p12 dosyasının parolası"
-          }
-        }
-      }
-    },
-    "Passwort kopieren": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Copy Password"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Copier le mot de passe"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Copiar contraseña"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Copia password"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Parolayı kopyala"
           }
         }
       }
@@ -13214,6 +13112,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Quill'i Aç ve Uygulamaları Yenile"
+          }
+        }
+      }
+    },
+    "Quill öffnet LiveContainer und übergibt das Zertifikat, mit dem LiveContainer signiert wurde. LiveContainer braucht es, um Apps ohne JIT zu signieren. Danach in LiveContainer unter Einstellungen „JIT-Less Mode Diagnose“ den Test starten.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill opens LiveContainer and hands over the certificate LiveContainer was signed with. LiveContainer needs it to sign apps without JIT. Then run the test under Settings → “JIT-Less Mode Diagnose” in LiveContainer."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill ouvre LiveContainer et lui transmet le certificat avec lequel LiveContainer a été signé. LiveContainer en a besoin pour signer des apps sans JIT. Lancez ensuite le test dans LiveContainer sous Réglages → « JIT-Less Mode Diagnose »."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill abre LiveContainer y le pasa el certificado con el que se firmó LiveContainer. LiveContainer lo necesita para firmar apps sin JIT. Después, ejecuta la prueba en LiveContainer en Ajustes → «JIT-Less Mode Diagnose»."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill apre LiveContainer e gli passa il certificato con cui LiveContainer è stato firmato. LiveContainer ne ha bisogno per firmare app senza JIT. Poi avvia il test in LiveContainer in Impostazioni → «JIT-Less Mode Diagnose»."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill, LiveContainer'ı açar ve LiveContainer'ın imzalandığı sertifikayı aktarır. LiveContainer, uygulamaları JIT olmadan imzalamak için buna ihtiyaç duyar. Ardından LiveContainer'da Ayarlar → “JIT-Less Mode Diagnose” altında testi başlatın."
           }
         }
       }
@@ -15780,6 +15712,40 @@
         }
       }
     },
+    "Zertifikat an LiveContainer übergeben": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hand certificate to LiveContainer"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Transmettre le certificat à LiveContainer"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pasar el certificado a LiveContainer"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Passa il certificato a LiveContainer"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sertifikayı LiveContainer'a aktar"
+          }
+        }
+      }
+    },
     "Zertifikat exportieren": {
       "localizations": {
         "en": {
@@ -15814,74 +15780,6 @@
         }
       }
     },
-    "Zertifikat für LiveContainer erzeugen": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Create Certificate for LiveContainer"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Créer le certificat pour LiveContainer"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Crear certificado para LiveContainer"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Crea certificato per LiveContainer"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "LiveContainer için sertifika oluştur"
-          }
-        }
-      }
-    },
-    "Zertifikat in Dateien sichern": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Save Certificate to Files"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Enregistrer le certificat dans Fichiers"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Guardar certificado en Archivos"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Salva certificato in File"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Sertifikayı Dosyalar'a kaydet"
-          }
-        }
-      }
-    },
     "Zertifikat widerrufen?": {
       "localizations": {
         "en": {
@@ -15912,6 +15810,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Sertifika iptal edilsin mi?"
+          }
+        }
+      }
+    },
+    "Zertifikat zusätzlich in Dateien sichern": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Also save certificate to Files"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enregistrer aussi le certificat dans Fichiers"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Guardar también el certificado en Archivos"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Salva anche il certificato in File"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sertifikayı ayrıca Dosyalar'a kaydet"
           }
         }
       }

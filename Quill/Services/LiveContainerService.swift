@@ -81,6 +81,16 @@ final class LiveContainerService {
 
     // MARK: - Zertifikat übergeben
 
+    /// Übergabe-Adresse von LiveContainer (wie bei SideStore): `livecontainer://certificate?cert=<Base64>&password=<Passwort>`.
+    /// LiveContainer speichert Zertifikat und Passwort dann selbst, ohne Dateiauswahl.
+    static func importURL(certificate: Data, password: String) -> URL? {
+        // Nur Buchstaben und Ziffern unkodiert lassen: `+`, `/` und `=` aus Base64 müssen kodiert sein.
+        let allowed = CharacterSet.alphanumerics
+        guard let cert = certificate.base64EncodedString().addingPercentEncoding(withAllowedCharacters: allowed),
+              let pass = password.addingPercentEncoding(withAllowedCharacters: allowed) else { return nil }
+        return URL(string: "livecontainer://certificate?cert=\(cert)&password=\(pass)")
+    }
+
     /// Erzeugt die .p12 für LiveContainer. Beim Apple-Account wird das Zertifikat zusätzlich
     /// als Identität in Quill abgelegt, damit es unter „Export .p12“ erscheint.
     func certificateForLiveContainer(installed: InstalledApp, password: String, account: AppleAccountService,

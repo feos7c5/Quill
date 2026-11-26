@@ -60,42 +60,24 @@ struct LiveContainerView: View {
                 }
 
                 Section {
-                    LabeledContent("Passwort") {
-                        TextField("Passwort", text: $password)
-                            .multilineTextAlignment(.trailing)
-                            .font(.body.monospaced())
-                            .textInputAutocapitalization(.never)
-                            .autocorrectionDisabled()
+                    Button {
+                        Task { await handOver() }
+                    } label: {
+                        Label("Zertifikat an LiveContainer übergeben", systemImage: "key")
                     }
+                    .disabled(current == nil || working)
                     if let certificateURL {
                         ShareLink(item: certificateURL) {
-                            Label("Zertifikat in Dateien sichern", systemImage: "square.and.arrow.up")
+                            Label("Zertifikat zusätzlich in Dateien sichern", systemImage: "square.and.arrow.up")
                         }
-                        Button("Passwort kopieren", systemImage: "doc.on.doc") {
-                            UIPasteboard.general.string = password
+                        LabeledContent("Passwort") {
+                            Text(password).font(.body.monospaced()).textSelection(.enabled)
                         }
-                    } else {
-                        Button("Zertifikat für LiveContainer erzeugen", systemImage: "key") {
-                            Task { await makeCertificate() }
-                        }
-                        .disabled(current == nil || password.isEmpty || working)
                     }
                 } header: {
                     Text("2. Zertifikat übergeben")
                 } footer: {
-                    Text("Ohne JIT signiert LiveContainer jede App selbst, und zwar mit demselben Zertifikat, mit dem LiveContainer signiert wurde. Wer Datei und Passwort hat, kann damit signieren.")
-                }
-
-                Section {
-                    Text("In LiveContainer: Einstellungen → „Import Certificate“ → die gesicherte Datei wählen → Passwort einfügen. Danach unter „JIT-Less Mode Diagnose“ den Test starten.")
-                        .font(.callout)
-                    Button("LiveContainer öffnen", systemImage: "arrow.up.forward.app") {
-                        UIPasteboard.general.string = password
-                        openURL(LiveContainerService.appURL)
-                    }
-                    .disabled(current == nil)
-                } header: {
-                    Text("3. In LiveContainer importieren")
+                    Text("Quill öffnet LiveContainer und übergibt das Zertifikat, mit dem LiveContainer signiert wurde. LiveContainer braucht es, um Apps ohne JIT zu signieren. Danach in LiveContainer unter Einstellungen „JIT-Less Mode Diagnose“ den Test starten.")
                 }
 
                 if let errorText {
@@ -111,7 +93,6 @@ struct LiveContainerView: View {
                 }
             }
             .task { if service.latest == nil { await loadLatest() } }
-            .onChange(of: password) { certificateURL = nil }
         }
     }
 
@@ -152,14 +133,21 @@ struct LiveContainerView: View {
         }
     }
 
-    private func makeCertificate() async {
+    private func handOver() async {
         guard let current else { return }
         working = true
         defer { working = false }
         errorText = nil
         do {
-            certificateURL = try await service.certificateForLiveContainer(installed: current, password: password,
-                                                                         account: account, context: context)
+            let url = try await service.certificateForLiveContainer(installed: current, password: password,
+                                                                    account: account, context: context)
+            certificateURL = url
+            guard let link = LiveContainerService.importURL(certificate: try Data(contentsOf: url), password: password) else {
+                throw AppError("Die Übergabe-Adresse für LiveContainer ließ sich nicht erzeugen.")
+            }
+            openURL(link) { accepted in
+                if !accepted { errorText = String(localized: "LiveContainer ließ sich nicht öffnen. Ist es installiert?") }
+            }
         } catch {
             errorText = error.localizedDescription
         }

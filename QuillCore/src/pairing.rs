@@ -238,54 +238,6 @@ async fn accept(
     }))
 }
 
-/// Selbsttest auf dem Gerät: Spielt über 127.0.0.1 ein iPhone nach, das Quill in den
-/// Einstellungen auswählt. Quill zeigt dann den Code wie bei einer echten Kopplung an
-/// (App, Mitteilung, Live-Aktivität). Nach `show_for` gibt der nachgespielte Client den Code
-/// ein. Weil er kein echtes iPhone ist, endet die Sitzung danach mit einem Fehler zu
-/// `remotepairing_udid`; daran erkennt die App, dass der Test bis zum Schluss gelaufen ist.
-pub fn self_test(show_for: Duration) -> CoreResult<Value> {
-    use idevice::remote_pairing::{RemotePairingClient, RpPairingSocketProvider};
-    let port = {
-        let s = lock();
-        if !s.running {
-            return Err("No pairing is running.".into());
-        }
-        s.port.ok_or(CoreError::new("No pairing is running."))?
-    };
-    std::thread::Builder::new()
-        .name("quill-pairing-selftest".into())
-        .spawn(move || {
-            let Ok(rt) = tokio::runtime::Builder::new_current_thread().enable_all().build() else { return };
-            rt.block_on(async move {
-                let result = timeout(Duration::from_secs(60), async {
-                    let stream = tokio::net::TcpStream::connect(("127.0.0.1", port)).await?;
-                    let mut socket = RpPairingSocket::new(stream);
-                    socket
-                        .send_plain(
-                            json!({"request":{"_0":{"handshake":{"_0":{
-                                "hostOptions":{"attemptPairVerify":false}, "wireProtocolVersion":26
-                            }}}}}),
-                            0,
-                        )
-                        .await?;
-                    socket.recv_plain().await?;
-                    let mut client = RemotePairingClient::new(socket, "Quill-Selbsttest");
-                    let mut file = RpPairingFile::generate("Quill-Selbsttest");
-                    client
-                        .pair(&mut file, || async move {
-                            sleep(show_for).await;
-                            snapshot()["pin"].as_str().unwrap_or_default().to_owned()
-                        })
-                        .await
-                })
-                .await;
-                tracing::info!("pairing self-test client finished: {result:?}");
-            });
-        })
-        .map_err(|e| CoreError::with("Pairing could not start.", e))?;
-    Ok(json!({ "port": port }))
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;

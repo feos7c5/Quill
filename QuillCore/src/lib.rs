@@ -546,10 +546,3 @@ pub unsafe extern "C" fn sc_profile_sign(
     });
     respond(result)
 }
-
-
-/// Startet den Selbsttest der Kopplung (siehe `pairing::self_test`). Eine Kopplung muss laufen.
-#[unsafe(no_mangle)]
-pub extern "C" fn sc_pair_selftest(show_seconds: u32) -> *mut c_char {
-    respond(pairing::self_test(std::time::Duration::from_secs(u64::from(show_seconds))))
-}

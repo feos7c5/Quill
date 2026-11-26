@@ -280,25 +280,37 @@ enum CoreVault {
                 guard (try? url.resourceValues(forKeys: [.isRegularFileKey]).isRegularFile) == true,
                       let data = try? Data(contentsOf: url) else { continue }
                 total += data.count
-                guard total <= maxBytes else { return }
+                guard total <= maxBytes else {
+                    AppLog.write("Vault: backup skipped, \(total) bytes is too large")
+                    return
+                }
                 let relative = folder + "/" + url.path.replacingOccurrences(of: root.path + "/", with: "")
                 files[relative] = data.base64EncodedString()
             }
         }
-        guard !files.isEmpty, let json = try? JSONEncoder().encode(files) else { return }
+        guard !files.isEmpty, let json = try? JSONEncoder().encode(files) else {
+            AppLog.write("Vault: nothing to back up")
+            return
+        }
         Keychain.set(String(decoding: json, as: UTF8.self), for: key)
+        AppLog.write("Vault: backed up \(files.count) files (\(total) bytes), stored: \(Keychain.get(key) != nil)")
     }
 
     /// Vor dem Start des Kerns aufrufen. Überschreibt nichts, was schon da ist.
     static func restoreIfMissing() {
         guard let text = Keychain.get(key),
-              let files = try? JSONDecoder().decode([String: String].self, from: Data(text.utf8)) else { return }
+              let files = try? JSONDecoder().decode([String: String].self, from: Data(text.utf8)) else {
+            AppLog.write("Vault: no backup in the keychain")
+            return
+        }
+        var restored = 0
+        defer { AppLog.write("Vault: \(files.count) files in backup, \(restored) restored") }
         for (relative, base64) in files {
             guard !relative.contains(".."), let data = Data(base64Encoded: base64) else { continue }
             let url = Paths.core.appendingPathComponent(relative)
             guard !FileManager.default.fileExists(atPath: url.path) else { continue }
             try? FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
-            try? Paths.writeProtected(data, to: url)
+            if (try? Paths.writeProtected(data, to: url)) != nil { restored += 1 }
         }
     }
 

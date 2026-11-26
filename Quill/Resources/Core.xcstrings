@@ -481,46 +481,6 @@
         }
       }
     },
-    "No pairing is running.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No pairing is running."
-          }
-        },
-        "de": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Es läuft keine Kopplung."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Aucun jumelage en cours."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "No hay ningún emparejamiento en curso."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Nessun abbinamento in corso."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Devam eden eşleme yok."
-          }
-        }
-      }
-    },
     "No sign-in is waiting for a code.": {
       "localizations": {
         "de": {

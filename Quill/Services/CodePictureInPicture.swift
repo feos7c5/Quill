@@ -30,14 +30,15 @@ final class CodePictureInPicture: NSObject {
     /// Der Nutzer ist über das Fenster zu Quill zurückgekehrt (kein Abbruch).
     private var restoring = false
     /// Der Nutzer hat das Fenster geschlossen, ohne dass die Kopplung fertig war.
-    var onClosedByUser: (() -> Void)?
+    private var onClosedByUser: (() -> Void)?
 
     static var isSupported: Bool { AVPictureInPictureController.isPictureInPictureSupported() }
 
     private static let pixelSize = CGSize(width: 720, height: 360)
 
     /// Vorbereiten, solange Quill im Vordergrund ist.
-    func prepare() {
+    func prepare(onClosedByUser: @escaping () -> Void) {
+        self.onClosedByUser = onClosedByUser
         guard Self.isSupported else {
             PairingLog.write("Picture in Picture: not supported on this device")
             return
@@ -46,14 +47,12 @@ final class CodePictureInPicture: NSObject {
         stoppingByQuill = false
         restoring = false
         displayLayer.videoGravity = .resizeAspect
-        if controller == nil {
-            let source = AVPictureInPictureController.ContentSource(sampleBufferDisplayLayer: displayLayer, playbackDelegate: self)
-            let controller = AVPictureInPictureController(contentSource: source)
-            controller.canStartPictureInPictureAutomaticallyFromInline = true
-            controller.requiresLinearPlayback = true
-            controller.delegate = self
-            self.controller = controller
-        }
+        let source = AVPictureInPictureController.ContentSource(sampleBufferDisplayLayer: displayLayer, playbackDelegate: self)
+        let controller = AVPictureInPictureController(contentSource: source)
+        controller.canStartPictureInPictureAutomaticallyFromInline = true
+        controller.requiresLinearPlayback = true
+        controller.delegate = self
+        self.controller = controller
         render()
         // Regelmäßig ein frisches Bild liefern, damit das Fenster nicht als „angehalten“ gilt.
         timer?.invalidate()
@@ -89,11 +88,16 @@ final class CodePictureInPicture: NSObject {
         }
     }
 
+    /// Schließt das Fenster und gibt den Controller frei. Ohne Controller kann iOS beim Verlassen
+    /// von Quill kein leeres (schwarzes) Fenster mehr öffnen.
     func stop() {
         stoppingByQuill = true
         timer?.invalidate()
         timer = nil
+        onClosedByUser = nil
+        controller?.canStartPictureInPictureAutomaticallyFromInline = false
         controller?.stopPictureInPicture()
+        controller = nil
         displayLayer.sampleBufferRenderer.flush(removingDisplayedImage: true, completionHandler: nil)
     }
 

@@ -82,7 +82,13 @@ final class UDIDProfileService {
 
     func start() {
         stop()
-        UDIDLog.write("----- Start, iOS \(UIDevice.current.systemVersion) -----")
+        // Mit verbundenem LocalDevVPN erreicht iOS Quill unter 127.0.0.1 nicht („Network is down“),
+        // und die Profilinstallation scheitert mit „Ein unbekannter Fehler“.
+        guard !NetworkState.shared.vpnActive else {
+            phase = .failed(String(localized: "LocalDevVPN ist verbunden. Zuerst in LocalDevVPN trennen."))
+            return
+        }
+        UDIDLog.write("----- Start, iOS \(UIDevice.current.systemVersion), \(NetworkState.shared.summary) -----")
         let token = UUID().uuidString
         hint = nil
         let tracker = CallbackTracker()
@@ -115,14 +121,6 @@ final class UDIDProfileService {
         server = started.server
         phase = .waiting
         // Während der Nutzer in Safari und den Einstellungen ist, liegt Quill im Hintergrund.
-        // Die Hintergrundaufgabe hält den Server erreichbar und zeigt den Stand über den Einstellungen.
-        ContinuedWork.shared.begin(kind: "udid",
-                                   title: String(localized: "Quill wartet auf die UDID"),
-                                   subtitle: String(localized: "Einstellungen › Profil geladen › Installieren"),
-                                   log: { UDIDLog.write($0) },
-                                   onExpire: { [weak self] in
-                                       self?.finish(.failure(AppError("Keine Antwort aus den Einstellungen. Erneut versuchen oder die UDID von Hand eintragen.")))
-                                   })
         KeepAlive.shared.begin()
         keepingAlive = true
         UDIDLog.write("Keep-alive audio: \(KeepAlive.shared.isPlaying ? "on" : "OFF")")
@@ -159,7 +157,7 @@ final class UDIDProfileService {
                 MainActor.assumeIsolated {
                     let rest = UIApplication.shared.backgroundTimeRemaining
                     let restText = rest > 10_000 ? "unlimited" : "\(Int(rest)) s"
-                    UDIDLog.write("\(text) · system task \(ContinuedWork.shared.isSystemTask ? "on" : "off") · keep-alive \(KeepAlive.shared.isPlaying ? "on" : "off") · time left \(restText)")
+                    UDIDLog.write("\(text) · keep-alive \(KeepAlive.shared.isPlaying ? "on" : "off") · time left \(restText)")
                     if name == UIApplication.willEnterForegroundNotification { self.checkContact() }
                 }
             }
@@ -182,7 +180,6 @@ final class UDIDProfileService {
         server = nil
         timeout?.cancel()
         timeout = nil
-        ContinuedWork.shared.end(success: { if case .received = phase { return true }; return false }())
         if keepingAlive {
             KeepAlive.shared.end()
             keepingAlive = false
@@ -420,6 +417,13 @@ enum UDIDLog {
     static func write(_ line: String) { log.write(line) }
 }
 
+/// Allgemeines Protokoll der App (Anmeldedaten-Sicherung u. Ä.), ohne Passwörter und Schlüssel.
+enum AppLog {
+    private static let log = FileLog("app.log")
+    static var url: URL { log.url }
+    static func write(_ line: String) { log.write(line) }
+}
+
 /// Protokoll der Kopplung (ohne Code und Schlüssel).
 enum PairingLog {
     private static let log = FileLog("pairing.log")
@@ -441,6 +445,7 @@ struct LogBundle: Transferable {
         var text = "Quill \(info["CFBundleShortVersionString"] as? String ?? "?") (\(info["CFBundleVersion"] as? String ?? "?"))"
         text += " · bundle \(Bundle.main.bundleIdentifier ?? "?") · iOS \(UIDevice.current.systemVersion)\n"
         let parts: [(String, URL)] = [
+            ("App", AppLog.url),
             ("Pairing", PairingLog.url),
             ("UDID detection", UDIDLog.url),
             ("Core", Paths.core.appendingPathComponent("core.log")),

@@ -61,6 +61,7 @@ struct UDIDView: View {
     @Environment(DeviceLink.self) private var device
     @Environment(UDIDProfileService.self) private var profileService
     @Environment(AppleAccountService.self) private var account
+    private var network = NetworkState.shared
     @Query private var profiles: [ProfileRecord]
 
     @State private var text = UserDefaults.standard.string(forKey: DeviceLink.manualUDIDKey) ?? ""
@@ -86,7 +87,14 @@ struct UDIDView: View {
                             Label("Erneut versuchen", systemImage: "arrow.clockwise")
                         }
                     }
-                    .disabled(profileService.preparingSigner)
+                    .disabled(profileService.preparingSigner || network.vpnActive)
+                    if network.vpnActive {
+                        // iOS erreicht Quill sonst nicht und meldet „Ein unbekannter Fehler“.
+                        Label("LocalDevVPN ist verbunden. Für die Erkennung in LocalDevVPN trennen und danach wieder verbinden.",
+                              systemImage: "exclamationmark.shield.fill")
+                            .font(.footnote)
+                            .foregroundStyle(.orange)
+                    }
                     if profileService.preparingSigner {
                         HStack(spacing: 10) {
                             ProgressView()

@@ -6,6 +6,7 @@ struct PairingView: View {
     @Environment(\.openURL) private var openURL
     @Environment(PairingService.self) private var pairing
     @Environment(DeviceLink.self) private var device
+    private var network = NetworkState.shared
 
     @State private var confirmUnpair = false
 
@@ -24,8 +25,8 @@ struct PairingView: View {
 
                 Section {
                     phaseView
-                    if pairing.vpnActive && pairing.isRunning {
-                        // Bei PhonePair: erst koppeln, danach LocalDevVPN verbinden.
+                    if network.vpnActive && !pairing.isRunning {
+                        // Mit verbundenem VPN erreichen die Einstellungen Quill nicht.
                         Label("LocalDevVPN ist verbunden. Für die Kopplung in LocalDevVPN trennen und danach wieder verbinden.",
                               systemImage: "exclamationmark.shield.fill")
                             .foregroundStyle(.orange)
@@ -48,7 +49,7 @@ struct PairingView: View {
                 Section("So geht’s") {
                     StepRow(number: 1, text: "LocalDevVPN trennen, dann „Kopplung starten“ tippen.")
                     StepRow(number: 2, text: "Einstellungen → Datenschutz & Sicherheit → Entwicklermodus öffnen und „Quill auf …“ auswählen.")
-                    StepRow(number: 3, text: "Den Code eingeben, den Quill im schwebenden Fenster, als Mitteilung und hier zeigt.")
+                    StepRow(number: 3, text: "Den Code aus dem schwebenden Fenster eingeben.")
                     StepRow(number: 4, text: "Erst danach LocalDevVPN wieder verbinden. Quill prüft dann die Verbindung.")
                 }
 
@@ -61,14 +62,10 @@ struct PairingView: View {
                         } label: {
                             Label("Kopplung starten", systemImage: "link")
                         }
+                        .disabled(network.vpnActive)
                     }
                     Button("Einstellungen öffnen", systemImage: "gear") {
                         SystemSettings.open()
-                    }
-                    NavigationLink {
-                        PairingDiagnosticsView()
-                    } label: {
-                        Label("Kopplung prüfen", systemImage: "stethoscope")
                     }
                     if pairing.phase != .idle {
                         NavigationLink("Protokoll") { LogFileView(url: PairingLog.url, title: "Kopplung") }

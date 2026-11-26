@@ -174,6 +174,13 @@ final class DeviceLink {
 
 /// Kopplung ab iOS 27: Quill erscheint in Einstellungen → Datenschutz & Sicherheit →
 /// Entwicklermodus als Rechner; der Nutzer tippt dort den Code ein, den Quill anzeigt.
+///
+/// Ablauf wie bei Husk und StikPair: Der Kern öffnet einen TCP-Port, Quill meldet ihn per Bonjour
+/// an, die Einstellungen verbinden sich, der Kern liefert den Code. Der Code erscheint im
+/// schwebenden Fenster (Bild im Bild) und in der Live-Aktivität.
+///
+/// LocalDevVPN muss dabei getrennt sein: Solange es verbunden ist, lässt iOS Verbindungen auf dem
+/// iPhone selbst nicht durch („Network is down“), und die Einstellungen erreichen Quill nie.
 @MainActor
 @Observable
 final class PairingService {
@@ -183,31 +190,15 @@ final class PairingService {
 
     private(set) var phase: Phase = .idle
     private(set) var message = ""
-    /// Hinweis zur Restzeit im Hintergrund.
-    private(set) var backgroundNote: String?
-    /// Ergebnis des Selbsttests (nil = kein Test gelaufen).
-    private(set) var selfTestPassed: Bool?
-    /// Name, unter dem Quill per Bonjour für die Einstellungen sichtbar ist.
-    private(set) var advertisedName: String?
-    /// Bonjour hat die Veröffentlichung bestätigt.
-    private(set) var published = false
     /// Die Freigabe „Lokales Netzwerk“ fehlt; die Ansicht bietet dann den Weg in die Einstellungen an.
     private(set) var needsLocalNetwork = false
-    /// Ein VPN (meist LocalDevVPN) ist verbunden; während der Kopplung trennen.
-    private(set) var vpnActive = false
-    @ObservationIgnored private var selfTesting = false
 
-    @ObservationIgnored private var relay: PairingRelay?
-    @ObservationIgnored private var probe: Task<Void, Never>?
+    @ObservationIgnored private let advertiser = BonjourAdvertiser()
+    @ObservationIgnored private var check: Task<Void, Never>?
     @ObservationIgnored private var poller: Task<Void, Never>?
-    @ObservationIgnored private var backgroundTask: UIBackgroundTaskIdentifier = .invalid
-    @ObservationIgnored private var observers: [NSObjectProtocol] = []
-    @ObservationIgnored private var notifiedPIN: String?
     @ObservationIgnored private var lastLoggedPhase: String?
-    @ObservationIgnored private var keepingAlive = false
+    @ObservationIgnored private var observers: [NSObjectProtocol] = []
     @ObservationIgnored var onPaired: ((PairSnapshot.Peer) -> Void)?
-
-    private static let pinNotification = "quill-pairing-pin"
 
     var isRunning: Bool {
         switch phase {
@@ -218,126 +209,81 @@ final class PairingService {
 
     func start() {
         guard !isRunning else { return }
-        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .sound]) { _, _ in }
+        guard !NetworkState.shared.vpnActive else {
+            phase = .failed(String(localized: "LocalDevVPN ist verbunden. Zuerst in LocalDevVPN trennen."))
+            return
+        }
         // In eine temporäre Datei schreiben; erst bei Erfolg ersetzt sie eine vorhandene Kopplung.
         let pending = Paths.support.appendingPathComponent("pairing.pending.plist")
         try? FileManager.default.removeItem(at: pending)
         let hostName = String(localized: "Quill auf \(UIDevice.current.name)")
+        let advert: PairAdvert
         do {
-            let advert = try hostName.withCString { name in
+            advert = try hostName.withCString { name in
                 try pending.path.withCString { path in
                     try Core.now(PairAdvert.self, sc_pair_start(name, path))
                 }
             }
-            PairingLog.reset()
-            PairingLog.write("Start, iOS \(UIDevice.current.systemVersion), port \(advert.port), service \(advert.serviceType)")
-            advertisedName = advert.name
-            published = false
-            needsLocalNetwork = false
-            vpnActive = false
-            selfTestPassed = nil
-            publish(advert)
-            phase = .listening
-            message = String(localized: "Jetzt Einstellungen → Datenschutz & Sicherheit → Entwicklermodus öffnen und Quill auswählen. Der Code erscheint erst danach, als Mitteilung und oben in der Systemanzeige.")
-            notifiedPIN = nil
-            observeLifecycle()
-            KeepAlive.shared.begin()
-            keepingAlive = true
-            PairingActivityController.start()
-            CodePictureInPicture.shared.prepare()
-            CodePictureInPicture.shared.onClosedByUser = { [weak self] in
-                guard let self, self.isRunning else { return }
-                self.cancel()
-            }
-            ContinuedWork.shared.begin(kind: "pairing",
-                                       title: String(localized: "Quill wartet auf die Kopplung"),
-                                       subtitle: String(localized: "Einstellungen › Datenschutz & Sicherheit › Entwicklermodus"),
-                                       log: { PairingLog.write($0) },
-                                       onExpire: { [weak self] in self?.cancel() })
-            startPolling(pending: pending)
         } catch {
             phase = .failed(error.localizedDescription)
-            message = error.localizedDescription
+            return
         }
+        PairingLog.reset()
+        PairingLog.write("Start, iOS \(UIDevice.current.systemVersion), port \(advert.port), \(NetworkState.shared.summary)")
+        needsLocalNetwork = false
+        phase = .listening
+        message = String(localized: "Jetzt Einstellungen → Datenschutz & Sicherheit → Entwicklermodus öffnen und Quill auswählen. Der Code erscheint dann im schwebenden Fenster.")
+
+        BonjourAdvertiser.onResult = { [weak self] error, name in
+            guard let self, self.isRunning else { return }
+            if error == 0 {
+                PairingLog.write("Bonjour registered: \(name ?? advert.name)")
+            } else if BonjourAdvertiser.isPolicyDenied(error) {
+                self.fail(localNetwork: true)
+            } else {
+                PairingLog.write("Bonjour registration failed: \(error)")
+                self.fail(String(localized: "Quill konnte sich nicht im lokalen Netzwerk anmelden. WLAN einschalten und erneut versuchen."))
+            }
+        }
+        let error = advertiser.publish(name: advert.name, type: advert.serviceType, port: advert.port, txt: advert.txt)
+        if error != 0 { BonjourAdvertiser.onResult?(error, nil) }
+
+        // Prüfen, ob Quill so sichtbar ist, wie die Einstellungen suchen. Erkennt auch eine
+        // verweigerte Freigabe „Lokales Netzwerk“.
+        check = Task { [weak self] in
+            let outcome = await LocalNetworkProbe.check(type: advert.serviceType, name: advert.name, seconds: 10)
+            guard let self, !Task.isCancelled, self.isRunning else { return }
+            switch outcome {
+            case .visible: PairingLog.write("Quill is visible on the local network")
+            case .denied: self.fail(localNetwork: true)
+            case .notFound(let reason): PairingLog.write("Quill not found on the local network (\(reason))")
+            }
+        }
+
+        KeepAlive.shared.begin()
+        observeLifecycle()
+        PairingActivityController.start()
+        CodePictureInPicture.shared.prepare { [weak self] in
+            // Fenster geschlossen, bevor die Kopplung fertig war: abbrechen.
+            guard let self, self.isRunning else { return }
+            PairingLog.write("Floating window closed by the user")
+            self.cancel()
+        }
+        startPolling(pending: pending)
     }
 
     func cancel() {
         sc_pair_cancel()
     }
 
-    /// Startet eine Kopplung und lässt Quill selbst ein iPhone nachspielen, das Quill auswählt.
-    /// Zeigt so ohne die Einstellungen, ob Code, Mitteilung und Live-Aktivität erscheinen.
-    func startSelfTest(showSeconds: UInt32 = 8) {
-        start()
-        guard isRunning else { return }
-        selfTesting = true
-        PairingLog.write("Self-test started")
-        do {
-            _ = try Core.now(Core.Ignored.self, sc_pair_selftest(showSeconds))
-        } catch {
-            PairingLog.write("Self-test not possible: \(error)")
-            selfTesting = false
-            selfTestPassed = false
-            cancel()
+    private func fail(_ text: String = "", localNetwork: Bool = false) {
+        if localNetwork {
+            PairingLog.write("Local Network access denied")
+            needsLocalNetwork = true
+            phase = .failed(String(localized: "Quill hat keinen Zugriff auf das lokale Netzwerk. Unter Einstellungen → Apps → Quill „Lokales Netzwerk“ einschalten und erneut koppeln."))
+        } else {
+            phase = .failed(text)
         }
-    }
-
-    private func publish(_ advert: PairAdvert) {
-        relay?.stop()
-        // Apples NWListener nimmt die Verbindung an, meldet den Dienst bei Bonjour an und reicht alles
-        // an den Kern (127.0.0.1) weiter. Jede eingehende Verbindung landet im Protokoll.
-        let relay = PairingRelay(corePort: advert.port) { line in PairingLog.write(line) }
-        self.relay = relay
-        relay.start(name: advert.name, type: advert.serviceType, txt: advert.txt) { [weak self] event in
-            Task { @MainActor in
-                guard let self, self.isRunning else { return }
-                switch event {
-                case .ready:
-                    self.published = true
-                    self.startSelfChecks(advert)
-                case .denied:
-                    self.localNetworkDenied()
-                case .failed(let error):
-                    PairingLog.write("Relay failed: \(error)")
-                    self.phase = .failed(String(localized: "Quill konnte sich nicht im lokalen Netzwerk anmelden. WLAN einschalten und erneut versuchen."))
-                    self.cancel()
-                }
-            }
-        }
-    }
-
-    /// Selbstkontrolle: Netzwerkzustand, Sichtbarkeit per Bonjour und eine Verbindung über genau den
-    /// Weg, den die Einstellungen nehmen.
-    private func startSelfChecks(_ advert: PairAdvert) {
-        probe?.cancel()
-        probe = Task { [weak self] in
-            let network = await LocalNetworkProbe.interfaces()
-            let path = await LocalNetworkProbe.pathSummary()
-            PairingLog.write("Network: \(path)")
-            guard let self, !Task.isCancelled, self.isRunning else { return }
-            self.vpnActive = network.vpnActive
-            if network.vpnActive { PairingLog.write("Warning: a VPN is active during pairing") }
-
-            let outcome = await LocalNetworkProbe.check(type: advert.serviceType, name: advert.name, seconds: 10)
-            guard !Task.isCancelled, self.isRunning else { return }
-            switch outcome {
-            case .visible:
-                PairingLog.write("Self-check: Quill is visible on the local network")
-                await PairingRelay.selfConnect(name: advert.name, type: advert.serviceType) { line in PairingLog.write(line) }
-            case .denied:
-                PairingLog.write("Self-check: Local Network access denied")
-                self.localNetworkDenied()
-            case .notFound(let reason):
-                PairingLog.write("Self-check: Quill not found on the local network (\(reason))")
-                self.message = String(localized: "Quill ist im lokalen Netzwerk nicht sichtbar. WLAN einschalten und unter Einstellungen → Apps → Quill „Lokales Netzwerk“ erlauben.")
-            }
-        }
-    }
-
-    /// Ohne „Lokales Netzwerk“ finden die Einstellungen Quill nicht, und es kommt kein Code.
-    private func localNetworkDenied() {
-        needsLocalNetwork = true
-        phase = .failed(String(localized: "Quill hat keinen Zugriff auf das lokale Netzwerk. Unter Einstellungen → Apps → Quill „Lokales Netzwerk“ einschalten und erneut koppeln."))
         cancel()
     }
 
@@ -349,7 +295,6 @@ final class PairingService {
                 guard let snapshot = try? Core.now(PairSnapshot.self, sc_pair_snapshot()) else { break }
                 self.apply(snapshot, pending: pending)
                 if !snapshot.running { break }
-                self.updateBackgroundNote()
                 try? await Task.sleep(for: .milliseconds(400))
             }
         }
@@ -360,25 +305,22 @@ final class PairingService {
             lastLoggedPhase = snapshot.phase
             PairingLog.write("Phase \(snapshot.phase): \(snapshot.message)\(snapshot.detail.map { " · \($0)" } ?? "")")
         }
-        message = Core.localized(snapshot.message, detail: snapshot.detail)
+        if isRunning || snapshot.phase == "paired" {
+            message = Core.localized(snapshot.message, detail: snapshot.detail)
+        }
         switch snapshot.phase {
         case "listening":
+            guard isRunning else { return }
             phase = .listening
-            PairingActivityController.update(.waiting)
-            CodePictureInPicture.shared.show(.waiting)
+            show(.waiting)
         case "connected":
+            guard isRunning else { return }
             phase = .connected
-            PairingActivityController.update(.connected)
-            CodePictureInPicture.shared.show(.connected)
+            show(.connected)
         case "pin":
-            if let pin = snapshot.pin {
-                phase = .pin(pin)
-                notify(pin: pin)
-                PairingActivityController.update(.code, code: pin)
-                CodePictureInPicture.shared.show(.code(pin))
-                ContinuedWork.shared.update(title: String(localized: "Kopplungscode \(pin)"),
-                                            subtitle: String(localized: "In den Einstellungen eingeben"))
-            }
+            guard isRunning, let pin = snapshot.pin else { return }
+            phase = .pin(pin)
+            show(.code(pin))
         case "paired":
             do {
                 let data = try Data(contentsOf: pending)
@@ -392,17 +334,7 @@ final class PairingService {
             }
             finish()
         case "error":
-            // Der Selbsttest endet planmäßig hier: Der nachgespielte Client hat keine UDID.
-            if selfTesting, snapshot.detail?.contains("remotepairing_udid") == true {
-                selfTestPassed = true
-                phase = .stopped
-                message = String(localized: "Selbsttest bestanden: Quill hat den Code angezeigt und geprüft.")
-                PairingLog.write("Self-test passed")
-            } else {
-                if selfTesting { selfTestPassed = false }
-                phase = .failed(Core.localized(snapshot.message, detail: snapshot.detail))
-            }
-            selfTesting = false
+            if isRunning { phase = .failed(Core.localized(snapshot.message, detail: snapshot.detail)) }
             finish()
         case "stopped":
             // Eine bereits gemeldete Ursache (z. B. fehlendes „Lokales Netzwerk“) nicht überschreiben.
@@ -413,86 +345,51 @@ final class PairingService {
         }
     }
 
-    private func notify(pin: String) {
-        guard notifiedPIN != pin else { return }
-        notifiedPIN = pin
-        let content = UNMutableNotificationContent()
-        content.title = String(localized: "Quill-Kopplungscode")
-        content.body = String(localized: "\(pin) in den Einstellungen eingeben.")
-        content.sound = .default
-        let request = UNNotificationRequest(identifier: Self.pinNotification, content: content, trigger: nil)
-        UNUserNotificationCenter.current().add(request) { error in
-            PairingLog.write(error.map { "Code notification failed: \($0)" } ?? "Code notification sent")
+    private func show(_ content: CodePictureInPicture.Content) {
+        CodePictureInPicture.shared.show(content)
+        switch content {
+        case .waiting: PairingActivityController.update(.waiting)
+        case .connected: PairingActivityController.update(.connected)
+        case .code(let pin): PairingActivityController.update(.code, code: pin)
+        case .paired, .failed: break
         }
     }
 
     private func finish() {
         poller?.cancel()
         poller = nil
-        relay?.stop()
-        relay = nil
-        probe?.cancel()
-        probe = nil
-        let center = UNUserNotificationCenter.current()
-        center.removeDeliveredNotifications(withIdentifiers: [Self.pinNotification])
-        center.removePendingNotificationRequests(withIdentifiers: [Self.pinNotification])
+        check?.cancel()
+        check = nil
+        advertiser.stop()
+        BonjourAdvertiser.onResult = nil
         for observer in observers { NotificationCenter.default.removeObserver(observer) }
         observers = []
-        endBackgroundTask()
-        ContinuedWork.shared.end(success: phase == .paired)
-        PairingActivityController.end(phase == .paired ? .paired : .failed)
-        // Wachhalten erst beenden, wenn das schwebende Fenster zu ist; sonst hält iOS Quill an,
-        // bevor es das Fenster schließen kann, und es bleibt mit „Fehlgeschlagen“ stehen.
-        let wasKeepingAlive = keepingAlive
-        keepingAlive = false
-        CodePictureInPicture.shared.finish(phase == .paired ? .paired : .failed) {
-            if wasKeepingAlive { KeepAlive.shared.end() }
-        }
-        backgroundNote = nil
         lastLoggedPhase = nil
+        let paired = phase == .paired
+        PairingActivityController.end(paired ? .paired : .failed)
+        // Wachhalten erst beenden, wenn das schwebende Fenster zu ist; sonst hält iOS Quill an,
+        // bevor es das Fenster schließen kann.
+        CodePictureInPicture.shared.finish(paired ? .paired : .failed) {
+            KeepAlive.shared.end()
+        }
     }
 
-    // MARK: - Hintergrund
-
-    /// Während der Nutzer in den Einstellungen ist, liegt Quill im Hintergrund.
-    /// Eine Hintergrund-Aufgabe hält den Port offen, aber nur begrenzt lange.
     private func observeLifecycle() {
         let center = NotificationCenter.default
-        observers.append(center.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: .main) { [weak self] _ in
+        observers.append(center.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: .main) { _ in
             MainActor.assumeIsolated {
-                PairingLog.write("Quill in background · system task \(ContinuedWork.shared.isSystemTask ? "on" : "off") · keep-alive \(KeepAlive.shared.isPlaying ? "on" : "off")")
-                self?.beginBackgroundTask()
+                PairingLog.write("Quill in background · keep-alive \(KeepAlive.shared.isPlaying ? "on" : "off") · \(NetworkState.shared.summary)")
             }
         })
-        observers.append(center.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: .main) { [weak self] _ in
-            MainActor.assumeIsolated {
-                PairingLog.write("Quill back in foreground")
-                self?.endBackgroundTask()
-                self?.backgroundNote = nil
-            }
+        observers.append(center.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: .main) { _ in
+            MainActor.assumeIsolated { PairingLog.write("Quill back in foreground") }
         })
     }
 
-    private func beginBackgroundTask() {
-        guard isRunning, backgroundTask == .invalid else { return }
-        backgroundTask = UIApplication.shared.beginBackgroundTask(withName: "Quill-Kopplung") { [weak self] in
-            // Die stumme Wiedergabe (KeepAlive) hält Quill weiter wach; nur die Aufgabe sauber beenden.
-            MainActor.assumeIsolated { self?.endBackgroundTask() }
-        }
+    /// Wird LocalDevVPN während der Kopplung verbunden, kann sie nicht mehr gelingen.
+    func vpnChanged(active: Bool) {
+        guard active, isRunning else { return }
+        PairingLog.write("LocalDevVPN connected during pairing")
+        fail(String(localized: "LocalDevVPN wurde verbunden. Kopplung abgebrochen; erst nach dem Koppeln verbinden."))
     }
-
-    private func endBackgroundTask() {
-        guard backgroundTask != .invalid else { return }
-        UIApplication.shared.endBackgroundTask(backgroundTask)
-        backgroundTask = .invalid
-    }
-
-    private func updateBackgroundNote() {
-        guard UIApplication.shared.applicationState == .background else { return }
-        let seconds = UIApplication.shared.backgroundTimeRemaining
-        if seconds < 10_000 {
-            backgroundNote = String(localized: "Noch \(Int(seconds)) Sekunden Hintergrundzeit. Kopplung jetzt abschließen.")
-        }
-    }
-
 }

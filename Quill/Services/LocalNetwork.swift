@@ -93,45 +93,37 @@ enum LocalNetworkProbe {
             }
         }
     }
+}
 
-    struct Interfaces: Sendable {
-        let wifi: (name: String, index: Int)?
-        let vpnActive: Bool
-    }
+/// Beobachtet laufend, ob WLAN da ist und ob ein VPN (LocalDevVPN) verbunden ist.
+@MainActor
+@Observable
+final class NetworkState {
+    static let shared = NetworkState()
 
-    /// WLAN-Schnittstelle und ob ein VPN-Tunnel aktiv ist.
-    static func interfaces() async -> Interfaces {
-        await withCheckedContinuation { continuation in
-            let monitor = NWPathMonitor()
-            let once = OnceFlag()
-            monitor.pathUpdateHandler = { path in
-                guard once.set() else { return }
-                monitor.cancel()
-                let wifi = path.availableInterfaces.first { $0.type == .wifi }
-                let vpn = path.availableInterfaces.contains { $0.name.hasPrefix("utun") || $0.name.hasPrefix("ipsec") }
-                continuation.resume(returning: Interfaces(wifi: wifi.map { ($0.name, $0.index) }, vpnActive: vpn))
+    private(set) var vpnActive = false
+    private(set) var wifi = false
+    /// Wird bei jeder Änderung des VPN-Zustands aufgerufen.
+    @ObservationIgnored var onVPNChange: ((Bool) -> Void)?
+
+    @ObservationIgnored private let monitor = NWPathMonitor()
+
+    var summary: String { "\(wifi ? "Wi-Fi" : "no Wi-Fi") · \(vpnActive ? "VPN connected" : "no VPN")" }
+
+    private init() {
+        monitor.pathUpdateHandler = { path in
+            // LocalDevVPN erscheint als „utun“-Schnittstelle.
+            let vpn = path.availableInterfaces.contains { $0.name.hasPrefix("utun") || $0.name.hasPrefix("ipsec") }
+            let wifi = path.usesInterfaceType(.wifi) || path.availableInterfaces.contains { $0.type == .wifi }
+            Task { @MainActor in
+                let shared = NetworkState.shared
+                let changed = shared.vpnActive != vpn
+                shared.vpnActive = vpn
+                shared.wifi = wifi
+                if changed { shared.onVPNChange?(vpn) }
             }
-            monitor.start(queue: .global())
         }
-    }
-
-    /// Kurzbeschreibung der Verbindung fürs Protokoll: WLAN, Mobilfunk, VPN.
-    static func pathSummary() async -> String {
-        await withCheckedContinuation { continuation in
-            let monitor = NWPathMonitor()
-            let once = OnceFlag()
-            monitor.pathUpdateHandler = { path in
-                guard once.set() else { return }
-                monitor.cancel()
-                var parts: [String] = []
-                parts.append(path.usesInterfaceType(.wifi) ? "Wi-Fi" : "no Wi-Fi")
-                if path.usesInterfaceType(.cellular) { parts.append("cellular") }
-                let tunnels = path.availableInterfaces.filter { $0.name.hasPrefix("utun") || $0.name.hasPrefix("ipsec") }
-                if !tunnels.isEmpty { parts.append("VPN active (\(tunnels.map(\.name).joined(separator: ", ")))") }
-                continuation.resume(returning: parts.joined(separator: " · "))
-            }
-            monitor.start(queue: .global())
-        }
+        monitor.start(queue: .global(qos: .utility))
     }
 }
 

@@ -99,9 +99,10 @@ struct PairingDiagnosticsView: View {
 
         // Bonjour: Ist Quill so im Netzwerk sichtbar, wie die Einstellungen es suchen?
         let name = pairing.advertisedName ?? ""
-        let visible = await Self.browse(for: name, seconds: 8)
+        let outcome = await LocalNetworkProbe.check(type: "_remotepairing-pairable-host._tcp", name: name, seconds: 10)
+        let visible = outcome == .visible
         add("Für die Einstellungen sichtbar (Bonjour)", visible,
-            visible ? name : String(localized: "Quill wurde im Netzwerk nicht gefunden. Lokales Netzwerk für Quill erlauben (Einstellungen → Apps → Quill)."))
+            visible ? "" : String(localized: "Quill wurde im Netzwerk nicht gefunden. Lokales Netzwerk für Quill erlauben (Einstellungen → Apps → Quill)."))
 
         // Auf den Code und das Ende des Tests warten.
         var sawCode = false
@@ -115,7 +116,7 @@ struct PairingDiagnosticsView: View {
         add("Code geprüft (wie in den Einstellungen)", passed, passed ? "" : pairing.message)
         if pairing.isRunning { pairing.cancel() }
 
-        PairingLog.write("Bericht: " + checks.map { "\($0.ok == true ? "OK" : "FEHLER") \($0.detail)" }.joined(separator: " | "))
+        PairingLog.write("Self-test report: " + checks.map { $0.ok == true ? "OK" : "FAIL" }.joined(separator: ", "))
     }
 
     private func add(_ title: LocalizedStringKey, _ ok: Bool?, _ detail: String) {
@@ -130,53 +131,6 @@ struct PairingDiagnosticsView: View {
                 continuation.resume(returning: path.status == .satisfied)
             }
             monitor.start(queue: .global())
-        }
-    }
-
-    /// Sucht den eigenen Dienst so, wie die Einstellungen ihn suchen.
-    private static func browse(for name: String, seconds: Int) async -> Bool {
-        await withCheckedContinuation { continuation in
-            let browser = NWBrowser(for: .bonjour(type: "_remotepairing-pairable-host._tcp", domain: "local."), using: .tcp)
-            let done = OnceFlag()
-            browser.browseResultsChangedHandler = { results, _ in
-                let found = results.contains { result in
-                    if case .service(let service, _, _, _) = result.endpoint { return service == name }
-                    return false
-                }
-                if found, done.set() {
-                    browser.cancel()
-                    continuation.resume(returning: true)
-                }
-            }
-            browser.stateUpdateHandler = { state in
-                if case .failed(let error) = state {
-                    PairingLog.write("Bonjour-Suche fehlgeschlagen: \(error)")
-                    if done.set() {
-                        browser.cancel()
-                        continuation.resume(returning: false)
-                    }
-                }
-            }
-            browser.start(queue: .global())
-            DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(seconds)) {
-                if done.set() {
-                    browser.cancel()
-                    continuation.resume(returning: false)
-                }
-            }
-        }
-    }
-}
-
-/// Lässt genau einen Aufruf durch (für Continuations mit mehreren möglichen Enden).
-private final class OnceFlag: @unchecked Sendable {
-    private let lock = NSLock()
-    private var fired = false
-    func set() -> Bool {
-        lock.withLock {
-            if fired { return false }
-            fired = true
-            return true
         }
     }
 }

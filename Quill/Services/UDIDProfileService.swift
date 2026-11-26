@@ -37,6 +37,20 @@ final class UDIDProfileService {
 
     static var logURL: URL { UDIDLog.url }
 
+    /// Apple-Entwicklerzertifikat des Accounts als .p12 (Base64) samt Passwort, nur im Speicher.
+    @ObservationIgnored private var signer: (p12: String, password: String)?
+
+    /// Holt das Entwicklerzertifikat des angemeldeten Accounts zum Signieren des Profils.
+    /// So zeigt iOS das Profil als „Verifiziert“, wie bei ESign. Ohne Anmeldung signiert Quill
+    /// mit einem eigenen Zertifikat („Nicht verifiziert“).
+    func prepareSigner(using account: AppleAccountService) async {
+        guard signer == nil, account.isSignedIn else { return }
+        let password = UUID().uuidString
+        if let exported = try? await account.exportP12(password: password) {
+            signer = (exported.data.base64EncodedString(), password)
+        }
+    }
+
     func start() {
         stop()
         UDIDLog.reset()
@@ -49,7 +63,7 @@ final class UDIDProfileService {
         for port in Self.ports {
             do {
                 let base = "http://127.0.0.1:\(port)"
-                let profile = try Self.profile(callbackURL: "\(base)/udid/\(token)")
+                let profile = try Self.profile(callbackURL: "\(base)/udid/\(token)", signer: signer)
                 let server = HTTPServer(port: port, loopbackOnly: true,
                                         handler: Self.makeHandler(token: token, port: port, profile: profile, tracker: tracker) { [weak self] result in
                                             Task { @MainActor in self?.finish(result) }
@@ -57,13 +71,13 @@ final class UDIDProfileService {
                 server.onState = { state in UDIDLog.write("Server \(port): \(state)") }
                 server.onTrace = { line in
                     UDIDLog.write(line)
-                    if line.hasPrefix("Verbindung von") { tracker.connection() }
+                    if line.hasPrefix("Connection from") { tracker.connection() }
                 }
                 try server.start()
                 started = (server, port)
                 break
             } catch {
-                UDIDLog.write("Port \(port) nicht nutzbar: \(error.localizedDescription)")
+                UDIDLog.write("Port \(port) unusable: \(error)")
             }
         }
         guard let started else {
@@ -83,12 +97,12 @@ final class UDIDProfileService {
                                    })
         KeepAlive.shared.begin()
         keepingAlive = true
-        UDIDLog.write("Wachhalten: \(KeepAlive.shared.isPlaying ? "aktiv" : "NICHT aktiv")")
+        UDIDLog.write("Keep-alive audio: \(KeepAlive.shared.isPlaying ? "on" : "OFF")")
         observeLifecycle()
         timeout = Task { [weak self] in
             try? await Task.sleep(for: .seconds(Self.waitSeconds))
             guard !Task.isCancelled else { return }
-            UDIDLog.write("Zeitüberschreitung ohne Antwort von iOS")
+            UDIDLog.write("Timed out without a response from iOS")
             self?.finish(.failure(AppError("Keine Antwort aus den Einstellungen. Erneut versuchen oder die UDID von Hand eintragen.")))
         }
         // Kurz warten, bis der Server bereit ist, sonst lädt Safari ins Leere.
@@ -100,7 +114,7 @@ final class UDIDProfileService {
 
     /// Bricht das Warten ab, ohne einen Fehler zu melden.
     func cancel() {
-        UDIDLog.write("Vom Nutzer abgebrochen")
+        UDIDLog.write("Cancelled by the user")
         stop()
         phase = .idle
     }
@@ -109,15 +123,15 @@ final class UDIDProfileService {
     private func observeLifecycle() {
         let center = NotificationCenter.default
         let events: [(Notification.Name, String)] = [
-            (UIApplication.didEnterBackgroundNotification, "Quill im Hintergrund"),
-            (UIApplication.willEnterForegroundNotification, "Quill wieder im Vordergrund"),
+            (UIApplication.didEnterBackgroundNotification, "Quill in background"),
+            (UIApplication.willEnterForegroundNotification, "Quill back in foreground"),
         ]
         lifecycle = events.map { name, text in
             center.addObserver(forName: name, object: nil, queue: .main) { [unowned self] _ in
                 MainActor.assumeIsolated {
                     let rest = UIApplication.shared.backgroundTimeRemaining
-                    let restText = rest > 10_000 ? "unbegrenzt" : "\(Int(rest)) s"
-                    UDIDLog.write("\(text) · Systemanzeige \(ContinuedWork.shared.isSystemTask ? "aktiv" : "nicht aktiv") · Wachhalten \(KeepAlive.shared.isPlaying ? "aktiv" : "nicht aktiv") · Restzeit \(restText)")
+                    let restText = rest > 10_000 ? "unlimited" : "\(Int(rest)) s"
+                    UDIDLog.write("\(text) · system task \(ContinuedWork.shared.isSystemTask ? "on" : "off") · keep-alive \(KeepAlive.shared.isPlaying ? "on" : "off") · time left \(restText)")
                     if name == UIApplication.willEnterForegroundNotification { self.checkContact() }
                 }
             }
@@ -129,7 +143,7 @@ final class UDIDProfileService {
     private func checkContact() {
         guard phase == .waiting, let served = tracker.servedAt, !tracker.contacted,
               Date.now.timeIntervalSince(served) > 8 else { return }
-        UDIDLog.write("Profil geladen, danach keine Verbindung von iOS")
+        UDIDLog.write("Profile downloaded, but iOS never connected afterwards")
         hint = String(localized: "iOS hat das Profil geladen, Quill danach aber nicht erreicht. Zuverlässiger: im Tab „Signieren“ das Gerät koppeln, das liefert die UDID automatisch.")
     }
 
@@ -151,11 +165,11 @@ final class UDIDProfileService {
         guard phase == .waiting else { return }
         switch result {
         case .success(let udid):
-            UDIDLog.write("UDID erkannt: \(udid)")
+            UDIDLog.write("UDID received: \(udid)")
             phase = .received(udid)
             onReceived?(udid)
         case .failure(let error):
-            UDIDLog.write("Fehler: \(error.localizedDescription)")
+            UDIDLog.write("Error: \(error)")
             phase = .failed(error.localizedDescription)
         }
         // Weiterlaufen lassen, bis Safari die Abschlussseite geladen hat.
@@ -192,7 +206,7 @@ final class UDIDProfileService {
             return response
 
         case ("POST", let path) where path.hasPrefix("/udid/"):
-            if path != "/udid/\(token)" { UDIDLog.write("Hinweis: unerwarteter Pfad, Token passt nicht") }
+            if path != "/udid/\(token)" { UDIDLog.write("Note: unexpected path, token does not match") }
             guard let file = request.bodyFile, let data = try? Data(contentsOf: file), let udid = extractUDID(from: data) else {
                 result(.failure(AppError("iOS hat keine UDID geliefert.")))
                 return .text("No UDID", status: 400)
@@ -229,23 +243,23 @@ final class UDIDProfileService {
     /// je nach iOS-Version als XML oder binär; als letzter Ausweg wird nach dem UDID-Muster gesucht.
     nonisolated static func extractUDID(from data: Data) -> String? {
         if let plist = try? ProvisioningProfile.embeddedPlist(in: data), let udid = plist["UDID"] as? String, !udid.isEmpty {
-            UDIDLog.write("Antwort: XML-Property-List")
+            UDIDLog.write("Response: XML property list")
             return udid.uppercased()
         }
         if let content = derOctetString(startingWith: Data("bplist00".utf8), in: data),
            let plist = try? PropertyListSerialization.propertyList(from: content, format: nil) as? [String: Any],
            let udid = plist["UDID"] as? String, !udid.isEmpty {
-            UDIDLog.write("Antwort: binäre Property List")
+            UDIDLog.write("Response: binary property list")
             return udid.uppercased()
         }
         let text = String(decoding: data, as: UTF8.self)
         for pattern in [#"[0-9A-Fa-f]{8}-[0-9A-Fa-f]{16}"#, #"\b[0-9a-fA-F]{40}\b"#] {
             if let range = text.range(of: pattern, options: .regularExpression) {
-                UDIDLog.write("Antwort: UDID über Muster gefunden")
+                UDIDLog.write("Response: UDID found by pattern")
                 return String(text[range]).uppercased()
             }
         }
-        UDIDLog.write("Antwort ohne erkennbare UDID, Anfang: \(data.prefix(48).map { String(format: "%02x", $0) }.joined())")
+        UDIDLog.write("Response without a recognizable UDID, start: \(data.prefix(48).map { String(format: "%02x", $0) }.joined())")
         return nil
     }
 
@@ -275,12 +289,12 @@ final class UDIDProfileService {
 
     /// Profil vom Typ „Profile Service“. Es wird nicht dauerhaft installiert; iOS liefert nur die
     /// angefragten Geräteattribute an `callbackURL`.
-    private nonisolated static func profile(callbackURL: String) throws -> Data {
+    private nonisolated static func profile(callbackURL: String, signer: (p12: String, password: String)?) throws -> Data {
         let plist: [String: Any] = [
             "PayloadContent": [
                 "URL": callbackURL,
-                // So knapp wie möglich, wie bei SayoSign; mehr braucht Quill nicht.
-                "DeviceAttributes": ["UDID", "PRODUCT"],
+                // Genau wie ESign: nur die UDID.
+                "DeviceAttributes": ["UDID"],
             ],
             "PayloadOrganization": "Quill",
             "PayloadDisplayName": String(localized: "Quill – UDID ermitteln"),
@@ -291,16 +305,25 @@ final class UDIDProfileService {
             "PayloadType": "Profile Service",
         ]
         let xml = try PropertyListSerialization.data(fromPropertyList: plist, format: .xml, options: 0)
-        // Signieren wie ESign: iOS 27 bricht die UDID-Abfrage bei unsignierten Profilen
-        // mit „Ein unbekannter Fehler“ ab, ohne die Rückmeldeadresse aufzurufen.
-        struct Signed: Decodable { let profile: String }
+        // Signieren wie ESign, das dieselbe lokale Abfrage mit einem signierten Profil ausliefert.
+        // Unsigniert scheiterte die Installation unter iOS 27 mit „Ein unbekannter Fehler“.
+        struct Signed: Decodable {
+            let profile: String
+            let developerCertificate: Bool
+        }
         do {
-            let signed = try Core.now(Signed.self, xml.base64EncodedString().withCString { sc_profile_sign($0) })
+            let signed = try xml.base64EncodedString().withCString { profile in
+                try (signer?.p12 ?? "").withCString { p12 in
+                    try (signer?.password ?? "").withCString { password in
+                        try Core.now(Signed.self, sc_profile_sign(profile, p12, password))
+                    }
+                }
+            }
             guard let data = Data(base64Encoded: signed.profile) else { throw AppError("Unlesbare Antwort des Kerns.") }
-            UDIDLog.write("Profil signiert (\(data.count) Bytes)")
+            UDIDLog.write("Profile signed with \(signed.developerCertificate ? "the Apple Development certificate (verified)" : "Quill's own certificate (not verified)"), \(data.count) bytes")
             return data
         } catch {
-            UDIDLog.write("Profil NICHT signiert: \(error.localizedDescription)")
+            UDIDLog.write("Profile NOT signed: \(error)")
             return xml
         }
     }
@@ -327,6 +350,15 @@ final class FileLog: @unchecked Sendable {
 
     init(_ name: String) { url = Paths.core.appendingPathComponent(name) }
 
+    /// Ortszeit des iPhones mit Zeitzone, z. B. „06:46:19.892 +01:00“.
+    nonisolated(unsafe) private static let formatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = .current
+        formatter.dateFormat = "HH:mm:ss.SSS xxx"
+        return formatter
+    }()
+
     func reset() {
         lock.lock()
         defer { lock.unlock() }
@@ -336,7 +368,7 @@ final class FileLog: @unchecked Sendable {
     func write(_ line: String) {
         lock.lock()
         defer { lock.unlock() }
-        let stamp = Date.now.formatted(.iso8601.time(includingFractionalSeconds: true))
+        let stamp = Self.formatter.string(from: .now)
         let data = Data("\(stamp) \(line)\n".utf8)
         if let handle = try? FileHandle(forWritingTo: url) {
             handle.seekToEndOfFile()

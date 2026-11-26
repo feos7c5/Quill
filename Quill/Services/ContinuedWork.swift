@@ -34,7 +34,7 @@ final class ContinuedWork {
             MainActor.assumeIsolated { self?.endGrace() }
         }
         guard let identifier = identifier(kind) else {
-            log("Hintergrundaufgabe: keine erlaubte Kennung in der Info.plist")
+            log("Background task: no permitted identifier in Info.plist")
             return
         }
         if !registered.contains(identifier) {
@@ -42,7 +42,7 @@ final class ContinuedWork {
                 MainActor.assumeIsolated { ContinuedWork.shared.attach(task) }
             }
             guard ok else {
-                log("Hintergrundaufgabe: Registrierung abgelehnt (\(identifier))")
+                log("Background task: registration refused (\(identifier)); the installed bundle ID differs, so the system banner is unavailable")
                 return
             }
             registered.insert(identifier)
@@ -50,8 +50,8 @@ final class ContinuedWork {
         let request = BGContinuedProcessingTaskRequest(identifier: identifier, title: title, subtitle: subtitle)
         request.strategy = .fail
         BGTaskScheduler.shared.submitTaskRequest(request) { error in
-            let line = error.map { "Hintergrundaufgabe abgelehnt: \($0.localizedDescription)" }
-                ?? "Hintergrundaufgabe angefordert (\(identifier))"
+            let line = error.map { "Background task refused: \($0)" }
+                ?? "Background task requested (\(identifier))"
             DispatchQueue.main.async { log(line) }
         }
     }
@@ -87,14 +87,14 @@ final class ContinuedWork {
         task.expirationHandler = {
             DispatchQueue.main.async {
                 let shared = ContinuedWork.shared
-                shared.log?("Hintergrundaufgabe von iOS beendet")
+                shared.log?("Background task ended by iOS")
                 let expire = shared.onExpire
                 shared.task = nil
                 shared.isSystemTask = false
                 expire?()
             }
         }
-        log?("Hintergrundaufgabe läuft, Systemanzeige aktiv")
+        log?("Background task running, system banner shown")
     }
 
     private func endGrace() {

@@ -3235,40 +3235,6 @@
         }
       }
     },
-    "Bonjour-Veröffentlichung fehlgeschlagen. Quill braucht Zugriff auf das lokale Netzwerk (Einstellungen → Quill).": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bonjour publishing failed. Quill needs local network access (Settings → Quill)."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "La publication Bonjour a échoué. Quill a besoin de l'accès au réseau local (Réglages → Quill)."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ha fallado la publicación Bonjour. Quill necesita acceso a la red local (Ajustes → Quill)."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pubblicazione Bonjour non riuscita. Quill ha bisogno dell'accesso alla rete locale (Impostazioni → Quill)."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Bonjour yayını başarısız. Quill'in yerel ağ erişimine ihtiyacı var (Ayarlar → Quill)."
-          }
-        }
-      }
-    },
     "Braucht iOS 27, eingeschalteten Entwicklermodus, WLAN und Zugriff auf das lokale Netzwerk. Die Pairing-Datei bleibt geschützt in Quill und gibt denselben Zugriff wie ein vertrauter Rechner.": {
       "localizations": {
         "en": {
@@ -10656,6 +10622,40 @@
         }
       }
     },
+    "Lokales Netzwerk erlauben": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Allow Local Network"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Autoriser le réseau local"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Permitir red local"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Consenti rete locale"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yerel Ağ'a izin ver"
+          }
+        }
+      }
+    },
     "Löschen": {
       "localizations": {
         "en": {
@@ -13256,6 +13256,40 @@
         }
       }
     },
+    "Quill hat keinen Zugriff auf das lokale Netzwerk. Unter Einstellungen → Apps → Quill „Lokales Netzwerk“ einschalten und erneut koppeln.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill has no access to the local network. Turn on “Local Network” under Settings → Apps → Quill and pair again."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill n'a pas accès au réseau local. Activez « Réseau local » dans Réglages → Apps → Quill et jumelez à nouveau."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill no tiene acceso a la red local. Activa «Red local» en Ajustes → Apps → Quill y vuelve a emparejar."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill non ha accesso alla rete locale. Attiva «Rete locale» in Impostazioni → App → Quill e abbina di nuovo."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill'in yerel ağa erişimi yok. Ayarlar → Uygulamalar → Quill altında “Yerel Ağ”ı açın ve yeniden eşleyin."
+          }
+        }
+      }
+    },
     "Quill ist bereits gekoppelt.": {
       "localizations": {
         "en": {
@@ -13286,6 +13320,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Quill zaten eşlenmiş."
+          }
+        }
+      }
+    },
+    "Quill ist im lokalen Netzwerk nicht sichtbar. WLAN einschalten und unter Einstellungen → Apps → Quill „Lokales Netzwerk“ erlauben.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill is not visible on the local network. Turn on Wi‑Fi and allow “Local Network” under Settings → Apps → Quill."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill n'est pas visible sur le réseau local. Activez le Wi‑Fi et autorisez « Réseau local » dans Réglages → Apps → Quill."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill no es visible en la red local. Activa el Wi‑Fi y permite «Red local» en Ajustes → Apps → Quill."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill non è visibile sulla rete locale. Attiva il Wi‑Fi e consenti «Rete locale» in Impostazioni → App → Quill."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill yerel ağda görünmüyor. Wi‑Fi'yi açın ve Ayarlar → Uygulamalar → Quill altında “Yerel Ağ”a izin verin."
           }
         }
       }
@@ -13354,6 +13422,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Quill bu iPhone'un UDID'sini henüz bilmiyor. “İmzala” sekmesinde “UDID'yi Algıla” ile otomatik algılatın veya elle girin."
+          }
+        }
+      }
+    },
+    "Quill konnte sich nicht im lokalen Netzwerk anmelden. WLAN einschalten und erneut versuchen.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill could not announce itself on the local network. Turn on Wi‑Fi and try again."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill n'a pas pu s'annoncer sur le réseau local. Activez le Wi‑Fi et réessayez."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill no ha podido anunciarse en la red local. Activa el Wi‑Fi e inténtalo de nuevo."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill non è riuscito ad annunciarsi sulla rete locale. Attiva il Wi‑Fi e riprova."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill yerel ağda kendini duyuramadı. Wi‑Fi'yi açıp yeniden deneyin."
           }
         }
       }

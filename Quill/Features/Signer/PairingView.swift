@@ -122,6 +122,12 @@ struct PairingView: View {
             }
         case .failed(let message):
             Label(message, systemImage: "exclamationmark.triangle.fill").foregroundStyle(.red)
+            if pairing.needsLocalNetwork {
+                // Die eigene Einstellungsseite darf Quill direkt öffnen; dort liegt der Schalter.
+                Button("Lokales Netzwerk erlauben", systemImage: "network") {
+                    if let url = URL(string: UIApplication.openSettingsURLString) { UIApplication.shared.open(url) }
+                }
+            }
         }
     }
 

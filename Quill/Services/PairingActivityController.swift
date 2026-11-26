@@ -11,7 +11,7 @@ enum PairingActivityController {
             Task { await old.end(nil, dismissalPolicy: .immediate) }
         }
         guard ActivityAuthorizationInfo().areActivitiesEnabled else {
-            PairingLog.write("Live-Aktivität: in den Einstellungen für Quill ausgeschaltet")
+            PairingLog.write("Live Activity: turned off for Quill in Settings")
             return
         }
         do {
@@ -19,9 +19,9 @@ enum PairingActivityController {
                 attributes: PairingActivityAttributes(),
                 content: ActivityContent(state: .init(stage: .waiting, code: nil), staleDate: nil)
             )
-            PairingLog.write("Live-Aktivität gestartet")
+            PairingLog.write("Live Activity started")
         } catch {
-            PairingLog.write("Live-Aktivität nicht möglich: \(error.localizedDescription)")
+            PairingLog.write("Live Activity not possible: \(error)")
         }
     }
 

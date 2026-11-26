@@ -55,10 +55,22 @@ fn identity(dir: &Path) -> CoreResult<(Vec<u8>, Vec<u8>)> {
     Ok((cert_der, key_der))
 }
 
-pub fn sign(dir: &Path, profile: &[u8]) -> CoreResult<Vec<u8>> {
-    let (cert_der, key_der) = identity(dir)?;
+/// Apples Zwischenzertifikat für Entwicklerzertifikate. Mitgeschickt, damit iOS die Kette
+/// Entwicklerzertifikat → WWDR G3 → Apple Root CA ohne Nachladen prüfen kann.
+const WWDR_G3: &[u8] = include_bytes!("../assets/AppleWWDRCAG3.cer");
+
+/// Signiert mit der übergebenen Identität (z. B. dem Apple-Entwicklerzertifikat des Accounts,
+/// dann zeigt iOS das Profil als „Verifiziert“) oder mit Quills eigener Identität.
+pub fn sign(dir: &Path, profile: &[u8], identity_override: Option<(Vec<u8>, Vec<u8>)>) -> CoreResult<Vec<u8>> {
+    let (cert_der, key_der) = match identity_override {
+        Some(identity) => identity,
+        None => identity(dir)?,
+    };
     let cert = Certificate::from_der(&cert_der).map_err(err)?;
-    let key = RsaPrivateKey::from_pkcs8_der(&key_der).map_err(err)?;
+    let key = RsaPrivateKey::from_pkcs8_der(&key_der)
+        .or_else(|_| <RsaPrivateKey as rsa::pkcs1::DecodeRsaPrivateKey>::from_pkcs1_der(&key_der))
+        .map_err(err)?;
+    let issued_by_apple = cert.tbs_certificate.issuer.to_string().contains("Worldwide Developer Relations");
     let signer = SigningKey::<Sha256>::new(key);
 
     let content = EncapsulatedContentInfo {
@@ -71,11 +83,17 @@ pub fn sign(dir: &Path, profile: &[u8]) -> CoreResult<Vec<u8>> {
         serial_number: cert.tbs_certificate.serial_number.clone(),
     });
     let info = SignerInfoBuilder::new(&signer, sid, digest.clone(), &content, None).map_err(err)?;
-    let signed: ContentInfo = SignedDataBuilder::new(&content)
+    let mut builder = SignedDataBuilder::new(&content);
+    builder
         .add_digest_algorithm(digest)
         .map_err(err)?
         .add_certificate(CertificateChoices::Certificate(cert))
-        .map_err(err)?
+        .map_err(err)?;
+    if issued_by_apple {
+        let wwdr = Certificate::from_der(WWDR_G3).map_err(err)?;
+        builder.add_certificate(CertificateChoices::Certificate(wwdr)).map_err(err)?;
+    }
+    let signed: ContentInfo = builder
         .add_signer_info::<SigningKey<Sha256>, Signature>(info)
         .map_err(err)?
         .build()
@@ -83,11 +101,18 @@ pub fn sign(dir: &Path, profile: &[u8]) -> CoreResult<Vec<u8>> {
     signed.to_der().map_err(err)
 }
 
-pub fn sign_b64(dir: &Path, profile_b64: &str) -> CoreResult<Value> {
+/// `p12_b64` leer = Quills eigene Identität.
+pub fn sign_b64(dir: &Path, profile_b64: &str, p12_b64: &str, password: &str) -> CoreResult<Value> {
     let profile = B64
         .decode(profile_b64.trim())
         .map_err(|_| CoreError::with("Invalid input from the app.", "profile is not valid Base64"))?;
-    Ok(json!({ "profile": B64.encode(sign(dir, &profile)?) }))
+    let identity = if p12_b64.trim().is_empty() {
+        None
+    } else {
+        Some(crate::crypto::open(p12_b64, password)?)
+    };
+    let verified = identity.is_some();
+    Ok(json!({ "profile": B64.encode(sign(dir, &profile, identity)?), "developer_certificate": verified }))
 }
 
 #[cfg(test)]
@@ -98,8 +123,8 @@ mod tests {
     fn signs_and_reuses_identity() {
         let dir = tempfile::tempdir().unwrap();
         let profile = b"<?xml version=\"1.0\"?><plist version=\"1.0\"><dict/></plist>";
-        let first = sign(dir.path(), profile).unwrap();
-        let second = sign(dir.path(), profile).unwrap();
+        let first = sign(dir.path(), profile, None).unwrap();
+        let second = sign(dir.path(), profile, None).unwrap();
         assert!(dir.path().join("profile-signer.cer").exists());
         // Gleiche Identität: dasselbe Zertifikat steckt in beiden Signaturen.
         let cert = std::fs::read(dir.path().join("profile-signer.cer")).unwrap();

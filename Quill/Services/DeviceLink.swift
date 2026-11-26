@@ -176,7 +176,7 @@ final class DeviceLink {
 /// Entwicklermodus als Rechner; der Nutzer tippt dort den Code ein, den Quill anzeigt.
 @MainActor
 @Observable
-final class PairingService: NSObject, NetServiceDelegate {
+final class PairingService {
     enum Phase: Equatable {
         case idle, listening, connected, pin(String), paired, failed(String), stopped
     }
@@ -191,9 +191,12 @@ final class PairingService: NSObject, NetServiceDelegate {
     private(set) var advertisedName: String?
     /// Bonjour hat die Veröffentlichung bestätigt.
     private(set) var published = false
+    /// Die Freigabe „Lokales Netzwerk“ fehlt; die Ansicht bietet dann den Weg in die Einstellungen an.
+    private(set) var needsLocalNetwork = false
     @ObservationIgnored private var selfTesting = false
 
-    @ObservationIgnored private var service: NetService?
+    @ObservationIgnored private let advertiser = BonjourAdvertiser()
+    @ObservationIgnored private var probe: Task<Void, Never>?
     @ObservationIgnored private var poller: Task<Void, Never>?
     @ObservationIgnored private var backgroundTask: UIBackgroundTaskIdentifier = .invalid
     @ObservationIgnored private var observers: [NSObjectProtocol] = []
@@ -225,9 +228,10 @@ final class PairingService: NSObject, NetServiceDelegate {
                 }
             }
             PairingLog.reset()
-            PairingLog.write("Start, iOS \(UIDevice.current.systemVersion), Port \(advert.port), Dienst \(advert.serviceType)")
+            PairingLog.write("Start, iOS \(UIDevice.current.systemVersion), port \(advert.port), service \(advert.serviceType)")
             advertisedName = advert.name
             published = false
+            needsLocalNetwork = false
             selfTestPassed = nil
             publish(advert)
             phase = .listening
@@ -259,11 +263,11 @@ final class PairingService: NSObject, NetServiceDelegate {
         start()
         guard isRunning else { return }
         selfTesting = true
-        PairingLog.write("Selbsttest gestartet")
+        PairingLog.write("Self-test started")
         do {
             _ = try Core.now(Core.Ignored.self, sc_pair_selftest(showSeconds))
         } catch {
-            PairingLog.write("Selbsttest nicht möglich: \(error.localizedDescription)")
+            PairingLog.write("Self-test not possible: \(error)")
             selfTesting = false
             selfTestPassed = false
             cancel()
@@ -271,13 +275,54 @@ final class PairingService: NSObject, NetServiceDelegate {
     }
 
     private func publish(_ advert: PairAdvert) {
-        let type = advert.serviceType.hasSuffix(".") ? String(advert.serviceType.dropLast()) : advert.serviceType
-        let service = NetService(domain: "local.", type: type + ".", name: advert.name, port: Int32(advert.port))
-        let txt = advert.txt.mapValues { Data($0.utf8) }
-        service.setTXTRecord(NetService.data(fromTXTRecord: txt))
-        service.delegate = self
-        service.publish()
-        self.service = service
+        BonjourAdvertiser.onResult = { [weak self] error, name in
+            guard let self else { return }
+            if error == 0 {
+                self.published = true
+                PairingLog.write("Bonjour registered: \(name ?? advert.name)")
+            } else {
+                self.bonjourFailed(error)
+            }
+        }
+        let error = advertiser.publish(name: advert.name, type: advert.serviceType, port: advert.port, txt: advert.txt)
+        if error != 0 { bonjourFailed(error) }
+
+        // Selbstkontrolle: Sieht Quill sich selbst so, wie die Einstellungen suchen? Löst bei Bedarf
+        // auch die Abfrage „Lokales Netzwerk“ aus.
+        probe?.cancel()
+        probe = Task { [weak self] in
+            let path = await LocalNetworkProbe.pathSummary()
+            PairingLog.write("Network: \(path)")
+            let outcome = await LocalNetworkProbe.check(type: advert.serviceType, name: advert.name, seconds: 10)
+            guard let self, !Task.isCancelled, self.isRunning else { return }
+            switch outcome {
+            case .visible:
+                PairingLog.write("Self-check: Quill is visible on the local network")
+            case .denied:
+                PairingLog.write("Self-check: Local Network access denied")
+                self.localNetworkDenied()
+            case .notFound(let reason):
+                PairingLog.write("Self-check: Quill not found on the local network (\(reason))")
+                self.message = String(localized: "Quill ist im lokalen Netzwerk nicht sichtbar. WLAN einschalten und unter Einstellungen → Apps → Quill „Lokales Netzwerk“ erlauben.")
+            }
+        }
+    }
+
+    private func bonjourFailed(_ error: Int32) {
+        PairingLog.write("Bonjour registration failed: \(error)")
+        if BonjourAdvertiser.isPolicyDenied(error) {
+            localNetworkDenied()
+        } else {
+            phase = .failed(String(localized: "Quill konnte sich nicht im lokalen Netzwerk anmelden. WLAN einschalten und erneut versuchen."))
+            cancel()
+        }
+    }
+
+    /// Ohne „Lokales Netzwerk“ finden die Einstellungen Quill nicht, und es kommt kein Code.
+    private func localNetworkDenied() {
+        needsLocalNetwork = true
+        phase = .failed(String(localized: "Quill hat keinen Zugriff auf das lokale Netzwerk. Unter Einstellungen → Apps → Quill „Lokales Netzwerk“ einschalten und erneut koppeln."))
+        cancel()
     }
 
     private func startPolling(pending: URL) {
@@ -333,7 +378,7 @@ final class PairingService: NSObject, NetServiceDelegate {
                 selfTestPassed = true
                 phase = .stopped
                 message = String(localized: "Selbsttest bestanden: Quill hat den Code angezeigt und geprüft.")
-                PairingLog.write("Selbsttest bestanden")
+                PairingLog.write("Self-test passed")
             } else {
                 if selfTesting { selfTestPassed = false }
                 phase = .failed(Core.localized(snapshot.message, detail: snapshot.detail))
@@ -341,7 +386,8 @@ final class PairingService: NSObject, NetServiceDelegate {
             selfTesting = false
             finish()
         case "stopped":
-            phase = .stopped
+            // Eine bereits gemeldete Ursache (z. B. fehlendes „Lokales Netzwerk“) nicht überschreiben.
+            if case .failed = phase {} else { phase = .stopped }
             finish()
         default:
             break
@@ -357,15 +403,16 @@ final class PairingService: NSObject, NetServiceDelegate {
         content.sound = .default
         let request = UNNotificationRequest(identifier: Self.pinNotification, content: content, trigger: nil)
         UNUserNotificationCenter.current().add(request) { error in
-            PairingLog.write(error.map { "Mitteilung mit Code fehlgeschlagen: \($0.localizedDescription)" } ?? "Mitteilung mit Code gesendet")
+            PairingLog.write(error.map { "Code notification failed: \($0)" } ?? "Code notification sent")
         }
     }
 
     private func finish() {
         poller?.cancel()
         poller = nil
-        service?.stop()
-        service = nil
+        advertiser.stop()
+        probe?.cancel()
+        probe = nil
         let center = UNUserNotificationCenter.current()
         center.removeDeliveredNotifications(withIdentifiers: [Self.pinNotification])
         center.removePendingNotificationRequests(withIdentifiers: [Self.pinNotification])
@@ -390,13 +437,13 @@ final class PairingService: NSObject, NetServiceDelegate {
         let center = NotificationCenter.default
         observers.append(center.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated {
-                PairingLog.write("Quill im Hintergrund · Systemanzeige \(ContinuedWork.shared.isSystemTask ? "aktiv" : "nicht aktiv") · Wachhalten \(KeepAlive.shared.isPlaying ? "aktiv" : "nicht aktiv")")
+                PairingLog.write("Quill in background · system task \(ContinuedWork.shared.isSystemTask ? "on" : "off") · keep-alive \(KeepAlive.shared.isPlaying ? "on" : "off")")
                 self?.beginBackgroundTask()
             }
         })
         observers.append(center.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: .main) { [weak self] _ in
             MainActor.assumeIsolated {
-                PairingLog.write("Quill wieder im Vordergrund")
+                PairingLog.write("Quill back in foreground")
                 self?.endBackgroundTask()
                 self?.backgroundNote = nil
             }
@@ -425,20 +472,4 @@ final class PairingService: NSObject, NetServiceDelegate {
         }
     }
 
-    // MARK: - NetServiceDelegate
-
-    nonisolated func netServiceDidPublish(_ sender: NetService) {
-        Task { @MainActor in
-            self.published = true
-            PairingLog.write("Bonjour veröffentlicht: \(sender.name)")
-        }
-    }
-
-    nonisolated func netService(_ sender: NetService, didNotPublish errorDict: [String: NSNumber]) {
-        Task { @MainActor in
-            PairingLog.write("Bonjour fehlgeschlagen: \(errorDict)")
-            self.phase = .failed(String(localized: "Bonjour-Veröffentlichung fehlgeschlagen. Quill braucht Zugriff auf das lokale Netzwerk (Einstellungen → Quill)."))
-            self.cancel()
-        }
-    }
 }

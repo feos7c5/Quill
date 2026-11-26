@@ -60,6 +60,7 @@ struct UDIDView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(DeviceLink.self) private var device
     @Environment(UDIDProfileService.self) private var profileService
+    @Environment(AppleAccountService.self) private var account
     @Query private var profiles: [ProfileRecord]
 
     @State private var text = UserDefaults.standard.string(forKey: DeviceLink.manualUDIDKey) ?? ""
@@ -77,7 +78,10 @@ struct UDIDView: View {
                     // Nie gesperrt: Schlägt die Profilinstallation fehl, meldet iOS das Quill nicht,
                     // deshalb muss ein neuer Versuch jederzeit möglich sein.
                     Button {
-                        profileService.start()
+                        Task {
+                            await profileService.prepareSigner(using: account)
+                            profileService.start()
+                        }
                     } label: {
                         if profileService.phase == .idle {
                             Label("Automatisch erkennen", systemImage: "sparkle.magnifyingglass")

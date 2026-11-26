@@ -78,7 +78,7 @@ fn write_p12(cert_der: &[u8], key_der: &[u8], password: &str) -> CoreResult<Vec<
     store.writer(password).write().map_err(|e| CoreError::with("The .p12 file could not be created.", format!("{e:?}")))
 }
 
-fn open(p12_b64: &str, password: &str) -> CoreResult<(Vec<u8>, Vec<u8>)> {
+pub(crate) fn open(p12_b64: &str, password: &str) -> CoreResult<(Vec<u8>, Vec<u8>)> {
     let data = decode(p12_b64, ".p12")?;
     let store = KeyStore::from_pkcs12(&data, password, Pkcs12ImportPolicy::Relaxed)
         .map_err(|_| CoreError::new("The password is wrong or the .p12 file is damaged."))?;

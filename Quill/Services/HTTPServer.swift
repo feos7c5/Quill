@@ -84,7 +84,7 @@ final class HTTPServer {
         let queue = self.queue
         let trace = self.onTrace
         listener.newConnectionHandler = { connection in
-            trace?("Verbindung von \(connection.endpoint)")
+            trace?("Connection from \(connection.endpoint)")
             HTTPConnection(connection: connection, queue: queue, handler: handler, trace: trace).start()
         }
         let onState = self.onState
@@ -147,7 +147,7 @@ private final class HTTPConnection {
             } else if error != nil || isComplete || self.buffer.count > Self.maxHeaderSize {
                 // 0x16 am Anfang wäre ein TLS-Handshake, also ein HTTPS-Versuch auf dem HTTP-Port.
                 let start = self.buffer.prefix(16).map { String(format: "%02x", $0) }.joined(separator: " ")
-                self.trace?("Verbindung ohne gültige Anfrage beendet · \(self.buffer.count) Bytes [\(start)] · \(error.map { "\($0)" } ?? "vom Gegenüber geschlossen")")
+                self.trace?("Connection closed without a valid request · \(self.buffer.count) bytes [\(start)] · \(error.map { "\($0)" } ?? "closed by peer")")
                 self.close()
             } else {
                 self.receiveHeader()

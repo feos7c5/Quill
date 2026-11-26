@@ -6743,40 +6743,6 @@
         }
       }
     },
-    "Erst danach LocalDevVPN wieder verbinden. Quill prüft dann die Verbindung.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Only then reconnect LocalDevVPN. Quill then checks the connection."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ensuite seulement, reconnectez LocalDevVPN. Quill vérifie alors la connexion."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Solo después vuelve a conectar LocalDevVPN. Quill comprobará la conexión."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Solo dopo riconnetti LocalDevVPN. Quill verificherà poi la connessione."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ancak bundan sonra LocalDevVPN'i yeniden bağlayın. Quill ardından bağlantıyı denetler."
-          }
-        }
-      }
-    },
     "Erweitert": {
       "localizations": {
         "en": {
@@ -6909,6 +6875,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Dışa aktar"
+          }
+        }
+      }
+    },
+    "Falls die Profilinstallation scheitert: LocalDevVPN kurz trennen und erneut versuchen.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "If the profile installation fails, briefly disconnect LocalDevVPN and try again."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Si l'installation du profil échoue, déconnectez brièvement LocalDevVPN et réessayez."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Si falla la instalación del perfil, desconecta LocalDevVPN un momento e inténtalo de nuevo."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Se l'installazione del profilo non riesce, disconnetti brevemente LocalDevVPN e riprova."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Profil yüklemesi başarısız olursa LocalDevVPN'i kısa süre kesip yeniden deneyin."
           }
         }
       }
@@ -10418,142 +10418,6 @@
         }
       }
     },
-    "LocalDevVPN ist verbunden. Für die Erkennung in LocalDevVPN trennen und danach wieder verbinden.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "LocalDevVPN is connected. Disconnect it in LocalDevVPN for detection and reconnect afterwards."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "LocalDevVPN est connecté. Déconnectez-le dans LocalDevVPN pour la détection, puis reconnectez-le."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "LocalDevVPN está conectado. Desconéctalo en LocalDevVPN para la detección y vuelve a conectarlo después."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "LocalDevVPN è connesso. Disconnettilo in LocalDevVPN per il rilevamento e riconnettilo dopo."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "LocalDevVPN bağlı. Algılama için LocalDevVPN'de bağlantıyı kesin ve sonra yeniden bağlayın."
-          }
-        }
-      }
-    },
-    "LocalDevVPN ist verbunden. Für die Kopplung in LocalDevVPN trennen und danach wieder verbinden.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "LocalDevVPN is connected. Disconnect it in LocalDevVPN for pairing and reconnect afterwards."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "LocalDevVPN est connecté. Déconnectez-le dans LocalDevVPN pour le jumelage, puis reconnectez-le ensuite."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "LocalDevVPN está conectado. Desconéctalo en LocalDevVPN para emparejar y vuelve a conectarlo después."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "LocalDevVPN è connesso. Disconnettilo in LocalDevVPN per l'abbinamento e riconnettilo dopo."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "LocalDevVPN bağlı. Eşleme için LocalDevVPN'de bağlantıyı kesin ve sonra yeniden bağlayın."
-          }
-        }
-      }
-    },
-    "LocalDevVPN ist verbunden. Zuerst in LocalDevVPN trennen.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "LocalDevVPN is connected. Disconnect it in LocalDevVPN first."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "LocalDevVPN est connecté. Déconnectez-le d'abord dans LocalDevVPN."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "LocalDevVPN está conectado. Desconéctalo primero en LocalDevVPN."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "LocalDevVPN è connesso. Disconnettilo prima in LocalDevVPN."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "LocalDevVPN bağlı. Önce LocalDevVPN'de bağlantıyı kesin."
-          }
-        }
-      }
-    },
-    "LocalDevVPN trennen, dann „Kopplung starten“ tippen.": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Disconnect LocalDevVPN, then tap “Start Pairing”."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Déconnectez LocalDevVPN, puis touchez « Démarrer le jumelage »."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Desconecta LocalDevVPN y toca «Iniciar emparejamiento»."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Disconnetti LocalDevVPN, poi tocca «Avvia abbinamento»."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "LocalDevVPN bağlantısını kesin, sonra “Eşlemeyi başlat”a dokunun."
-          }
-        }
-      }
-    },
     "LocalDevVPN verbinden": {
       "localizations": {
         "en": {
@@ -10588,36 +10452,36 @@
         }
       }
     },
-    "LocalDevVPN wurde verbunden. Kopplung abgebrochen; erst nach dem Koppeln verbinden.": {
+    "LocalDevVPN verbinden. Quill prüft dann die Verbindung.": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "LocalDevVPN was connected. Pairing cancelled; connect it only after pairing."
+            "value": "Connect LocalDevVPN. Quill then checks the connection."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "LocalDevVPN a été connecté. Jumelage annulé ; connectez-le seulement après le jumelage."
+            "value": "Connectez LocalDevVPN. Quill vérifie ensuite la connexion."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Se ha conectado LocalDevVPN. Emparejamiento cancelado; conéctalo solo después de emparejar."
+            "value": "Conecta LocalDevVPN. Quill comprobará la conexión."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "LocalDevVPN è stato connesso. Abbinamento annullato; connettilo solo dopo l'abbinamento."
+            "value": "Connetti LocalDevVPN. Quill verificherà la connessione."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "LocalDevVPN bağlandı. Eşleme iptal edildi; yalnızca eşlemeden sonra bağlayın."
+            "value": "LocalDevVPN'i bağlayın. Quill ardından bağlantıyı denetler."
           }
         }
       }
@@ -17748,6 +17612,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "“%@” imzalandı."
+          }
+        }
+      }
+    },
+    "„Kopplung starten“ tippen.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap “Start Pairing”."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Touchez « Démarrer le jumelage »."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toca «Iniciar emparejamiento»."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tocca «Avvia abbinamento»."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“Eşlemeyi başlat”a dokunun."
           }
         }
       }

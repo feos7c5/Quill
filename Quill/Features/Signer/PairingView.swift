@@ -6,7 +6,6 @@ struct PairingView: View {
     @Environment(\.openURL) private var openURL
     @Environment(PairingService.self) private var pairing
     @Environment(DeviceLink.self) private var device
-    private var network = NetworkState.shared
 
     @State private var confirmUnpair = false
 
@@ -25,12 +24,7 @@ struct PairingView: View {
 
                 Section {
                     phaseView
-                    if network.vpnActive && !pairing.isRunning {
-                        // Mit verbundenem VPN erreichen die Einstellungen Quill nicht.
-                        Label("LocalDevVPN ist verbunden. Für die Kopplung in LocalDevVPN trennen und danach wieder verbinden.",
-                              systemImage: "exclamationmark.shield.fill")
-                            .foregroundStyle(.orange)
-                    }
+
                 }
 
                 if pairing.isRunning && CodePictureInPicture.isSupported {
@@ -47,10 +41,10 @@ struct PairingView: View {
                 }
 
                 Section("So geht’s") {
-                    StepRow(number: 1, text: "LocalDevVPN trennen, dann „Kopplung starten“ tippen.")
+                    StepRow(number: 1, text: "„Kopplung starten“ tippen.")
                     StepRow(number: 2, text: "Einstellungen → Datenschutz & Sicherheit → Entwicklermodus → „Pair with Quill“ tippen.")
                     StepRow(number: 3, text: "Zuerst den Gerätecode des iPhones eingeben (Entsperrcode), danach den 6-stelligen Quill-Code aus dem schwebenden Fenster.")
-                    StepRow(number: 4, text: "Erst danach LocalDevVPN wieder verbinden. Quill prüft dann die Verbindung.")
+                    StepRow(number: 4, text: "LocalDevVPN verbinden. Quill prüft dann die Verbindung.")
                 }
 
                 Section {
@@ -62,7 +56,6 @@ struct PairingView: View {
                         } label: {
                             Label("Kopplung starten", systemImage: "link")
                         }
-                        .disabled(network.vpnActive)
                     }
                     Button("Einstellungen öffnen", systemImage: "gear") {
                         SystemSettings.open()

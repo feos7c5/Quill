@@ -87,10 +87,10 @@ struct UDIDView: View {
                             Label("Erneut versuchen", systemImage: "arrow.clockwise")
                         }
                     }
-                    .disabled(profileService.preparingSigner || network.vpnActive)
+                    .disabled(profileService.preparingSigner)
                     if network.vpnActive {
-                        // iOS erreicht Quill sonst nicht und meldet „Ein unbekannter Fehler“.
-                        Label("LocalDevVPN ist verbunden. Für die Erkennung in LocalDevVPN trennen und danach wieder verbinden.",
+                        // Mit aktivem VPN scheiterten Verbindungen über 127.0.0.1; nur ein Hinweis, keine Sperre.
+                        Label("Falls die Profilinstallation scheitert: LocalDevVPN kurz trennen und erneut versuchen.",
                               systemImage: "exclamationmark.shield.fill")
                             .font(.footnote)
                             .foregroundStyle(.orange)

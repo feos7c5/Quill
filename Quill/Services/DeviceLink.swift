@@ -179,8 +179,8 @@ final class DeviceLink {
 /// an, die Einstellungen verbinden sich, der Kern liefert den Code. Der Code erscheint im
 /// schwebenden Fenster (Bild im Bild) und in der Live-Aktivität.
 ///
-/// LocalDevVPN muss dabei getrennt sein: Solange es verbunden ist, lässt iOS Verbindungen auf dem
-/// iPhone selbst nicht durch („Network is down“), und die Einstellungen erreichen Quill nie.
+/// Wichtig für den Nutzer: Die erste Abfrage in den Einstellungen ist der Gerätecode des iPhones,
+/// erst danach verbindet sich das iPhone und Quill zeigt den 6-stelligen Code.
 @MainActor
 @Observable
 final class PairingService {
@@ -209,10 +209,6 @@ final class PairingService {
 
     func start() {
         guard !isRunning else { return }
-        guard !NetworkState.shared.vpnActive else {
-            phase = .failed(String(localized: "LocalDevVPN ist verbunden. Zuerst in LocalDevVPN trennen."))
-            return
-        }
         // In eine temporäre Datei schreiben; erst bei Erfolg ersetzt sie eine vorhandene Kopplung.
         let pending = Paths.support.appendingPathComponent("pairing.pending.plist")
         try? FileManager.default.removeItem(at: pending)
@@ -385,12 +381,5 @@ final class PairingService {
         observers.append(center.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: .main) { _ in
             MainActor.assumeIsolated { PairingLog.write("Quill back in foreground") }
         })
-    }
-
-    /// Wird LocalDevVPN während der Kopplung verbunden, kann sie nicht mehr gelingen.
-    func vpnChanged(active: Bool) {
-        guard active, isRunning else { return }
-        PairingLog.write("LocalDevVPN connected during pairing")
-        fail(String(localized: "LocalDevVPN wurde verbunden. Kopplung abgebrochen; erst nach dem Koppeln verbinden."))
     }
 }

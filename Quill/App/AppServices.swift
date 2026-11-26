@@ -30,7 +30,6 @@ final class AppServices {
         }
         pipeline = SigningPipeline(device: device, account: account, ota: installer)
         udidProfile.onReceived = { [device] udid in try? device.setManualUDID(udid) }
-        NetworkState.shared.onVPNChange = { [pairing] active in pairing.vpnChanged(active: active) }
     }
 
     var context: ModelContext { container.mainContext }

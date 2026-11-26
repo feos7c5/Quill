@@ -103,8 +103,6 @@ final class NetworkState {
 
     private(set) var vpnActive = false
     private(set) var wifi = false
-    /// Wird bei jeder Änderung des VPN-Zustands aufgerufen.
-    @ObservationIgnored var onVPNChange: ((Bool) -> Void)?
 
     @ObservationIgnored private let monitor = NWPathMonitor()
 
@@ -116,11 +114,8 @@ final class NetworkState {
             let vpn = path.availableInterfaces.contains { $0.name.hasPrefix("utun") || $0.name.hasPrefix("ipsec") }
             let wifi = path.usesInterfaceType(.wifi) || path.availableInterfaces.contains { $0.type == .wifi }
             Task { @MainActor in
-                let shared = NetworkState.shared
-                let changed = shared.vpnActive != vpn
-                shared.vpnActive = vpn
-                shared.wifi = wifi
-                if changed { shared.onVPNChange?(vpn) }
+                NetworkState.shared.vpnActive = vpn
+                NetworkState.shared.wifi = wifi
             }
         }
         monitor.start(queue: .global(qos: .utility))

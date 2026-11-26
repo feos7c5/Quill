@@ -82,12 +82,6 @@ final class UDIDProfileService {
 
     func start() {
         stop()
-        // Mit verbundenem LocalDevVPN erreicht iOS Quill unter 127.0.0.1 nicht („Network is down“),
-        // und die Profilinstallation scheitert mit „Ein unbekannter Fehler“.
-        guard !NetworkState.shared.vpnActive else {
-            phase = .failed(String(localized: "LocalDevVPN ist verbunden. Zuerst in LocalDevVPN trennen."))
-            return
-        }
         UDIDLog.write("----- Start, iOS \(UIDevice.current.systemVersion), \(NetworkState.shared.summary) -----")
         let token = UUID().uuidString
         hint = nil

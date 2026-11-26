@@ -241,6 +241,7 @@ final class PairingService {
             KeepAlive.shared.begin()
             keepingAlive = true
             PairingActivityController.start()
+            CodePictureInPicture.shared.prepare()
             ContinuedWork.shared.begin(kind: "pairing",
                                        title: String(localized: "Quill wartet auf die Kopplung"),
                                        subtitle: String(localized: "Einstellungen › Datenschutz & Sicherheit › Entwicklermodus"),
@@ -349,14 +350,17 @@ final class PairingService {
         case "listening":
             phase = .listening
             PairingActivityController.update(.waiting)
+            CodePictureInPicture.shared.show(.waiting)
         case "connected":
             phase = .connected
             PairingActivityController.update(.connected)
+            CodePictureInPicture.shared.show(.connected)
         case "pin":
             if let pin = snapshot.pin {
                 phase = .pin(pin)
                 notify(pin: pin)
                 PairingActivityController.update(.code, code: pin)
+                CodePictureInPicture.shared.show(.code(pin))
                 ContinuedWork.shared.update(title: String(localized: "Kopplungscode \(pin)"),
                                             subtitle: String(localized: "In den Einstellungen eingeben"))
             }
@@ -421,6 +425,7 @@ final class PairingService {
         endBackgroundTask()
         ContinuedWork.shared.end(success: phase == .paired)
         PairingActivityController.end(phase == .paired ? .paired : .failed)
+        CodePictureInPicture.shared.finish(phase == .paired ? .paired : .failed)
         backgroundNote = nil
         lastLoggedPhase = nil
         if keepingAlive {

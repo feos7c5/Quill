@@ -117,6 +117,9 @@ struct UDIDView: View {
                             .font(.footnote)
                     }
                     if profileService.phase != .idle {
+                        ShareLink(item: LogBundle(), preview: SharePreview("Quill-logs.txt")) {
+                            Label("Protokolle teilen", systemImage: "square.and.arrow.up")
+                        }
                         NavigationLink("Protokoll") {
                             LogFileView(url: UDIDProfileService.logURL, title: "UDID-Erkennung")
                         }

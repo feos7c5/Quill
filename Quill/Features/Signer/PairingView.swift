@@ -26,10 +26,23 @@ struct PairingView: View {
                     phaseView
                 }
 
+                if pairing.isRunning && CodePictureInPicture.isSupported {
+                    Section {
+                        CodePictureInPicturePreview()
+                            .aspectRatio(2, contentMode: .fit)
+                            .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                        Button("Als schwebendes Fenster zeigen", systemImage: "pip.enter") {
+                            CodePictureInPicture.shared.start()
+                        }
+                    } footer: {
+                        Text("Beim Wechsel in die Einstellungen schwebt dieses Fenster mit dem Code über allen Apps, wie ein Video im Bild-im-Bild.")
+                    }
+                }
+
                 Section("So geht’s") {
                     StepRow(number: 1, text: "„Kopplung starten“ tippen.")
                     StepRow(number: 2, text: "Einstellungen → Datenschutz & Sicherheit → Entwicklermodus öffnen und „Quill auf …“ auswählen.")
-                    StepRow(number: 3, text: "Den Code eingeben, den Quill hier und als Mitteilung zeigt.")
+                    StepRow(number: 3, text: "Den Code eingeben, den Quill im schwebenden Fenster, als Mitteilung und hier zeigt.")
                     StepRow(number: 4, text: "LocalDevVPN öffnen und verbinden. Quill prüft danach die Verbindung.")
                 }
 
@@ -53,6 +66,9 @@ struct PairingView: View {
                     }
                     if pairing.phase != .idle {
                         NavigationLink("Protokoll") { LogFileView(url: PairingLog.url, title: "Kopplung") }
+                    }
+                    ShareLink(item: LogBundle(), preview: SharePreview("Quill-logs.txt")) {
+                        Label("Protokolle teilen", systemImage: "square.and.arrow.up")
                     }
                 } footer: {
                     Text("Braucht iOS 27, eingeschalteten Entwicklermodus, WLAN und Zugriff auf das lokale Netzwerk. Die Pairing-Datei bleibt geschützt in Quill und gibt denselben Zugriff wie ein vertrauter Rechner.")

@@ -1263,6 +1263,40 @@
         }
       }
     },
+    "Alle Protokolle teilen": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share All Logs"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partager tous les journaux"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Compartir todos los registros"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Condividi tutti i registri"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tüm günlükleri paylaş"
+          }
+        }
+      }
+    },
     "Alle Zertifikate und Profile löschen?": {
       "localizations": {
         "en": {
@@ -1463,6 +1497,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Metin olarak aç"
+          }
+        }
+      }
+    },
+    "Als schwebendes Fenster zeigen": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show as Floating Window"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Afficher en fenêtre flottante"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostrar como ventana flotante"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mostra come finestra mobile"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yüzen pencere olarak göster"
           }
         }
       }
@@ -2929,6 +2997,40 @@
         }
       }
     },
+    "Beim Wechsel in die Einstellungen schwebt dieses Fenster mit dem Code über allen Apps, wie ein Video im Bild-im-Bild.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "When you switch to Settings, this window with the code floats above all apps, like a video in Picture in Picture."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quand vous passez à Réglages, cette fenêtre avec le code flotte au-dessus de toutes les apps, comme une vidéo en image dans l'image."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Al cambiar a Ajustes, esta ventana con el código flota sobre todas las apps, como un vídeo en imagen dentro de imagen."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quando passi a Impostazioni, questa finestra con il codice resta sopra tutte le app, come un video in Picture in Picture."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ayarlar'a geçtiğinizde kodu gösteren bu pencere, Resim içinde Resim'deki bir video gibi tüm uygulamaların üzerinde durur."
+          }
+        }
+      }
+    },
     "Benötigt eine eigene Domain, deren DNS-Eintrag auf 127.0.0.1 zeigt, und dafür ein öffentlich gültiges Zertifikat (z. B. Let's Encrypt per DNS-Challenge) als .p12. Manifest und IPA verlassen das Gerät nicht.": {
       "localizations": {
         "en": {
@@ -4323,36 +4425,36 @@
         }
       }
     },
-    "Den Code eingeben, den Quill hier und als Mitteilung zeigt.": {
+    "Den Code eingeben, den Quill im schwebenden Fenster, als Mitteilung und hier zeigt.": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Enter the code Quill shows here and as a notification."
+            "value": "Enter the code Quill shows in the floating window, as a notification and here."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Saisissez le code que Quill affiche ici et en notification."
+            "value": "Saisissez le code que Quill affiche dans la fenêtre flottante, en notification et ici."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Introduce el código que Quill muestra aquí y como notificación."
+            "value": "Introduce el código que Quill muestra en la ventana flotante, como notificación y aquí."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Inserisci il codice che Quill mostra qui e come notifica."
+            "value": "Inserisci il codice che Quill mostra nella finestra mobile, come notifica e qui."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Quill'in burada ve bildirimde gösterdiği kodu girin."
+            "value": "Quill'in yüzen pencerede, bildirimde ve burada gösterdiği kodu girin."
           }
         }
       }
@@ -12773,6 +12875,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Çekirdek günlüğü"
+          }
+        }
+      }
+    },
+    "Protokolle teilen": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share Logs"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Partager les journaux"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Compartir registros"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Condividi registri"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Günlükleri paylaş"
           }
         }
       }

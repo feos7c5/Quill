@@ -1,3 +1,4 @@
+import CoreTransferable
 import Foundation
 import Observation
 import QuillCore
@@ -351,7 +352,7 @@ final class FileLog: @unchecked Sendable {
     init(_ name: String) { url = Paths.core.appendingPathComponent(name) }
 
     /// Ortszeit des iPhones mit Zeitzone, z. B. „06:46:19.892 +01:00“.
-    nonisolated(unsafe) private static let formatter: DateFormatter = {
+    private static let formatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "en_US_POSIX")
         formatter.timeZone = .current
@@ -394,4 +395,31 @@ enum PairingLog {
     static var url: URL { log.url }
     static func reset() { log.reset() }
     static func write(_ line: String) { log.write(line) }
+}
+
+/// Alle Protokolle in einer Datei zum Teilen (Kopplung, UDID-Erkennung, Kern).
+struct LogBundle: Transferable {
+    static var transferRepresentation: some TransferRepresentation {
+        FileRepresentation(exportedContentType: .plainText) { _ in
+            SentTransferredFile(try LogBundle.write())
+        }
+    }
+
+    static func write() throws -> URL {
+        let info = Bundle.main.infoDictionary ?? [:]
+        var text = "Quill \(info["CFBundleShortVersionString"] as? String ?? "?") (\(info["CFBundleVersion"] as? String ?? "?"))"
+        text += " · bundle \(Bundle.main.bundleIdentifier ?? "?") · iOS \(UIDevice.current.systemVersion)\n"
+        let parts: [(String, URL)] = [
+            ("Pairing", PairingLog.url),
+            ("UDID detection", UDIDLog.url),
+            ("Core", Paths.core.appendingPathComponent("core.log")),
+        ]
+        for (title, url) in parts {
+            let body = (try? String(contentsOf: url, encoding: .utf8)) ?? "(empty)\n"
+            text += "\n===== \(title) =====\n" + String(body.suffix(200_000))
+        }
+        let url = Paths.temporary.appendingPathComponent("Quill-logs.txt")
+        try Data(text.utf8).write(to: url)
+        return url
+    }
 }

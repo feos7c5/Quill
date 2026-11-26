@@ -45,7 +45,7 @@ struct PairingDiagnosticsView: View {
                     }
                 }
                 Section {
-                    ShareLink(item: PairingLog.url) {
+                    ShareLink(item: LogBundle(), preview: SharePreview("Quill-logs.txt")) {
                         Label("Bericht teilen", systemImage: "square.and.arrow.up")
                     }
                     NavigationLink("Protokoll") { LogFileView(url: PairingLog.url, title: "Kopplung") }

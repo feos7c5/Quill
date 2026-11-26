@@ -83,7 +83,8 @@ struct PairingView: View {
                     Task { await device.refresh() }
                 }
             }
-            .confirmationDialog("Kopplung entfernen?", isPresented: $confirmUnpair, titleVisibility: .visible) {
+            .alert("Kopplung entfernen?", isPresented: $confirmUnpair) {
+                Button("Abbrechen", role: .cancel) {}
                 Button("Entfernen", role: .destructive) { device.unpair() }
             } message: {
                 Text("Danach kann Quill nicht mehr installieren, bis neu gekoppelt ist. In den Entwicklermodus-Einstellungen bleibt Quill als Rechner stehen und lässt sich dort entfernen.")

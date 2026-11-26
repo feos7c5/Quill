@@ -208,7 +208,8 @@ struct AppDetailView: View {
         .sheet(isPresented: $showSignSheet) {
             SignView(app: app)
         }
-        .confirmationDialog("„\(app.name)“ löschen?", isPresented: $confirmDelete, titleVisibility: .visible) {
+        .alert("„\(app.name)“ löschen?", isPresented: $confirmDelete) {
+            Button("Abbrechen", role: .cancel) {}
             Button("Löschen", role: .destructive) {
                 // Erst die Ansicht schließen, dann löschen: die Ansicht darf kein gelöschtes Modell mehr lesen.
                 let app = app

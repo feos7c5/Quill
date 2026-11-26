@@ -266,22 +266,23 @@ struct AccountDetailView: View {
         .navigationBarTitleDisplayMode(.inline)
         .task(id: account.team?.id) { await load() }
         .refreshable { await load() }
-        .confirmationDialog("Zertifikat widerrufen?", isPresented: $confirmRevoke,
-                            titleVisibility: .visible) {
+        .alert("Zertifikat widerrufen?", isPresented: $confirmRevoke) {
+            Button("Abbrechen", role: .cancel) {}
             Button("Widerrufen", role: .destructive) {
                 if let serial = revoking?.serial { revoke(serial) }
             }
         } message: {
             Text("Alle mit diesem Zertifikat signierten Apps starten danach nicht mehr.")
         }
-        .confirmationDialog("App-ID löschen?", isPresented: Binding(get: { deleting != nil }, set: { if !$0 { deleting = nil } }),
-                            titleVisibility: .visible, presenting: deleting) { entry in
+        .alert("App-ID löschen?", isPresented: Binding(get: { deleting != nil }, set: { if !$0 { deleting = nil } }), presenting: deleting) { entry in
+            Button("Abbrechen", role: .cancel) {}
             Button("Löschen", role: .destructive) { delete(entry) }
                 .tint(.red)
         } message: { entry in
             Text("„\(entry.name)“ wird bei Apple gelöscht. Apps, die damit signiert sind, lassen sich danach nicht mehr erneuern.")
         }
-        .confirmationDialog("Apple-Account wechseln?", isPresented: $confirmSwitch, titleVisibility: .visible) {
+        .alert("Apple-Account wechseln?", isPresented: $confirmSwitch) {
+            Button("Abbrechen", role: .cancel) {}
             Button("Abmelden und neu anmelden") {
                 Task {
                     await account.signOut(forget: true)
@@ -292,7 +293,8 @@ struct AccountDetailView: View {
         } message: {
             Text("Quill meldet diesen Account ab und vergisst Passwort und Zertifikat. Danach meldest du dich mit dem anderen Account an. Apps, die mit diesem Account signiert sind, lassen sich dann nicht mehr erneuern.")
         }
-        .confirmationDialog("Alles vergessen?", isPresented: $confirmSignOut, titleVisibility: .visible) {
+        .alert("Alles vergessen?", isPresented: $confirmSignOut) {
+            Button("Abbrechen", role: .cancel) {}
             Button("Abmelden und vergessen", role: .destructive) { Task { await account.signOut(forget: true) } }
         } message: {
             Text("Löscht gespeichertes Passwort, den privaten Schlüssel des Account-Zertifikats und den Anisette-Zustand. Beim nächsten Anmelden legt Quill ein neues Zertifikat an; Apps mit dem alten lassen sich dann nicht mehr erneuern.")

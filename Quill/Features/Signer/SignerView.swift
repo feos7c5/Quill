@@ -78,7 +78,8 @@ struct SignerView: View {
         } message: {
             Text("Die IPA wird geladen, signiert und installiert.")
         }
-        .confirmationDialog("Alle Zertifikate und Profile löschen?", isPresented: $confirmReset, titleVisibility: .visible) {
+        .alert("Alle Zertifikate und Profile löschen?", isPresented: $confirmReset) {
+            Button("Abbrechen", role: .cancel) {}
             Button("Alles löschen", role: .destructive) { reset() }
         } message: {
             Text("Löscht alle importierten Zertifikate, Profile und einen wartenden CSR-Schlüssel aus Quill. Installierte Apps bleiben, lassen sich damit aber nicht mehr erneuern.")

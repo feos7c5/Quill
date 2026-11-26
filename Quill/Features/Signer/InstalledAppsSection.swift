@@ -61,7 +61,8 @@ struct InstalledAppsSection: View {
                 Text("Beim Erneuern bleiben die Daten der App erhalten. Quill erinnert einen Tag vor Ablauf.")
             }
         }
-        .confirmationDialog("App entfernen?", isPresented: $confirmRemove, titleVisibility: .visible, presenting: removing) { app in
+        .alert("App entfernen?", isPresented: $confirmRemove, presenting: removing) { app in
+            Button("Abbrechen", role: .cancel) {}
             Button("Vom iPhone löschen", role: .destructive) { uninstall(app) }
             Button("Nur aus der Liste entfernen") { forget(app) }
         } message: { app in

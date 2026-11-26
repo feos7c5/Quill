@@ -209,10 +209,11 @@ struct AccountDetailView: View {
                                 Text("Diese App").font(.caption).foregroundStyle(.secondary)
                             }
                         }
-                        .swipeActions {
+                        .swipeActions(edge: .trailing, allowsFullSwipe: false) {
                             // Die App-ID, unter der Quill selbst läuft, nicht anbieten.
                             if !isThisApp && entry.appIdId != nil {
-                                Button("Löschen", role: .destructive) { deleting = entry }
+                                Button("Löschen", systemImage: "trash") { deleting = entry }
+                                    .tint(.red)
                             }
                         }
                     }
@@ -222,7 +223,7 @@ struct AccountDetailView: View {
             } header: {
                 Text("App-IDs")
             } footer: {
-                Text("Kostenlose Accounts bekommen nur wenige neue App-IDs pro Woche. Jede App und jede ihrer Erweiterungen braucht eine. Nicht mehr gebrauchte App-IDs nach links wischen und löschen; ob Apple dadurch sofort wieder eine freigibt, entscheidet Apple.")
+                Text("Kostenlose Accounts bekommen nur wenige neue App-IDs pro Woche. Jede App und jede ihrer Erweiterungen braucht eine. Apple zählt jede neu angelegte App-ID sieben Tage lang, auch nach dem Löschen. Die freie Anzahl steigt deshalb erst nach einer Woche wieder.")
             }
 
             Section {
@@ -242,8 +243,9 @@ struct AccountDetailView: View {
                             Text("Quill").font(.caption).foregroundStyle(.tint)
                         }
                     }
-                    .swipeActions {
-                        Button("Widerrufen", role: .destructive) { revoking = certificate; confirmRevoke = true }
+                    .swipeActions(edge: .trailing, allowsFullSwipe: false) {
+                        Button("Widerrufen", systemImage: "xmark.seal") { revoking = certificate; confirmRevoke = true }
+                            .tint(.red)
                     }
                 }
             } header: {
@@ -275,6 +277,7 @@ struct AccountDetailView: View {
         .confirmationDialog("App-ID löschen?", isPresented: Binding(get: { deleting != nil }, set: { if !$0 { deleting = nil } }),
                             titleVisibility: .visible, presenting: deleting) { entry in
             Button("Löschen", role: .destructive) { delete(entry) }
+                .tint(.red)
         } message: { entry in
             Text("„\(entry.name)“ wird bei Apple gelöscht. Apps, die damit signiert sind, lassen sich danach nicht mehr erneuern.")
         }

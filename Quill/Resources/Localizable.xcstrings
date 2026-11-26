@@ -10007,36 +10007,42 @@
         }
       }
     },
-    "Kostenlose Accounts bekommen nur wenige neue App-IDs pro Woche. Jede App und jede ihrer Erweiterungen braucht eine. Nicht mehr gebrauchte App-IDs nach links wischen und löschen; ob Apple dadurch sofort wieder eine freigibt, entscheidet Apple.": {
+    "Kostenlose Accounts bekommen nur wenige neue App-IDs pro Woche. Jede App und jede ihrer Erweiterungen braucht eine. Apple zählt jede neu angelegte App-ID sieben Tage lang, auch nach dem Löschen. Die freie Anzahl steigt deshalb erst nach einer Woche wieder.": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Free accounts get only a few new app IDs per week. Every app and each of its extensions needs one. Swipe left to delete app IDs you no longer need; whether Apple frees a slot right away is up to Apple."
+            "value": "Free accounts get only a few new app IDs per week. Every app and each of its extensions needs one. Apple counts every newly created app ID for seven days, even after deleting it, so the free count only rises again after a week."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Les comptes gratuits n'obtiennent que quelques identifiants d'app par semaine. Chaque app et chacune de ses extensions en nécessite un. Balayez vers la gauche pour supprimer ceux dont vous n'avez plus besoin ; Apple décide si une place se libère aussitôt."
+            "value": "Les comptes gratuits n'obtiennent que quelques nouveaux identifiants d'app par semaine. Chaque app et chacune de ses extensions en demande un. Apple compte chaque identifiant créé pendant sept jours, même après suppression ; le nombre disponible ne remonte donc qu'après une semaine."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Las cuentas gratuitas solo reciben unas pocas ID de app nuevas por semana. Cada app y cada una de sus extensiones necesita una. Desliza a la izquierda para eliminar las que ya no necesites; Apple decide si libera una plaza de inmediato."
+            "value": "Las cuentas gratuitas solo reciben unas pocas ID de app nuevas por semana. Cada app y cada una de sus extensiones necesita una. Apple cuenta cada ID creada durante siete días, incluso tras borrarla, así que el número libre solo sube pasada una semana."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Gli account gratuiti ricevono solo pochi nuovi ID app a settimana. Ogni app e ogni sua estensione ne richiede uno. Scorri a sinistra per eliminare quelli che non servono più; è Apple a decidere se liberare subito un posto."
+            "value": "Gli account gratuiti ricevono solo pochi nuovi ID app a settimana. Ogni app e ogni sua estensione ne richiede uno. Apple conta ogni ID creato per sette giorni, anche dopo l'eliminazione, quindi il numero disponibile risale solo dopo una settimana."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ücretsiz hesaplar haftada yalnızca birkaç yeni uygulama kimliği alır. Her uygulama ve her uzantısı bir tane gerektirir. Artık gerekmeyenleri sola kaydırıp silin; yerin hemen açılıp açılmayacağına Apple karar verir."
+            "value": "Ücretsiz hesaplar haftada yalnızca birkaç yeni uygulama kimliği alır. Her uygulama ve her uzantısı bir tane gerektirir. Apple, yeni oluşturulan her kimliği silinse bile yedi gün sayar; bu yüzden boş sayı ancak bir hafta sonra yükselir."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kostenlose Accounts bekommen nur wenige neue App-IDs pro Woche. Jede App und jede ihrer Erweiterungen braucht eine. Apple zählt jede neu angelegte App-ID sieben Tage lang, auch nach dem Löschen. Die freie Anzahl steigt deshalb erst nach einer Woche wieder."
           }
         }
       }

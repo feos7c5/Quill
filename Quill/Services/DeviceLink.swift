@@ -197,7 +197,7 @@ final class PairingService {
     private(set) var vpnActive = false
     @ObservationIgnored private var selfTesting = false
 
-    @ObservationIgnored private let advertiser = BonjourAdvertiser()
+    @ObservationIgnored private var relay: PairingRelay?
     @ObservationIgnored private var probe: Task<Void, Never>?
     @ObservationIgnored private var poller: Task<Void, Never>?
     @ObservationIgnored private var backgroundTask: UIBackgroundTaskIdentifier = .invalid
@@ -283,45 +283,47 @@ final class PairingService {
     }
 
     private func publish(_ advert: PairAdvert) {
-        BonjourAdvertiser.onResult = { [weak self] error, name in
-            guard let self else { return }
-            if error == 0 {
-                self.published = true
-                PairingLog.write("Bonjour registered: \(name ?? advert.name)")
-            } else {
-                self.bonjourFailed(error)
+        relay?.stop()
+        // Apples NWListener nimmt die Verbindung an, meldet den Dienst bei Bonjour an und reicht alles
+        // an den Kern (127.0.0.1) weiter. Jede eingehende Verbindung landet im Protokoll.
+        let relay = PairingRelay(corePort: advert.port) { line in PairingLog.write(line) }
+        self.relay = relay
+        relay.start(name: advert.name, type: advert.serviceType, txt: advert.txt) { [weak self] event in
+            Task { @MainActor in
+                guard let self, self.isRunning else { return }
+                switch event {
+                case .ready:
+                    self.published = true
+                    self.startSelfChecks(advert)
+                case .denied:
+                    self.localNetworkDenied()
+                case .failed(let error):
+                    PairingLog.write("Relay failed: \(error)")
+                    self.phase = .failed(String(localized: "Quill konnte sich nicht im lokalen Netzwerk anmelden. WLAN einschalten und erneut versuchen."))
+                    self.cancel()
+                }
             }
         }
-        Task { [weak self] in
-            // Nur über WLAN anmelden: Mit aktivem VPN (LocalDevVPN) würden die Einstellungen sonst eine
-            // Tunnel-Adresse erhalten und die Verbindung landete nie bei Quill.
-            let network = await LocalNetworkProbe.interfaces()
-            guard let self, self.isRunning else { return }
-            if let wifi = network.wifi {
-                PairingLog.write("Bonjour restricted to Wi-Fi interface \(wifi.name) (index \(wifi.index))")
-            } else {
-                PairingLog.write("No Wi-Fi interface found, registering Bonjour on all interfaces")
-            }
-            self.vpnActive = network.vpnActive
-            if network.vpnActive {
-                PairingLog.write("Warning: a VPN is active during pairing")
-            }
-            let error = self.advertiser.publish(name: advert.name, type: advert.serviceType, port: advert.port,
-                                                txt: advert.txt, interfaceIndex: UInt32(network.wifi?.index ?? 0))
-            if error != 0 { self.bonjourFailed(error) }
-        }
+    }
 
-        // Selbstkontrolle: Sieht Quill sich selbst so, wie die Einstellungen suchen? Löst bei Bedarf
-        // auch die Abfrage „Lokales Netzwerk“ aus.
+    /// Selbstkontrolle: Netzwerkzustand, Sichtbarkeit per Bonjour und eine Verbindung über genau den
+    /// Weg, den die Einstellungen nehmen.
+    private func startSelfChecks(_ advert: PairAdvert) {
         probe?.cancel()
         probe = Task { [weak self] in
+            let network = await LocalNetworkProbe.interfaces()
             let path = await LocalNetworkProbe.pathSummary()
             PairingLog.write("Network: \(path)")
-            let outcome = await LocalNetworkProbe.check(type: advert.serviceType, name: advert.name, seconds: 10)
             guard let self, !Task.isCancelled, self.isRunning else { return }
+            self.vpnActive = network.vpnActive
+            if network.vpnActive { PairingLog.write("Warning: a VPN is active during pairing") }
+
+            let outcome = await LocalNetworkProbe.check(type: advert.serviceType, name: advert.name, seconds: 10)
+            guard !Task.isCancelled, self.isRunning else { return }
             switch outcome {
             case .visible:
                 PairingLog.write("Self-check: Quill is visible on the local network")
+                await PairingRelay.selfConnect(name: advert.name, type: advert.serviceType) { line in PairingLog.write(line) }
             case .denied:
                 PairingLog.write("Self-check: Local Network access denied")
                 self.localNetworkDenied()
@@ -329,16 +331,6 @@ final class PairingService {
                 PairingLog.write("Self-check: Quill not found on the local network (\(reason))")
                 self.message = String(localized: "Quill ist im lokalen Netzwerk nicht sichtbar. WLAN einschalten und unter Einstellungen → Apps → Quill „Lokales Netzwerk“ erlauben.")
             }
-        }
-    }
-
-    private func bonjourFailed(_ error: Int32) {
-        PairingLog.write("Bonjour registration failed: \(error)")
-        if BonjourAdvertiser.isPolicyDenied(error) {
-            localNetworkDenied()
-        } else {
-            phase = .failed(String(localized: "Quill konnte sich nicht im lokalen Netzwerk anmelden. WLAN einschalten und erneut versuchen."))
-            cancel()
         }
     }
 
@@ -437,7 +429,8 @@ final class PairingService {
     private func finish() {
         poller?.cancel()
         poller = nil
-        advertiser.stop()
+        relay?.stop()
+        relay = nil
         probe?.cancel()
         probe = nil
         let center = UNUserNotificationCenter.current()

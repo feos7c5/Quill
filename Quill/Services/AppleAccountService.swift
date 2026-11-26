@@ -37,6 +37,8 @@ final class AppleAccountService {
     private static let passwordKey = "account-password"
 
     private(set) var state: State = .signedOut
+    /// Bittet die Signieren-Ansicht, die Anmeldung zu öffnen (z. B. nach „Account wechseln“).
+    var wantsLogin = false
     private(set) var status: AccountStatus?
     private(set) var lastError: String?
 
@@ -188,6 +190,10 @@ final class AppleAccountService {
 
     func appIDQuota() async throws -> AppIDQuota {
         try await Core.run(AppIDQuota.self) { sc_account_app_ids() }
+    }
+
+    func deleteAppID(_ appIdId: String) async throws {
+        try await Core.perform { appIdId.withCString { sc_account_delete_app_id($0) } }
     }
 
     func certificates() async throws -> [AppleCertificate] {

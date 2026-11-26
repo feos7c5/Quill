@@ -36,6 +36,7 @@ char *sc_account_select_team(const char *team_id);
 char *sc_account_register_device(const char *udid, const char *name);
 char *sc_account_sign(const char *app_path, const char *options_json, sc_progress_cb progress, void *context);
 char *sc_account_app_ids(void);
+char *sc_account_delete_app_id(const char *app_id);
 char *sc_account_certificates(void);
 char *sc_account_revoke_certificate(const char *serial);
 char *sc_account_export_p12(const char *password);

@@ -991,6 +991,40 @@
         }
       }
     },
+    "Abmelden und neu anmelden": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign Out and Sign In Again"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Se déconnecter et se reconnecter"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cerrar sesión y volver a iniciarla"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esci e accedi di nuovo"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Oturumu kapat ve yeniden aç"
+          }
+        }
+      }
+    },
     "Abmelden und vergessen": {
       "localizations": {
         "en": {
@@ -2113,6 +2147,40 @@
         }
       }
     },
+    "App-ID löschen?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete app ID?"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Supprimer l'identifiant d'app ?"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Eliminar la ID de app?"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Eliminare l'ID app?"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uygulama kimliği silinsin mi?"
+          }
+        }
+      }
+    },
     "App-IDs": {
       "localizations": {
         "en": {
@@ -2347,6 +2415,74 @@
           "stringUnit": {
             "state": "translated",
             "value": "Apple Hesabı (%@)"
+          }
+        }
+      }
+    },
+    "Apple-Account wechseln": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Switch Apple Account"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Changer de compte Apple"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cambiar de cuenta de Apple"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cambia account Apple"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Hesabını değiştir"
+          }
+        }
+      }
+    },
+    "Apple-Account wechseln?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Switch Apple Account?"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Changer de compte Apple ?"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "¿Cambiar de cuenta de Apple?"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cambiare account Apple?"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple Hesabı değiştirilsin mi?"
           }
         }
       }
@@ -5441,6 +5577,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "“%@” için orijinal IPA artık kitaplıkta değil. Yeniden içe aktarıp imzalayın."
+          }
+        }
+      }
+    },
+    "Diese App": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This app"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cette app"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Esta app"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Questa app"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bu uygulama"
           }
         }
       }
@@ -9837,36 +10007,36 @@
         }
       }
     },
-    "Kostenlose Accounts bekommen nur wenige neue App-IDs pro Woche. Jede App und jede ihrer Erweiterungen braucht eine. Den genauen Stand meldet Apple hier.": {
+    "Kostenlose Accounts bekommen nur wenige neue App-IDs pro Woche. Jede App und jede ihrer Erweiterungen braucht eine. Nicht mehr gebrauchte App-IDs nach links wischen und löschen; ob Apple dadurch sofort wieder eine freigibt, entscheidet Apple.": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Free accounts get only a few new app IDs per week. Every app and each of its extensions needs one. Apple reports the exact count here."
+            "value": "Free accounts get only a few new app IDs per week. Every app and each of its extensions needs one. Swipe left to delete app IDs you no longer need; whether Apple frees a slot right away is up to Apple."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Les comptes gratuits n'obtiennent que quelques identifiants d'app par semaine. Chaque app et chacune de ses extensions en nécessite un. Apple indique ici le nombre exact."
+            "value": "Les comptes gratuits n'obtiennent que quelques identifiants d'app par semaine. Chaque app et chacune de ses extensions en nécessite un. Balayez vers la gauche pour supprimer ceux dont vous n'avez plus besoin ; Apple décide si une place se libère aussitôt."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Las cuentas gratuitas solo reciben unas pocas ID de app nuevas por semana. Cada app y cada una de sus extensiones necesita una. Apple indica aquí la cifra exacta."
+            "value": "Las cuentas gratuitas solo reciben unas pocas ID de app nuevas por semana. Cada app y cada una de sus extensiones necesita una. Desliza a la izquierda para eliminar las que ya no necesites; Apple decide si libera una plaza de inmediato."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Gli account gratuiti ricevono solo pochi nuovi ID app a settimana. Ogni app e ogni sua estensione ne richiede uno. Apple indica qui il numero esatto."
+            "value": "Gli account gratuiti ricevono solo pochi nuovi ID app a settimana. Ogni app e ogni sua estensione ne richiede uno. Scorri a sinistra per eliminare quelli che non servono più; è Apple a decidere se liberare subito un posto."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ücretsiz hesaplar haftada yalnızca birkaç yeni uygulama kimliği alır. Her uygulama ve her uzantısı bir tane gerektirir. Kesin durumu Apple burada bildirir."
+            "value": "Ücretsiz hesaplar haftada yalnızca birkaç yeni uygulama kimliği alır. Her uygulama ve her uzantısı bir tane gerektirir. Artık gerekmeyenleri sola kaydırıp silin; yerin hemen açılıp açılmayacağına Apple karar verir."
           }
         }
       }
@@ -13242,6 +13412,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Quill yerel ağda kendini duyuramadı. Wi‑Fi'yi açıp yeniden deneyin."
+          }
+        }
+      }
+    },
+    "Quill meldet diesen Account ab und vergisst Passwort und Zertifikat. Danach meldest du dich mit dem anderen Account an. Apps, die mit diesem Account signiert sind, lassen sich dann nicht mehr erneuern.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill signs out of this account and forgets its password and certificate. Then sign in with the other account. Apps signed with this account can no longer be refreshed."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill se déconnecte de ce compte et oublie son mot de passe et son certificat. Connectez-vous ensuite avec l'autre compte. Les apps signées avec ce compte ne pourront plus être renouvelées."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill cierra la sesión de esta cuenta y olvida su contraseña y certificado. Después inicia sesión con la otra cuenta. Las apps firmadas con esta cuenta ya no podrán renovarse."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill esce da questo account e ne dimentica password e certificato. Poi accedi con l'altro account. Le app firmate con questo account non potranno più essere rinnovate."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill bu hesaptan çıkar, parolasını ve sertifikasını unutur. Ardından diğer hesapla oturum açın. Bu hesapla imzalanan uygulamalar artık yenilenemez."
           }
         }
       }
@@ -17544,6 +17748,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "“%@” silinsin mi?"
+          }
+        }
+      }
+    },
+    "„%@“ wird bei Apple gelöscht. Apps, die damit signiert sind, lassen sich danach nicht mehr erneuern.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” will be deleted at Apple. Apps signed with it can no longer be refreshed."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "« %@ » sera supprimé chez Apple. Les apps signées avec ne pourront plus être renouvelées."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«%@» se eliminará en Apple. Las apps firmadas con ella ya no podrán renovarse."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "«%@» verrà eliminato presso Apple. Le app firmate con esso non potranno più essere rinnovate."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“%@” Apple'da silinecek. Bununla imzalanan uygulamalar artık yenilenemez."
           }
         }
       }

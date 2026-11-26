@@ -171,6 +171,9 @@ struct AccountDetailView: View {
     @State private var revoking: AppleCertificate?
     @State private var confirmRevoke = false
     @State private var confirmSignOut = false
+    @State private var confirmSwitch = false
+    @State private var deleting: AppIDQuota.Entry?
+    @Environment(\.dismiss) private var dismiss
     @State private var errorText: String?
 
     var body: some View {
@@ -190,13 +193,26 @@ struct AccountDetailView: View {
                         LabeledContent("Freie App-IDs", value: "\(available) von \(max)")
                     }
                     ForEach(quota.appIds) { entry in
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(entry.name)
-                            Text(entry.identifier).font(.caption).foregroundStyle(.secondary)
-                            if let expires = entry.expires {
-                                Text("läuft ab: \(Date(timeIntervalSince1970: expires).formatted(date: .abbreviated, time: .omitted))")
-                                    .font(.caption2)
-                                    .foregroundStyle(.tertiary)
+                        let isThisApp = entry.identifier == Bundle.main.bundleIdentifier
+                        HStack {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(entry.name)
+                                Text(entry.identifier).font(.caption).foregroundStyle(.secondary)
+                                if let expires = entry.expires {
+                                    Text("läuft ab: \(Date(timeIntervalSince1970: expires).formatted(date: .abbreviated, time: .omitted))")
+                                        .font(.caption2)
+                                        .foregroundStyle(.tertiary)
+                                }
+                            }
+                            Spacer()
+                            if isThisApp {
+                                Text("Diese App").font(.caption).foregroundStyle(.secondary)
+                            }
+                        }
+                        .swipeActions {
+                            // Die App-ID, unter der Quill selbst läuft, nicht anbieten.
+                            if !isThisApp && entry.appIdId != nil {
+                                Button("Löschen", role: .destructive) { deleting = entry }
                             }
                         }
                     }
@@ -206,7 +222,7 @@ struct AccountDetailView: View {
             } header: {
                 Text("App-IDs")
             } footer: {
-                Text("Kostenlose Accounts bekommen nur wenige neue App-IDs pro Woche. Jede App und jede ihrer Erweiterungen braucht eine. Den genauen Stand meldet Apple hier.")
+                Text("Kostenlose Accounts bekommen nur wenige neue App-IDs pro Woche. Jede App und jede ihrer Erweiterungen braucht eine. Nicht mehr gebrauchte App-IDs nach links wischen und löschen; ob Apple dadurch sofort wieder eine freigibt, entscheidet Apple.")
             }
 
             Section {
@@ -237,8 +253,11 @@ struct AccountDetailView: View {
             }
 
             Section {
-                Button("Abmelden") { Task { await account.signOut(forget: false) } }
-                Button("Abmelden und alles vergessen", role: .destructive) { confirmSignOut = true }
+                Button("Apple-Account wechseln", systemImage: "person.2") { confirmSwitch = true }
+                Button("Abmelden", systemImage: "rectangle.portrait.and.arrow.right") {
+                    Task { await account.signOut(forget: false) }
+                }
+                Button("Abmelden und alles vergessen", systemImage: "trash", role: .destructive) { confirmSignOut = true }
             }
         }
         .navigationTitle("Apple-Account")
@@ -253,6 +272,23 @@ struct AccountDetailView: View {
         } message: {
             Text("Alle mit diesem Zertifikat signierten Apps starten danach nicht mehr.")
         }
+        .confirmationDialog("App-ID löschen?", isPresented: Binding(get: { deleting != nil }, set: { if !$0 { deleting = nil } }),
+                            titleVisibility: .visible, presenting: deleting) { entry in
+            Button("Löschen", role: .destructive) { delete(entry) }
+        } message: { entry in
+            Text("„\(entry.name)“ wird bei Apple gelöscht. Apps, die damit signiert sind, lassen sich danach nicht mehr erneuern.")
+        }
+        .confirmationDialog("Apple-Account wechseln?", isPresented: $confirmSwitch, titleVisibility: .visible) {
+            Button("Abmelden und neu anmelden") {
+                Task {
+                    await account.signOut(forget: true)
+                    dismiss()
+                    account.wantsLogin = true
+                }
+            }
+        } message: {
+            Text("Quill meldet diesen Account ab und vergisst Passwort und Zertifikat. Danach meldest du dich mit dem anderen Account an. Apps, die mit diesem Account signiert sind, lassen sich dann nicht mehr erneuern.")
+        }
         .confirmationDialog("Alles vergessen?", isPresented: $confirmSignOut, titleVisibility: .visible) {
             Button("Abmelden und vergessen", role: .destructive) { Task { await account.signOut(forget: true) } }
         } message: {
@@ -262,6 +298,18 @@ struct AccountDetailView: View {
             Button("OK", role: .cancel) {}
         } message: {
             Text(errorText ?? "")
+        }
+    }
+
+    private func delete(_ entry: AppIDQuota.Entry) {
+        guard let appIdId = entry.appIdId else { return }
+        Task {
+            do {
+                try await account.deleteAppID(appIdId)
+                await load()
+            } catch {
+                errorText = error.localizedDescription
+            }
         }
     }
 

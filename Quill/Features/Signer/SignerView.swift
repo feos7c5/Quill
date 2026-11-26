@@ -51,6 +51,11 @@ struct SignerView: View {
             case .udid: UDIDView()
             }
         }
+        .onChange(of: account.wantsLogin) { _, wants in
+            guard wants else { return }
+            account.wantsLogin = false
+            sheet = .login
+        }
         .onChange(of: account.state) { _, state in
             // Eine automatische Anmeldung (App-Start, Refresh) kann nach einem Code fragen.
             if case .needsCode = state, sheet == nil { sheet = .login }

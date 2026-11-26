@@ -167,6 +167,7 @@ struct AccountSignResult: Decodable, Sendable {
 
 struct AppIDQuota: Decodable, Sendable {
     struct Entry: Decodable, Sendable, Identifiable {
+        let appIdId: String?
         let identifier: String
         let name: String
         let expires: Double?

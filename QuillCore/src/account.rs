@@ -328,11 +328,22 @@ pub async fn app_ids() -> CoreResult<Value> {
             "available": response.available_quantity,
             "max": response.max_quantity,
             "app_ids": response.app_ids.iter().map(|id| json!({
+                "app_id_id": id.app_id_id,
                 "identifier": id.identifier,
                 "name": id.name,
                 "expires": id.expiration_date.map(|d| std::time::SystemTime::from(d).duration_since(std::time::UNIX_EPOCH).map(|d| d.as_secs()).unwrap_or(0)),
             })).collect::<Vec<_>>(),
         }))
+    })
+    .await
+}
+
+/// Löscht eine App-ID beim Apple-Account. Apps, die mit ihr signiert sind, lassen sich danach
+/// nicht mehr erneuern.
+pub async fn delete_app_id(app_id_id: String) -> CoreResult<Value> {
+    with_team(async |a, team| {
+        a.session.delete_app_id(&team, &app_id_id, None).await.map_err(message)?;
+        Ok(json!({ "deleted": true }))
     })
     .await
 }

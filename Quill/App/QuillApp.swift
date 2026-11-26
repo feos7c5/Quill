@@ -15,6 +15,10 @@ struct QuillApp: App {
     var body: some Scene {
         WindowGroup {
             RootView()
+                // Schaltflächen in Listen in Textfarbe statt Blau, wie in Apples eigenen Apps
+                // mit dezentem Erscheinungsbild; Schalter bleiben grün.
+                .tint(.primary)
+                .toggleStyle(QuillSwitchStyle())
                 .environment(services.downloads)
                 .environment(services.installer)
                 .environment(services.transfer)
@@ -208,5 +212,15 @@ final class NotificationPresenter: NSObject, UNUserNotificationCenterDelegate {
 
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {
         [.banner, .sound, .list]
+    }
+}
+
+
+/// Systemschalter mit grüner Farbe, unabhängig vom App-weiten Farbton.
+struct QuillSwitchStyle: ToggleStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        Toggle(configuration)
+            .toggleStyle(.switch)
+            .tint(.green)
     }
 }

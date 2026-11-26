@@ -408,6 +408,16 @@ pub extern "C" fn sc_account_app_ids() -> *mut c_char {
     respond(block(account::app_ids()))
 }
 
+/// Löscht eine App-ID (`id` aus [`sc_account_app_ids`]).
+///
+/// # Safety
+/// `app_id` muss eine gültige Zeichenkette sein.
+#[unsafe(no_mangle)]
+pub unsafe extern "C" fn sc_account_delete_app_id(app_id: *const c_char) -> *mut c_char {
+    let result = unsafe { read_str(app_id, "app ID") }.and_then(|id| block(account::delete_app_id(id)));
+    respond(result)
+}
+
 /// Entwicklungszertifikate des Teams: `[{"serial", "name", "machine_name", "expires"}]`.
 #[unsafe(no_mangle)]
 pub extern "C" fn sc_account_certificates() -> *mut c_char {

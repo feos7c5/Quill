@@ -515,6 +515,40 @@
         }
       }
     },
+    "1. Einstellungen › Datenschutz & Sicherheit › Entwicklermodus": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1. Settings › Privacy & Security › Developer Mode"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1. Réglages › Confidentialité et sécurité › Mode développeur"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1. Ajustes › Privacidad y seguridad › Modo de desarrollador"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1. Impostazioni › Privacy e sicurezza › Modalità sviluppatore"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "1. Ayarlar › Gizlilik ve Güvenlik › Geliştirici Modu"
+          }
+        }
+      }
+    },
     "1. Laden und installieren": {
       "localizations": {
         "en": {
@@ -579,6 +613,74 @@
           "stringUnit": {
             "state": "translated",
             "value": "2. Sertifikayı aktar"
+          }
+        }
+      }
+    },
+    "2. „Pair with Quill“ tippen › Gerätecode des iPhones eingeben": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "2. Tap “Pair with Quill” › enter your iPhone passcode"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "2. Touchez « Pair with Quill » › saisissez le code de l'iPhone"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "2. Toca «Pair with Quill» › introduce el código del iPhone"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "2. Tocca «Pair with Quill» › inserisci il codice dell'iPhone"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "2. “Pair with Quill”e dokunun › iPhone parolanızı girin"
+          }
+        }
+      }
+    },
+    "3. Danach erscheint hier der 6-stellige Quill-Code": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "3. Then the 6-digit Quill code appears here"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "3. Le code Quill à 6 chiffres apparaît ensuite ici"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "3. Después aparece aquí el código de Quill de 6 dígitos"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "3. Poi qui appare il codice Quill a 6 cifre"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "3. Ardından 6 haneli Quill kodu burada görünür"
           }
         }
       }
@@ -4357,36 +4459,36 @@
         }
       }
     },
-    "Den Code aus dem schwebenden Fenster eingeben.": {
+    "Der 6-stellige Quill-Code erscheint gleich.": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Enter the code from the floating window."
+            "value": "The 6-digit Quill code will appear shortly."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Saisissez le code affiché dans la fenêtre flottante."
+            "value": "Le code Quill à 6 chiffres va apparaître."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Introduce el código de la ventana flotante."
+            "value": "El código de Quill de 6 dígitos aparecerá en breve."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Inserisci il codice della finestra mobile."
+            "value": "Il codice Quill a 6 cifre apparirà a breve."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Yüzen penceredeki kodu girin."
+            "value": "6 haneli Quill kodu birazdan görünecek."
           }
         }
       }
@@ -5203,6 +5305,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Uygulamanın yürütülebilir dosyası eksik."
+          }
+        }
+      }
+    },
+    "Die erste Abfrage ist dein iPhone-Entsperrcode, erst danach kommt der Quill-Code.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The first prompt is your iPhone passcode; the Quill code comes after it."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La première demande est le code de déverrouillage de l'iPhone ; le code Quill vient ensuite."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La primera solicitud es el código de desbloqueo del iPhone; después viene el código de Quill."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "La prima richiesta è il codice di sblocco dell'iPhone; il codice Quill arriva dopo."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "İlk istenen iPhone kilit parolanızdır; Quill kodu ondan sonra gelir."
           }
         }
       }
@@ -6159,36 +6295,36 @@
         }
       }
     },
-    "Einstellungen → Datenschutz & Sicherheit → Entwicklermodus öffnen und „Quill auf …“ auswählen.": {
+    "Einstellungen → Datenschutz & Sicherheit → Entwicklermodus → „Pair with Quill“ tippen.": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Open Settings → Privacy & Security → Developer Mode and select “Quill on …”."
+            "value": "Settings → Privacy & Security → Developer Mode → tap “Pair with Quill”."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ouvrez Réglages → Confidentialité et sécurité → Mode développeur et sélectionnez « Quill sur … »."
+            "value": "Réglages → Confidentialité et sécurité → Mode développeur → touchez « Pair with Quill »."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Abre Ajustes → Privacidad y seguridad → Modo de desarrollador y selecciona «Quill en …»."
+            "value": "Ajustes → Privacidad y seguridad → Modo de desarrollador → toca «Pair with Quill»."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Apri Impostazioni → Privacy e sicurezza → Modalità sviluppatore e seleziona «Quill su …»."
+            "value": "Impostazioni → Privacy e sicurezza → Modalità sviluppatore → tocca «Pair with Quill»."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ayarlar → Gizlilik ve Güvenlik → Geliştirici Modu'nu açın ve “… üzerinde Quill”i seçin."
+            "value": "Ayarlar → Gizlilik ve Güvenlik → Geliştirici Modu → “Pair with Quill”e dokunun."
           }
         }
       }
@@ -8749,36 +8885,36 @@
         }
       }
     },
-    "Jetzt Einstellungen → Datenschutz & Sicherheit → Entwicklermodus öffnen und Quill auswählen. Der Code erscheint dann im schwebenden Fenster.": {
+    "Jetzt Einstellungen → Datenschutz & Sicherheit → Entwicklermodus öffnen und „Pair with Quill“ tippen. Zuerst fragt iOS nach dem Gerätecode des iPhones, danach erscheint der Quill-Code im schwebenden Fenster.": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Now open Settings → Privacy & Security → Developer Mode and select Quill. The code then appears in the floating window."
+            "value": "Now open Settings → Privacy & Security → Developer Mode and tap “Pair with Quill”. iOS first asks for your iPhone passcode, then the Quill code appears in the floating window."
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ouvrez maintenant Réglages → Confidentialité et sécurité → Mode développeur et sélectionnez Quill. Le code apparaît alors dans la fenêtre flottante."
+            "value": "Ouvrez maintenant Réglages → Confidentialité et sécurité → Mode développeur et touchez « Pair with Quill ». iOS demande d'abord le code de l'iPhone, puis le code Quill apparaît dans la fenêtre flottante."
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Abre ahora Ajustes → Privacidad y seguridad → Modo de desarrollador y selecciona Quill. El código aparecerá en la ventana flotante."
+            "value": "Abre ahora Ajustes → Privacidad y seguridad → Modo de desarrollador y toca «Pair with Quill». iOS pide primero el código del iPhone y luego aparece el código de Quill en la ventana flotante."
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Ora apri Impostazioni → Privacy e sicurezza → Modalità sviluppatore e seleziona Quill. Il codice apparirà nella finestra mobile."
+            "value": "Ora apri Impostazioni → Privacy e sicurezza → Modalità sviluppatore e tocca «Pair with Quill». iOS chiede prima il codice dell'iPhone, poi il codice Quill appare nella finestra mobile."
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Şimdi Ayarlar → Gizlilik ve Güvenlik → Geliştirici Modu'nu açın ve Quill'i seçin. Kod ardından yüzen pencerede görünür."
+            "value": "Şimdi Ayarlar → Gizlilik ve Güvenlik → Geliştirici Modu'nu açın ve “Pair with Quill”e dokunun. iOS önce iPhone parolanızı ister, ardından Quill kodu yüzen pencerede görünür."
           }
         }
       }
@@ -12906,40 +13042,6 @@
     "Quill": {
       "shouldTranslate": false
     },
-    "Quill auf %@": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quill on %@"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quill sur %@"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quill en %@"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quill su %@"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "%@ üzerinde Quill"
-          }
-        }
-      }
-    },
     "Quill erstellt Zertifikat und Profil automatisch. Kostenlose Apple-ID: 7 Tage Laufzeit, höchstens drei Apps. Bezahlter Account: ein Jahr.": {
       "localizations": {
         "en": {
@@ -13106,6 +13208,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Quill'in yerel ağa erişimi yok. Ayarlar → Uygulamalar → Quill altında “Yerel Ağ”ı açın ve yeniden eşleyin."
+          }
+        }
+      }
+    },
+    "Quill ist bereit zur Kopplung": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill is ready to pair"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill est prêt pour le jumelage"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill está listo para emparejar"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill è pronto per l'abbinamento"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill eşlemeye hazır"
           }
         }
       }
@@ -13280,40 +13416,6 @@
         }
       }
     },
-    "Quill wartet auf die Kopplung": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quill is waiting for pairing"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quill attend le jumelage"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quill espera el emparejamiento"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quill attende l'abbinamento"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Quill eşlemeyi bekliyor"
-          }
-        }
-      }
-    },
     "Quill wartet auf die UDID": {
       "localizations": {
         "en": {
@@ -13412,6 +13514,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Quill – UDID'yi Algıla"
+          }
+        }
+      }
+    },
+    "Quill-Code": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill Code"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Code Quill"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Código de Quill"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Codice Quill"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill kodu"
           }
         }
       }
@@ -16352,6 +16488,40 @@
         }
       }
     },
+    "Zuerst den Gerätecode des iPhones eingeben (Entsperrcode), danach den 6-stelligen Quill-Code aus dem schwebenden Fenster.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "First enter your iPhone passcode, then the 6-digit Quill code from the floating window."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saisissez d'abord le code de l'iPhone, puis le code Quill à 6 chiffres de la fenêtre flottante."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Introduce primero el código del iPhone y después el código de Quill de 6 dígitos de la ventana flotante."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inserisci prima il codice dell'iPhone, poi il codice Quill a 6 cifre della finestra mobile."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Önce iPhone parolanızı, ardından yüzen penceredeki 6 haneli Quill kodunu girin."
+          }
+        }
+      }
+    },
     "Zum Erneuern bitte mit der Apple-ID anmelden.": {
       "localizations": {
         "en": {
@@ -16769,36 +16939,70 @@
         }
       }
     },
-    "iPhone verbunden, warte auf den Code …": {
+    "iPhone verbunden": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "iPhone connected, waiting for the code…"
+            "value": "iPhone connected"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "iPhone connecté, en attente du code…"
+            "value": "iPhone connecté"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "iPhone conectado, esperando el código…"
+            "value": "iPhone conectado"
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "iPhone connesso, in attesa del codice…"
+            "value": "iPhone connesso"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "iPhone bağlandı, kod bekleniyor…"
+            "value": "iPhone bağlandı"
+          }
+        }
+      }
+    },
+    "iPhone verbunden, der Quill-Code erscheint gleich": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone connected, the Quill code appears shortly"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone connecté, le code Quill va apparaître"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone conectado, el código de Quill aparecerá en breve"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone connesso, il codice Quill apparirà a breve"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone bağlandı, Quill kodu birazdan görünecek"
           }
         }
       }

@@ -36,7 +36,7 @@ struct PairingView: View {
                 if pairing.isRunning && CodePictureInPicture.isSupported {
                     Section {
                         CodePictureInPicturePreview()
-                            .aspectRatio(2, contentMode: .fit)
+                            .aspectRatio(1.8, contentMode: .fit)
                             .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
                         Button("Als schwebendes Fenster zeigen", systemImage: "pip.enter") {
                             CodePictureInPicture.shared.start()
@@ -48,8 +48,8 @@ struct PairingView: View {
 
                 Section("So geht’s") {
                     StepRow(number: 1, text: "LocalDevVPN trennen, dann „Kopplung starten“ tippen.")
-                    StepRow(number: 2, text: "Einstellungen → Datenschutz & Sicherheit → Entwicklermodus öffnen und „Quill auf …“ auswählen.")
-                    StepRow(number: 3, text: "Den Code aus dem schwebenden Fenster eingeben.")
+                    StepRow(number: 2, text: "Einstellungen → Datenschutz & Sicherheit → Entwicklermodus → „Pair with Quill“ tippen.")
+                    StepRow(number: 3, text: "Zuerst den Gerätecode des iPhones eingeben (Entsperrcode), danach den 6-stelligen Quill-Code aus dem schwebenden Fenster.")
                     StepRow(number: 4, text: "Erst danach LocalDevVPN wieder verbinden. Quill prüft dann die Verbindung.")
                 }
 
@@ -111,7 +111,7 @@ struct PairingView: View {
         case .connected:
             HStack(spacing: 12) {
                 ProgressView()
-                Text("iPhone verbunden, warte auf den Code …")
+                Text("iPhone verbunden, der Quill-Code erscheint gleich")
             }
         case .pin(let pin):
             VStack(spacing: 8) {

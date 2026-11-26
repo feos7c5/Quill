@@ -146,40 +146,6 @@
         }
       }
     },
-    "Einstellungen › Datenschutz & Sicherheit › Entwicklermodus": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Settings › Privacy & Security › Developer Mode"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Réglages › Confidentialité et sécurité › Mode développeur"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ajustes › Privacidad y seguridad › Modo de desarrollador"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Impostazioni › Privacy e sicurezza › Modalità sviluppatore"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ayarlar › Gizlilik ve Güvenlik › Geliştirici Modu"
-          }
-        }
-      }
-    },
     "Gekoppelt.": {
       "localizations": {
         "en": {
@@ -350,40 +316,6 @@
         }
       }
     },
-    "Kopplungscode": {
-      "localizations": {
-        "en": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Pairing Code"
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Code de jumelage"
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Código de emparejamiento"
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Codice di abbinamento"
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Eşleme kodu"
-          }
-        }
-      }
-    },
     "Kopplungscode %@": {
       "localizations": {
         "en": {
@@ -455,36 +387,70 @@
     "Quill": {
       "shouldTranslate": false
     },
-    "Quill wartet auf die Kopplung": {
+    "Quill ist bereit zur Kopplung": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Quill is waiting for pairing"
+            "value": "Quill is ready to pair"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Quill attend le jumelage"
+            "value": "Quill est prêt pour le jumelage"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Quill espera el emparejamiento"
+            "value": "Quill está listo para emparejar"
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Quill attende l'abbinamento"
+            "value": "Quill è pronto per l'abbinamento"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Quill eşlemeyi bekliyor"
+            "value": "Quill eşlemeye hazır"
+          }
+        }
+      }
+    },
+    "Quill-Code": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill Code"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Code Quill"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Código de Quill"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Codice Quill"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quill kodu"
           }
         }
       }
@@ -693,36 +659,36 @@
         }
       }
     },
-    "iPhone verbunden, warte auf den Code …": {
+    "iPhone verbunden, der Quill-Code erscheint gleich": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "iPhone connected, waiting for the code…"
+            "value": "iPhone connected, the Quill code appears shortly"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "iPhone connecté, en attente du code…"
+            "value": "iPhone connecté, le code Quill va apparaître"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "iPhone conectado, esperando el código…"
+            "value": "iPhone conectado, el código de Quill aparecerá en breve"
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "iPhone connesso, in attesa del codice…"
+            "value": "iPhone connesso, il codice Quill apparirà a breve"
           }
         },
         "tr": {
           "stringUnit": {
             "state": "translated",
-            "value": "iPhone bağlandı, kod bekleniyor…"
+            "value": "iPhone bağlandı, Quill kodu birazdan görünecek"
           }
         }
       }
@@ -757,6 +723,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Quill'i açar ve tüm uygulamaları yeniler."
+          }
+        }
+      }
+    },
+    "„Pair with Quill“ tippen, zuerst den iPhone-Gerätecode eingeben": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap “Pair with Quill”, enter your iPhone passcode first"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Touchez « Pair with Quill », saisissez d'abord le code de l'iPhone"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Toca «Pair with Quill» e introduce primero el código del iPhone"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tocca «Pair with Quill», inserisci prima il codice dell'iPhone"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "“Pair with Quill”e dokunun, önce iPhone parolanızı girin"
           }
         }
       }

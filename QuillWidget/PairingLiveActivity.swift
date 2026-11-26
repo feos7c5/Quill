@@ -75,8 +75,8 @@ private struct LockScreenPairingView: View {
 
 private func title(_ state: PairingActivityAttributes.ContentState) -> LocalizedStringKey {
     switch state.stage {
-    case .waiting, .connected: "Quill wartet auf die Kopplung"
-    case .code: "Kopplungscode"
+    case .waiting, .connected: "Quill ist bereit zur Kopplung"
+    case .code: "Quill-Code"
     case .paired: "Gekoppelt."
     case .failed: "Kopplung fehlgeschlagen."
     }
@@ -84,8 +84,8 @@ private func title(_ state: PairingActivityAttributes.ContentState) -> Localized
 
 private func detail(_ state: PairingActivityAttributes.ContentState) -> LocalizedStringKey {
     switch state.stage {
-    case .waiting: "Einstellungen › Datenschutz & Sicherheit › Entwicklermodus"
-    case .connected: "iPhone verbunden, warte auf den Code …"
+    case .waiting: "„Pair with Quill“ tippen, zuerst den iPhone-Gerätecode eingeben"
+    case .connected: "iPhone verbunden, der Quill-Code erscheint gleich"
     case .code: "In den Einstellungen eingeben"
     case .paired: "Zurück zu Quill"
     case .failed: "In Quill erneut starten."

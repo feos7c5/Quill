@@ -34,7 +34,7 @@ final class CodePictureInPicture: NSObject {
 
     static var isSupported: Bool { AVPictureInPictureController.isPictureInPictureSupported() }
 
-    private static let pixelSize = CGSize(width: 720, height: 360)
+    private static let pixelSize = CGSize(width: 720, height: 400)
 
     /// Vorbereiten, solange Quill im Vordergrund ist.
     func prepare(onClosedByUser: @escaping () -> Void) {
@@ -111,22 +111,55 @@ final class CodePictureInPicture: NSObject {
         renderer.enqueue(sample)
     }
 
-    private static func lines(for content: Content) -> (title: String, main: String, footnote: String) {
+    /// Ein Textblock im Fenster, von oben nach unten gestapelt und mittig ausgerichtet.
+    private struct Block {
+        let text: String
+        let font: UIFont
+        let color: UIColor
+        var spacingAfter: CGFloat = 14
+    }
+
+    private static let secondary = UIColor(white: 0.62, alpha: 1)
+    private static let accent = UIColor(red: 1.0, green: 0.84, blue: 0.35, alpha: 1)
+
+    private static func blocks(for content: Content) -> [Block] {
+        let title = UIFont.systemFont(ofSize: 31, weight: .semibold)
+        let body = UIFont.systemFont(ofSize: 24, weight: .regular)
+        let emphasis = UIFont.systemFont(ofSize: 24, weight: .semibold)
+        let small = UIFont.systemFont(ofSize: 19, weight: .regular)
+        let code = UIFont.monospacedDigitSystemFont(ofSize: 112, weight: .bold)
         switch content {
         case .waiting:
-            (String(localized: "Quill wartet auf die Kopplung"), "· · ·",
-             String(localized: "Einstellungen › Datenschutz & Sicherheit › Entwicklermodus"))
+            return [
+                Block(text: String(localized: "Quill ist bereit zur Kopplung"), font: title, color: .white, spacingAfter: 20),
+                Block(text: String(localized: "1. Einstellungen › Datenschutz & Sicherheit › Entwicklermodus"), font: body, color: .white, spacingAfter: 6),
+                Block(text: String(localized: "2. „Pair with Quill“ tippen › Gerätecode des iPhones eingeben"), font: body, color: .white, spacingAfter: 16),
+                Block(text: String(localized: "3. Danach erscheint hier der 6-stellige Quill-Code"), font: emphasis, color: accent, spacingAfter: 16),
+                Block(text: String(localized: "Die erste Abfrage ist dein iPhone-Entsperrcode, erst danach kommt der Quill-Code."), font: small, color: secondary, spacingAfter: 0),
+            ]
         case .connected:
-            (String(localized: "Quill wartet auf die Kopplung"), "· · ·",
-             String(localized: "iPhone verbunden, warte auf den Code …"))
-        case .code(let code):
-            (String(localized: "Kopplungscode"),
-             code.count == 6 ? "\(code.prefix(3)) \(code.suffix(3))" : code,
-             String(localized: "In den Einstellungen eingeben"))
+            return [
+                Block(text: String(localized: "iPhone verbunden"), font: title, color: .white, spacingAfter: 8),
+                Block(text: "· · ·", font: code, color: .white, spacingAfter: 8),
+                Block(text: String(localized: "Der 6-stellige Quill-Code erscheint gleich."), font: body, color: secondary, spacingAfter: 0),
+            ]
+        case .code(let pin):
+            return [
+                Block(text: String(localized: "Quill-Code"), font: title, color: .white, spacingAfter: 4),
+                Block(text: pin.count == 6 ? "\(pin.prefix(3)) \(pin.suffix(3))" : pin, font: code, color: accent, spacingAfter: 4),
+                Block(text: String(localized: "In den Einstellungen eingeben"), font: body, color: secondary, spacingAfter: 0),
+            ]
         case .paired:
-            (String(localized: "Gekoppelt."), "✓", String(localized: "Zurück zu Quill"))
+            return [
+                Block(text: "✓", font: code, color: .white, spacingAfter: 4),
+                Block(text: String(localized: "Gekoppelt."), font: title, color: .white, spacingAfter: 8),
+                Block(text: String(localized: "Zurück zu Quill"), font: body, color: secondary, spacingAfter: 0),
+            ]
         case .failed:
-            (String(localized: "Kopplung fehlgeschlagen."), "!", String(localized: "In Quill erneut starten."))
+            return [
+                Block(text: String(localized: "Kopplung fehlgeschlagen."), font: title, color: .white, spacingAfter: 8),
+                Block(text: String(localized: "In Quill erneut starten."), font: body, color: secondary, spacingAfter: 0),
+            ]
         }
     }
 
@@ -154,23 +187,26 @@ final class CodePictureInPicture: NSObject {
         UIGraphicsPushContext(context)
         defer { UIGraphicsPopContext() }
 
-        UIColor(white: 0.08, alpha: 1).setFill()
+        UIColor(red: 0.07, green: 0.08, blue: 0.11, alpha: 1).setFill()
         context.fill(CGRect(origin: .zero, size: pixelSize))
 
-        let text = lines(for: content)
+        // Blöcke messen, dann als Ganzes senkrecht mittig setzen. Lange Zeilen brechen um.
         let centered = NSMutableParagraphStyle()
         centered.alignment = .center
-        func draw(_ string: String, font: UIFont, color: UIColor, y: CGFloat, height: CGFloat) {
-            let attributes: [NSAttributedString.Key: Any] = [.font: font, .foregroundColor: color, .paragraphStyle: centered]
-            (string as NSString).draw(with: CGRect(x: 24, y: y, width: pixelSize.width - 48, height: height),
-                                      options: [.usesLineFragmentOrigin, .truncatesLastVisibleLine],
-                                      attributes: attributes, context: nil)
+        let textWidth = pixelSize.width - 56
+        let laid = blocks(for: content).map { block -> (Block, [NSAttributedString.Key: Any], CGFloat) in
+            let attributes: [NSAttributedString.Key: Any] = [.font: block.font, .foregroundColor: block.color, .paragraphStyle: centered]
+            let height = (block.text as NSString).boundingRect(with: CGSize(width: textWidth, height: .greatestFiniteMagnitude),
+                                                                options: [.usesLineFragmentOrigin], attributes: attributes, context: nil).height
+            return (block, attributes, ceil(height))
         }
-        draw(text.title, font: .systemFont(ofSize: 34, weight: .semibold), color: UIColor(white: 0.75, alpha: 1), y: 28, height: 48)
-        let mainFont = UIFont.monospacedDigitSystemFont(ofSize: 116, weight: .bold)
-        draw(text.main, font: mainFont, color: .white, y: 78, height: 150)
-        // Pfad vollständig, bei Bedarf auf zwei Zeilen.
-        draw(text.footnote, font: .systemFont(ofSize: 27, weight: .regular), color: UIColor(white: 0.65, alpha: 1), y: 262, height: 90)
+        let total = laid.reduce(0) { $0 + $1.2 + $1.0.spacingAfter }
+        var y = max(12, (pixelSize.height - total) / 2)
+        for (block, attributes, height) in laid {
+            (block.text as NSString).draw(with: CGRect(x: 28, y: y, width: textWidth, height: height),
+                                          options: [.usesLineFragmentOrigin], attributes: attributes, context: nil)
+            y += height + block.spacingAfter
+        }
         return buffer
     }
 

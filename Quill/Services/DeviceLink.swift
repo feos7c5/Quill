@@ -216,7 +216,8 @@ final class PairingService {
         // In eine temporäre Datei schreiben; erst bei Erfolg ersetzt sie eine vorhandene Kopplung.
         let pending = Paths.support.appendingPathComponent("pairing.pending.plist")
         try? FileManager.default.removeItem(at: pending)
-        let hostName = String(localized: "Quill auf \(UIDevice.current.name)")
+        // Erscheint in den Einstellungen als „Pair with Quill“.
+        let hostName = "Quill"
         let advert: PairAdvert
         do {
             advert = try hostName.withCString { name in
@@ -232,7 +233,7 @@ final class PairingService {
         PairingLog.write("Start, iOS \(UIDevice.current.systemVersion), port \(advert.port), \(NetworkState.shared.summary)")
         needsLocalNetwork = false
         phase = .listening
-        message = String(localized: "Jetzt Einstellungen → Datenschutz & Sicherheit → Entwicklermodus öffnen und Quill auswählen. Der Code erscheint dann im schwebenden Fenster.")
+        message = String(localized: "Jetzt Einstellungen → Datenschutz & Sicherheit → Entwicklermodus öffnen und „Pair with Quill“ tippen. Zuerst fragt iOS nach dem Gerätecode des iPhones, danach erscheint der Quill-Code im schwebenden Fenster.")
 
         BonjourAdvertiser.onResult = { [weak self] error, name in
             guard let self, self.isRunning else { return }

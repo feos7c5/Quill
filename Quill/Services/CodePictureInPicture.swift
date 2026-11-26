@@ -73,13 +73,19 @@ final class CodePictureInPicture: NSObject {
         controller?.startPictureInPicture()
     }
 
-    /// Beenden; bei Erfolg kurz „Gekoppelt“ zeigen.
-    func finish(_ content: Content) {
+    /// Beenden. Bei Erfolg kurz „Gekoppelt“ zeigen, bei Fehlern sofort schließen (die Meldung steht
+    /// in Quill). `completion` läuft, wenn das Fenster zu ist.
+    func finish(_ content: Content, completion: @escaping @MainActor () -> Void) {
+        guard content == .paired else {
+            stop()
+            completion()
+            return
+        }
         show(content)
-        let delay: Duration = content == .paired ? .seconds(4) : .seconds(2)
         Task {
-            try? await Task.sleep(for: delay)
+            try? await Task.sleep(for: .seconds(3))
             self.stop()
+            completion()
         }
     }
 

@@ -39,17 +39,42 @@ final class UDIDProfileService {
     static var logURL: URL { UDIDLog.url }
 
     /// Apple-Entwicklerzertifikat des Accounts als .p12 (Base64) samt Passwort, nur im Speicher.
-    @ObservationIgnored private var signer: (p12: String, password: String)?
+    @ObservationIgnored private var signer: (p12: String, password: String)? {
+        didSet { hasDeveloperSigner = signer != nil }
+    }
+    /// Das Apple-Entwicklerzertifikat liegt bereit; iOS zeigt das Profil dann als „Überprüft“.
+    private(set) var hasDeveloperSigner = false
+    /// Das Zertifikat wird gerade bei Apple geholt.
+    private(set) var preparingSigner = false
+
+    private static let signerP12Key = "udid.signer.p12"
+    private static let signerPasswordKey = "udid.signer.password"
 
     /// Holt das Entwicklerzertifikat des angemeldeten Accounts zum Signieren des Profils.
     /// So zeigt iOS das Profil als „Verifiziert“, wie bei ESign. Ohne Anmeldung signiert Quill
     /// mit einem eigenen Zertifikat („Nicht verifiziert“).
     func prepareSigner(using account: AppleAccountService) async {
-        guard signer == nil, account.isSignedIn else { return }
+        guard signer == nil else { return }
+        // Einmal geholt, liegt es im Schlüsselbund und steht sofort bereit.
+        if let p12 = Keychain.get(Self.signerP12Key), let password = Keychain.get(Self.signerPasswordKey) {
+            signer = (p12, password)
+            UDIDLog.write("Apple Development certificate loaded from the keychain")
+            return
+        }
+        guard account.isSignedIn else {
+            UDIDLog.write("Not signed in: the profile will be signed with Quill's own certificate")
+            return
+        }
+        preparingSigner = true
+        defer { preparingSigner = false }
         let password = UUID().uuidString
         do {
             let exported = try await account.exportP12(password: password)
-            signer = (exported.data.base64EncodedString(), password)
+            let p12 = exported.data.base64EncodedString()
+            signer = (p12, password)
+            Keychain.set(p12, for: Self.signerP12Key)
+            Keychain.set(password, for: Self.signerPasswordKey)
+            UDIDLog.write("Apple Development certificate fetched (serial \(exported.serial))")
         } catch {
             UDIDLog.write("Apple Development certificate not available: \(error)")
         }
@@ -57,8 +82,7 @@ final class UDIDProfileService {
 
     func start() {
         stop()
-        UDIDLog.reset()
-        UDIDLog.write("Start, iOS \(UIDevice.current.systemVersion)")
+        UDIDLog.write("----- Start, iOS \(UIDevice.current.systemVersion) -----")
         let token = UUID().uuidString
         hint = nil
         let tracker = CallbackTracker()
@@ -375,9 +399,13 @@ final class FileLog: @unchecked Sendable {
         let stamp = Self.formatter.string(from: .now)
         let data = Data("\(stamp) \(line)\n".utf8)
         if let handle = try? FileHandle(forWritingTo: url) {
-            handle.seekToEndOfFile()
+            let size = handle.seekToEndOfFile()
             handle.write(data)
             try? handle.close()
+            // Nicht endlos wachsen lassen: ab 512 KB nur die zweite Hälfte behalten.
+            if size > 512 * 1024, let all = try? Data(contentsOf: url) {
+                try? all.suffix(256 * 1024).write(to: url)
+            }
         } else {
             try? data.write(to: url)
         }

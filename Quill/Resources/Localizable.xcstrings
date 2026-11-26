@@ -2453,6 +2453,40 @@
         }
       }
     },
+    "Apple-Zertifikat wird vorbereitet …": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preparing your Apple certificate…"
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Préparation de votre certificat Apple…"
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preparando tu certificado de Apple…"
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preparazione del certificato Apple…"
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple sertifikanız hazırlanıyor…"
+          }
+        }
+      }
+    },
     "Apps": {
       "localizations": {
         "en": {
@@ -3945,6 +3979,40 @@
           "stringUnit": {
             "state": "translated",
             "value": "Profil geçicidir: iOS yalnızca UDID'yi bu iPhone'daki Quill'e iletir ve kalıcı bir şey yüklemez. İnternete hiçbir şey gitmez."
+          }
+        }
+      }
+    },
+    "Das Profil wird mit deinem Apple-Zertifikat signiert.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The profile is signed with your Apple certificate."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le profil est signé avec votre certificat Apple."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El perfil se firma con tu certificado de Apple."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il profilo viene firmato con il tuo certificato Apple."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Profil, Apple sertifikanızla imzalanır."
           }
         }
       }

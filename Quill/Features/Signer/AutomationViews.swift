@@ -86,6 +86,19 @@ struct UDIDView: View {
                             Label("Erneut versuchen", systemImage: "arrow.clockwise")
                         }
                     }
+                    .disabled(profileService.preparingSigner)
+                    if profileService.preparingSigner {
+                        HStack(spacing: 10) {
+                            ProgressView()
+                            Text("Apple-Zertifikat wird vorbereitet …")
+                        }
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                    } else if profileService.hasDeveloperSigner {
+                        Label("Das Profil wird mit deinem Apple-Zertifikat signiert.", systemImage: "checkmark.seal")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
                     if profileService.phase == .waiting {
                         // Das geladene Profil steht oben auf der Startseite der Einstellungen.
                         Button("Einstellungen öffnen", systemImage: "gear") { SystemSettings.open() }

@@ -167,6 +167,9 @@ final class AppleAccountService {
             Keychain.delete(Self.emailKey)
             Keychain.delete(Self.rememberKey)
             CoreVault.clear()
+            // Das gemerkte Zertifikat für das UDID-Profil gehört zum Account.
+            Keychain.delete("udid.signer.p12")
+            Keychain.delete("udid.signer.password")
             UserDefaults.standard.removeObject(forKey: Self.emailKey)
             UserDefaults.standard.removeObject(forKey: Self.teamKey)
             UserDefaults.standard.set(false, forKey: Self.rememberKey)

@@ -441,13 +441,15 @@ final class PairingService {
         endBackgroundTask()
         ContinuedWork.shared.end(success: phase == .paired)
         PairingActivityController.end(phase == .paired ? .paired : .failed)
-        CodePictureInPicture.shared.finish(phase == .paired ? .paired : .failed)
+        // Wachhalten erst beenden, wenn das schwebende Fenster zu ist; sonst hält iOS Quill an,
+        // bevor es das Fenster schließen kann, und es bleibt mit „Fehlgeschlagen“ stehen.
+        let wasKeepingAlive = keepingAlive
+        keepingAlive = false
+        CodePictureInPicture.shared.finish(phase == .paired ? .paired : .failed) {
+            if wasKeepingAlive { KeepAlive.shared.end() }
+        }
         backgroundNote = nil
         lastLoggedPhase = nil
-        if keepingAlive {
-            KeepAlive.shared.end()
-            keepingAlive = false
-        }
     }
 
     // MARK: - Hintergrund

@@ -90,10 +90,13 @@ impl SideloadingStorage for FileStorage {
     }
 }
 
-/// Schreibt das Protokoll des Kerns nach `<dir>/core.log` (wird beim Start gekürzt).
+/// Schreibt das Protokoll des Kerns nach `<dir>/core.log`; die vorige Sitzung bleibt als `core.previous.log`.
 /// Passwörter und Codes werden nie protokolliert; isideload protokolliert keine Zugangsdaten.
 pub fn init_logging(dir: &Path) {
     let path = dir.join("core.log");
+    // Das Protokoll der vorigen Sitzung aufheben: Nach einem Absturz steht dort, was zuletzt geschah.
+    let _ = std::fs::rename(&path, dir.join("core.previous.log"));
+    install_panic_hook();
     let file = OpenOptions::new()
         .create(true)
         .truncate(true)
@@ -107,6 +110,23 @@ pub fn init_logging(dir: &Path) {
         .with_target(false)
         .with_max_level(tracing::Level::INFO)
         .try_init();
+}
+
+/// Protokolliert interne Fehler (panics) mit Ort, bevor sie als Fehlermeldung an die App gehen.
+fn install_panic_hook() {
+    static ONCE: std::sync::Once = std::sync::Once::new();
+    ONCE.call_once(|| {
+        std::panic::set_hook(Box::new(|info| {
+            let location = info.location().map(|l| format!("{}:{}", l.file(), l.line())).unwrap_or_default();
+            let message = info
+                .payload()
+                .downcast_ref::<&str>()
+                .map(|s| (*s).to_string())
+                .or_else(|| info.payload().downcast_ref::<String>().cloned())
+                .unwrap_or_default();
+            tracing::error!("panic at {location}: {message}");
+        }));
+    });
 }
 
 #[cfg(test)]

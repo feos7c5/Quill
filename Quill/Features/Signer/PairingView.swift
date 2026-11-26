@@ -24,6 +24,12 @@ struct PairingView: View {
 
                 Section {
                     phaseView
+                    if pairing.vpnActive && pairing.isRunning {
+                        // Bei PhonePair: erst koppeln, danach LocalDevVPN verbinden.
+                        Label("LocalDevVPN ist verbunden. Für die Kopplung in LocalDevVPN trennen und danach wieder verbinden.",
+                              systemImage: "exclamationmark.shield.fill")
+                            .foregroundStyle(.orange)
+                    }
                 }
 
                 if pairing.isRunning && CodePictureInPicture.isSupported {
@@ -40,10 +46,10 @@ struct PairingView: View {
                 }
 
                 Section("So geht’s") {
-                    StepRow(number: 1, text: "„Kopplung starten“ tippen.")
+                    StepRow(number: 1, text: "LocalDevVPN trennen, dann „Kopplung starten“ tippen.")
                     StepRow(number: 2, text: "Einstellungen → Datenschutz & Sicherheit → Entwicklermodus öffnen und „Quill auf …“ auswählen.")
                     StepRow(number: 3, text: "Den Code eingeben, den Quill im schwebenden Fenster, als Mitteilung und hier zeigt.")
-                    StepRow(number: 4, text: "LocalDevVPN öffnen und verbinden. Quill prüft danach die Verbindung.")
+                    StepRow(number: 4, text: "Erst danach LocalDevVPN wieder verbinden. Quill prüft dann die Verbindung.")
                 }
 
                 Section {

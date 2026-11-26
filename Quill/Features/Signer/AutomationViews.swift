@@ -78,10 +78,7 @@ struct UDIDView: View {
                     // Nie gesperrt: Schlägt die Profilinstallation fehl, meldet iOS das Quill nicht,
                     // deshalb muss ein neuer Versuch jederzeit möglich sein.
                     Button {
-                        Task {
-                            await profileService.prepareSigner(using: account)
-                            profileService.start()
-                        }
+                        profileService.start()
                     } label: {
                         if profileService.phase == .idle {
                             Label("Automatisch erkennen", systemImage: "sparkle.magnifyingglass")
@@ -152,6 +149,10 @@ struct UDIDView: View {
             }
             .navigationTitle("UDID")
             .navigationBarTitleDisplayMode(.inline)
+            .task {
+                // Im Hintergrund vorbereiten; die Erkennung wartet nicht darauf.
+                await profileService.prepareSigner(using: account)
+            }
             .onChange(of: profileService.phase) { _, phase in
                 if case .received(let udid) = phase { text = udid }
             }

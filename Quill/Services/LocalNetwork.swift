@@ -13,7 +13,7 @@ final class BonjourAdvertiser {
     private var ref: DNSServiceRef?
 
     /// Gibt einen sofortigen Fehler zurück; das endgültige Ergebnis kommt über `onResult`.
-    func publish(name: String, type: String, port: UInt16, txt: [String: String]) -> DNSServiceErrorType {
+    func publish(name: String, type: String, port: UInt16, txt: [String: String], interfaceIndex: UInt32 = 0) -> DNSServiceErrorType {
         stop()
         // TXT-Record: je Eintrag ein Längenbyte und „key=value“.
         var record = Data()
@@ -25,7 +25,7 @@ final class BonjourAdvertiser {
         let serviceType = type.hasSuffix(".") ? String(type.dropLast()) : type
         var newRef: DNSServiceRef?
         let error = record.withUnsafeBytes { raw in
-            DNSServiceRegister(&newRef, 0, 0, name, serviceType, nil, nil, port.bigEndian,
+            DNSServiceRegister(&newRef, 0, interfaceIndex, name, serviceType, nil, nil, port.bigEndian,
                                UInt16(raw.count), raw.baseAddress, { _, _, error, name, _, _, _ in
                 let registered = name.map { String(cString: $0) }
                 DispatchQueue.main.async {
@@ -91,6 +91,27 @@ enum LocalNetworkProbe {
             DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(seconds)) {
                 finish(.notFound("not found within \(seconds) seconds"))
             }
+        }
+    }
+
+    struct Interfaces: Sendable {
+        let wifi: (name: String, index: Int)?
+        let vpnActive: Bool
+    }
+
+    /// WLAN-Schnittstelle und ob ein VPN-Tunnel aktiv ist.
+    static func interfaces() async -> Interfaces {
+        await withCheckedContinuation { continuation in
+            let monitor = NWPathMonitor()
+            let once = OnceFlag()
+            monitor.pathUpdateHandler = { path in
+                guard once.set() else { return }
+                monitor.cancel()
+                let wifi = path.availableInterfaces.first { $0.type == .wifi }
+                let vpn = path.availableInterfaces.contains { $0.name.hasPrefix("utun") || $0.name.hasPrefix("ipsec") }
+                continuation.resume(returning: Interfaces(wifi: wifi.map { ($0.name, $0.index) }, vpnActive: vpn))
+            }
+            monitor.start(queue: .global())
         }
     }
 

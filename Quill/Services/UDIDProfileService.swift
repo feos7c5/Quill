@@ -47,8 +47,11 @@ final class UDIDProfileService {
     func prepareSigner(using account: AppleAccountService) async {
         guard signer == nil, account.isSignedIn else { return }
         let password = UUID().uuidString
-        if let exported = try? await account.exportP12(password: password) {
+        do {
+            let exported = try await account.exportP12(password: password)
             signer = (exported.data.base64EncodedString(), password)
+        } catch {
+            UDIDLog.write("Apple Development certificate not available: \(error)")
         }
     }
 
@@ -413,6 +416,7 @@ struct LogBundle: Transferable {
             ("Pairing", PairingLog.url),
             ("UDID detection", UDIDLog.url),
             ("Core", Paths.core.appendingPathComponent("core.log")),
+            ("Core (previous session)", Paths.core.appendingPathComponent("core.previous.log")),
         ]
         for (title, url) in parts {
             let body = (try? String(contentsOf: url, encoding: .utf8)) ?? "(empty)\n"

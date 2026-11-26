@@ -25,6 +25,12 @@ final class CodePictureInPicture: NSObject {
     private var controller: AVPictureInPictureController?
     private var timer: Timer?
     private var content: Content = .waiting
+    /// Quill selbst beendet das Fenster (Kopplung fertig), nicht der Nutzer.
+    private var stoppingByQuill = false
+    /// Der Nutzer ist über das Fenster zu Quill zurückgekehrt (kein Abbruch).
+    private var restoring = false
+    /// Der Nutzer hat das Fenster geschlossen, ohne dass die Kopplung fertig war.
+    var onClosedByUser: (() -> Void)?
 
     static var isSupported: Bool { AVPictureInPictureController.isPictureInPictureSupported() }
 
@@ -37,6 +43,8 @@ final class CodePictureInPicture: NSObject {
             return
         }
         content = .waiting
+        stoppingByQuill = false
+        restoring = false
         displayLayer.videoGravity = .resizeAspect
         if controller == nil {
             let source = AVPictureInPictureController.ContentSource(sampleBufferDisplayLayer: displayLayer, playbackDelegate: self)
@@ -76,6 +84,7 @@ final class CodePictureInPicture: NSObject {
     }
 
     func stop() {
+        stoppingByQuill = true
         timer?.invalidate()
         timer = nil
         controller?.stopPictureInPicture()
@@ -147,10 +156,11 @@ final class CodePictureInPicture: NSObject {
                                       options: [.usesLineFragmentOrigin, .truncatesLastVisibleLine],
                                       attributes: attributes, context: nil)
         }
-        draw(text.title, font: .systemFont(ofSize: 34, weight: .semibold), color: UIColor(white: 0.75, alpha: 1), y: 36, height: 48)
-        let mainFont = UIFont.monospacedDigitSystemFont(ofSize: 128, weight: .bold)
-        draw(text.main, font: mainFont, color: .white, y: 96, height: 160)
-        draw(text.footnote, font: .systemFont(ofSize: 28, weight: .regular), color: UIColor(white: 0.6, alpha: 1), y: 284, height: 64)
+        draw(text.title, font: .systemFont(ofSize: 34, weight: .semibold), color: UIColor(white: 0.75, alpha: 1), y: 28, height: 48)
+        let mainFont = UIFont.monospacedDigitSystemFont(ofSize: 116, weight: .bold)
+        draw(text.main, font: mainFont, color: .white, y: 78, height: 150)
+        // Pfad vollständig, bei Bedarf auf zwei Zeilen.
+        draw(text.footnote, font: .systemFont(ofSize: 27, weight: .regular), color: UIColor(white: 0.65, alpha: 1), y: 262, height: 90)
         return buffer
     }
 
@@ -200,8 +210,25 @@ extension CodePictureInPicture: AVPictureInPictureControllerDelegate {
         Task { @MainActor in PairingLog.write("Picture in Picture failed to start: \(error)") }
     }
 
+    nonisolated func pictureInPictureController(_ controller: AVPictureInPictureController,
+                                                restoreUserInterfaceForPictureInPictureStopWithCompletionHandler completionHandler: @escaping (Bool) -> Void) {
+        Task { @MainActor in
+            CodePictureInPicture.shared.restoring = true
+            completionHandler(true)
+        }
+    }
+
     nonisolated func pictureInPictureControllerDidStopPictureInPicture(_ controller: AVPictureInPictureController) {
-        Task { @MainActor in PairingLog.write("Picture in Picture stopped") }
+        Task { @MainActor in
+            let shared = CodePictureInPicture.shared
+            if shared.stoppingByQuill || shared.restoring {
+                PairingLog.write("Picture in Picture stopped")
+            } else {
+                PairingLog.write("Picture in Picture closed by the user, cancelling pairing")
+                shared.onClosedByUser?()
+            }
+            shared.restoring = false
+        }
     }
 }
 

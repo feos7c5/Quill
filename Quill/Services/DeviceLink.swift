@@ -193,6 +193,8 @@ final class PairingService {
     private(set) var published = false
     /// Die Freigabe „Lokales Netzwerk“ fehlt; die Ansicht bietet dann den Weg in die Einstellungen an.
     private(set) var needsLocalNetwork = false
+    /// Ein VPN (meist LocalDevVPN) ist verbunden; während der Kopplung trennen.
+    private(set) var vpnActive = false
     @ObservationIgnored private var selfTesting = false
 
     @ObservationIgnored private let advertiser = BonjourAdvertiser()
@@ -232,6 +234,7 @@ final class PairingService {
             advertisedName = advert.name
             published = false
             needsLocalNetwork = false
+            vpnActive = false
             selfTestPassed = nil
             publish(advert)
             phase = .listening
@@ -242,6 +245,10 @@ final class PairingService {
             keepingAlive = true
             PairingActivityController.start()
             CodePictureInPicture.shared.prepare()
+            CodePictureInPicture.shared.onClosedByUser = { [weak self] in
+                guard let self, self.isRunning else { return }
+                self.cancel()
+            }
             ContinuedWork.shared.begin(kind: "pairing",
                                        title: String(localized: "Quill wartet auf die Kopplung"),
                                        subtitle: String(localized: "Einstellungen › Datenschutz & Sicherheit › Entwicklermodus"),
@@ -285,8 +292,24 @@ final class PairingService {
                 self.bonjourFailed(error)
             }
         }
-        let error = advertiser.publish(name: advert.name, type: advert.serviceType, port: advert.port, txt: advert.txt)
-        if error != 0 { bonjourFailed(error) }
+        Task { [weak self] in
+            // Nur über WLAN anmelden: Mit aktivem VPN (LocalDevVPN) würden die Einstellungen sonst eine
+            // Tunnel-Adresse erhalten und die Verbindung landete nie bei Quill.
+            let network = await LocalNetworkProbe.interfaces()
+            guard let self, self.isRunning else { return }
+            if let wifi = network.wifi {
+                PairingLog.write("Bonjour restricted to Wi-Fi interface \(wifi.name) (index \(wifi.index))")
+            } else {
+                PairingLog.write("No Wi-Fi interface found, registering Bonjour on all interfaces")
+            }
+            self.vpnActive = network.vpnActive
+            if network.vpnActive {
+                PairingLog.write("Warning: a VPN is active during pairing")
+            }
+            let error = self.advertiser.publish(name: advert.name, type: advert.serviceType, port: advert.port,
+                                                txt: advert.txt, interfaceIndex: UInt32(network.wifi?.index ?? 0))
+            if error != 0 { self.bonjourFailed(error) }
+        }
 
         // Selbstkontrolle: Sieht Quill sich selbst so, wie die Einstellungen suchen? Löst bei Bedarf
         // auch die Abfrage „Lokales Netzwerk“ aus.

@@ -31,6 +31,21 @@ pub use device::ProgressCallback;
 
 // MARK: - Laufzeit
 
+/// Führt eine Kernaufgabe aus. Ein interner Fehler (panic) beendet nicht mehr die ganze App,
+/// sondern kommt als Fehlermeldung zurück; die Einzelheiten stehen im Protokoll des Kerns.
+fn block<T>(future: impl std::future::Future<Output = CoreResult<T>>) -> CoreResult<T> {
+    match std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| runtime().block_on(future))) {
+        Ok(result) => result,
+        Err(_) => Err(CoreError::new("The core stopped unexpectedly. Details are in the log.")),
+    }
+}
+
+/// Wie [`block`], für Aufrufe ohne asynchrone Arbeit.
+fn guard<T>(work: impl FnOnce() -> CoreResult<T>) -> CoreResult<T> {
+    std::panic::catch_unwind(std::panic::AssertUnwindSafe(work))
+        .unwrap_or_else(|_| Err(CoreError::new("The core stopped unexpectedly. Details are in the log.")))
+}
+
 fn runtime() -> &'static tokio::runtime::Runtime {
     static RUNTIME: OnceLock<tokio::runtime::Runtime> = OnceLock::new();
     RUNTIME.get_or_init(|| {
@@ -203,11 +218,11 @@ pub unsafe extern "C" fn sc_string_free(ptr: *mut c_char) {
 /// Beide Zeiger müssen gültige, NUL-terminierte Zeichenketten sein.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sc_pair_start(host_name: *const c_char, output_path: *const c_char) -> *mut c_char {
-    let result = (|| {
+    let result = guard(|| {
         let name = unsafe { read_str(host_name, "host name") }?;
         let output = PathBuf::from(unsafe { read_str(output_path, "output path") }?);
         pairing::start(name, output)
-    })();
+    });
     respond(result)
 }
 
@@ -234,10 +249,10 @@ pub extern "C" fn sc_pair_cancel() {
 /// Alle Zeiger müssen gültige, NUL-terminierte Zeichenketten sein.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sc_device_info(pairing_path: *const c_char, address: *const c_char) -> *mut c_char {
-    let result = (|| {
+    let result = guard(|| {
         let target = unsafe { device::Target::read(pairing_path, address) }?;
-        runtime().block_on(device::info(&target))
-    })();
+        block(device::info(&target))
+    });
     respond(result)
 }
 
@@ -254,12 +269,12 @@ pub unsafe extern "C" fn sc_device_install(
     progress: Option<ProgressCallback>,
     context: *mut c_void,
 ) -> *mut c_char {
-    let result = (|| {
+    let result = guard(|| {
         let target = unsafe { device::Target::read(pairing_path, address) }?;
         let package = PathBuf::from(unsafe { read_str(package_path, "package path") }?);
         let reporter = device::Progress::new(progress, Context(context));
-        runtime().block_on(device::install(&target, &package, &reporter))
-    })();
+        block(device::install(&target, &package, &reporter))
+    });
     respond(result)
 }
 
@@ -273,11 +288,11 @@ pub unsafe extern "C" fn sc_device_uninstall(
     address: *const c_char,
     bundle_id: *const c_char,
 ) -> *mut c_char {
-    let result = (|| {
+    let result = guard(|| {
         let target = unsafe { device::Target::read(pairing_path, address) }?;
         let bundle_id = unsafe { read_str(bundle_id, "bundle ID") }?;
-        runtime().block_on(device::uninstall(&target, &bundle_id))
-    })();
+        block(device::uninstall(&target, &bundle_id))
+    });
     respond(result)
 }
 
@@ -287,10 +302,10 @@ pub unsafe extern "C" fn sc_device_uninstall(
 /// Alle Zeiger müssen gültige, NUL-terminierte Zeichenketten sein.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sc_device_apps(pairing_path: *const c_char, address: *const c_char) -> *mut c_char {
-    let result = (|| {
+    let result = guard(|| {
         let target = unsafe { device::Target::read(pairing_path, address) }?;
-        runtime().block_on(device::user_apps(&target))
-    })();
+        block(device::user_apps(&target))
+    });
     respond(result)
 }
 
@@ -311,13 +326,13 @@ pub unsafe extern "C" fn sc_account_login(
     two_factor: Option<TwoFactorCallback>,
     context: *mut c_void,
 ) -> *mut c_char {
-    let result = (|| {
+    let result = guard(|| {
         let email = unsafe { read_str(email, "Apple ID") }?;
         let password = unsafe { read_str(password, "password") }?;
         let anisette = unsafe { read_opt(anisette_url) };
         let dir = data_dir().ok_or(CoreError::new("The core is not initialized."))?;
-        runtime().block_on(account::login(dir, email, password, anisette, two_factor, Context(context)))
-    })();
+        block(account::login(dir, email, password, anisette, two_factor, Context(context)))
+    });
     respond(result)
 }
 
@@ -335,7 +350,7 @@ pub unsafe extern "C" fn sc_account_two_factor_respond(response: *const c_char) 
 /// Stand der Anmeldung: `{"logged_in", "email", "name", "team", "teams"}`.
 #[unsafe(no_mangle)]
 pub extern "C" fn sc_account_status() -> *mut c_char {
-    respond(runtime().block_on(account::status()))
+    respond(block(account::status()))
 }
 
 /// Wählt das Team, mit dem signiert wird.
@@ -344,7 +359,7 @@ pub extern "C" fn sc_account_status() -> *mut c_char {
 /// `team_id` muss eine gültige Zeichenkette sein.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sc_account_select_team(team_id: *const c_char) -> *mut c_char {
-    let result = unsafe { read_str(team_id, "team ID") }.and_then(|t| runtime().block_on(account::select_team(t)));
+    let result = unsafe { read_str(team_id, "team ID") }.and_then(|t| block(account::select_team(t)));
     respond(result)
 }
 
@@ -354,11 +369,11 @@ pub unsafe extern "C" fn sc_account_select_team(team_id: *const c_char) -> *mut 
 /// Beide Zeiger müssen gültige Zeichenketten sein.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sc_account_register_device(udid: *const c_char, name: *const c_char) -> *mut c_char {
-    let result = (|| {
+    let result = guard(|| {
         let udid = unsafe { read_str(udid, "UDID") }?;
         let name = unsafe { read_str(name, "device name") }?;
-        runtime().block_on(account::register_device(udid, name))
-    })();
+        block(account::register_device(udid, name))
+    });
     respond(result)
 }
 
@@ -376,27 +391,27 @@ pub unsafe extern "C" fn sc_account_sign(
     progress: Option<ProgressCallback>,
     context: *mut c_void,
 ) -> *mut c_char {
-    let result = (|| {
+    let result = guard(|| {
         let path = PathBuf::from(unsafe { read_str(app_path, "app path") }?);
         let options = unsafe { read_opt(options) }.unwrap_or_else(|| "{}".into());
         let options: account::SignOptions =
             serde_json::from_str(&options).map_err(|e| CoreError::with("Invalid input from the app.", e))?;
         let reporter = device::Progress::new(progress, Context(context));
-        runtime().block_on(account::sign(path, options, &reporter))
-    })();
+        block(account::sign(path, options, &reporter))
+    });
     respond(result)
 }
 
 /// Freie und belegte App-IDs des Teams: `{"available", "max", "app_ids": [...]}`.
 #[unsafe(no_mangle)]
 pub extern "C" fn sc_account_app_ids() -> *mut c_char {
-    respond(runtime().block_on(account::app_ids()))
+    respond(block(account::app_ids()))
 }
 
 /// Entwicklungszertifikate des Teams: `[{"serial", "name", "machine_name", "expires"}]`.
 #[unsafe(no_mangle)]
 pub extern "C" fn sc_account_certificates() -> *mut c_char {
-    respond(runtime().block_on(account::certificates()))
+    respond(block(account::certificates()))
 }
 
 /// Widerruft ein Entwicklungszertifikat.
@@ -405,7 +420,7 @@ pub extern "C" fn sc_account_certificates() -> *mut c_char {
 /// `serial` muss eine gültige Zeichenkette sein.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sc_account_revoke_certificate(serial: *const c_char) -> *mut c_char {
-    let result = unsafe { read_str(serial, "serial number") }.and_then(|s| runtime().block_on(account::revoke(s)));
+    let result = unsafe { read_str(serial, "serial number") }.and_then(|s| block(account::revoke(s)));
     respond(result)
 }
 
@@ -416,7 +431,7 @@ pub unsafe extern "C" fn sc_account_revoke_certificate(serial: *const c_char) ->
 /// `password` muss eine gültige Zeichenkette sein (leer ist erlaubt).
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sc_account_export_p12(password: *const c_char) -> *mut c_char {
-    let result = unsafe { read_str(password, "password") }.and_then(|p| runtime().block_on(account::export_p12(p)));
+    let result = unsafe { read_str(password, "password") }.and_then(|p| block(account::export_p12(p)));
     respond(result)
 }
 
@@ -424,13 +439,13 @@ pub unsafe extern "C" fn sc_account_export_p12(password: *const c_char) -> *mut 
 /// damit das Zertifikat beim nächsten Anmelden weiter passt.
 #[unsafe(no_mangle)]
 pub extern "C" fn sc_account_logout() -> *mut c_char {
-    respond(runtime().block_on(account::logout()))
+    respond(block(account::logout()))
 }
 
 /// Löscht zusätzlich den gespeicherten Account-Schlüssel und den Anisette-Zustand.
 #[unsafe(no_mangle)]
 pub extern "C" fn sc_account_forget() -> *mut c_char {
-    respond(runtime().block_on(account::forget()))
+    respond(block(account::forget()))
 }
 
 // MARK: - Zertifikate ohne Account
@@ -441,11 +456,11 @@ pub extern "C" fn sc_account_forget() -> *mut c_char {
 /// `common_name` muss eine gültige Zeichenkette sein, `email` darf NULL sein.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sc_csr_create(common_name: *const c_char, email: *const c_char) -> *mut c_char {
-    let result = (|| {
+    let result = guard(|| {
         let name = unsafe { read_str(common_name, "name") }?;
         let email = unsafe { read_opt(email) };
         crypto::create_csr(&name, email.as_deref())
-    })();
+    });
     respond(result)
 }
 
@@ -459,12 +474,12 @@ pub unsafe extern "C" fn sc_p12_build(
     key_pkcs8: *const c_char,
     password: *const c_char,
 ) -> *mut c_char {
-    let result = (|| {
+    let result = guard(|| {
         let cert = unsafe { read_str(certificate_der, "certificate") }?;
         let key = unsafe { read_str(key_pkcs8, "key") }?;
         let password = unsafe { read_str(password, "password") }?;
         crypto::build_p12(&cert, &key, &password)
-    })();
+    });
     respond(result)
 }
 
@@ -478,12 +493,12 @@ pub unsafe extern "C" fn sc_p12_rewrap(
     old_password: *const c_char,
     new_password: *const c_char,
 ) -> *mut c_char {
-    let result = (|| {
+    let result = guard(|| {
         let p12 = unsafe { read_str(p12, ".p12") }?;
         let old = unsafe { read_str(old_password, "old password") }?;
         let new = unsafe { read_str(new_password, "new password") }?;
         crypto::rewrap_p12(&p12, &old, &new)
-    })();
+    });
     respond(result)
 }
 
@@ -493,11 +508,11 @@ pub unsafe extern "C" fn sc_p12_rewrap(
 /// Beide Zeiger müssen gültige Zeichenketten sein.
 #[unsafe(no_mangle)]
 pub unsafe extern "C" fn sc_p12_inspect(p12: *const c_char, password: *const c_char) -> *mut c_char {
-    let result = (|| {
+    let result = guard(|| {
         let p12 = unsafe { read_str(p12, ".p12") }?;
         let password = unsafe { read_str(password, "password") }?;
         crypto::inspect_p12(&p12, &password)
-    })();
+    });
     respond(result)
 }
 
@@ -522,13 +537,13 @@ pub unsafe extern "C" fn sc_profile_sign(
     p12: *const c_char,
     password: *const c_char,
 ) -> *mut c_char {
-    let result = (|| {
+    let result = guard(|| {
         let profile = unsafe { read_str(profile, "profile") }?;
         let p12 = unsafe { read_str(p12, "p12") }?;
         let password = unsafe { read_str(password, "password") }?;
         let dir = data_dir().ok_or(CoreError::new("The core is not initialized."))?;
         profile::sign_b64(&dir, &profile, &p12, &password)
-    })();
+    });
     respond(result)
 }
 

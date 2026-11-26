@@ -1441,6 +1441,46 @@
         }
       }
     },
+    "The core stopped unexpectedly. Details are in the log.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The core stopped unexpectedly. Details are in the log."
+          }
+        },
+        "de": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Im Kern ist ein unerwarteter Fehler aufgetreten. Einzelheiten stehen im Protokoll."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Le noyau s'est arrêté de façon inattendue. Les détails figurent dans le journal."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "El núcleo se ha detenido de forma inesperada. Los detalles están en el registro."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il core si è interrotto in modo imprevisto. I dettagli sono nel registro."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Çekirdek beklenmedik şekilde durdu. Ayrıntılar günlükte."
+          }
+        }
+      }
+    },
     "The data folder cannot be used.": {
       "localizations": {
         "de": {

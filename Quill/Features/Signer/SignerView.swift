@@ -110,8 +110,11 @@ struct SignerView: View {
             }
             if !isReady {
                 setupStep(done: signerName != nil,
+                          busy: signerName == nil && account.state == .signingIn,
                           title: "Mit Apple-ID anmelden",
-                          detail: signerName ?? String(localized: "Oder unten unter „Eigene Zertifikate“ ein Zertifikat importieren.")) {
+                          detail: signerName == nil && account.state == .signingIn
+                              ? String(localized: "Anmeldung läuft …")
+                              : signerName ?? String(localized: "Oder unten unter „Eigene Zertifikate“ ein Zertifikat importieren.")) {
                     sheet = .login
                 }
                 // Die Kopplung liefert die UDID mit; den Weg über das Safari-Profil braucht es nur ohne Kopplung.
@@ -146,12 +149,21 @@ struct SignerView: View {
     }
 
     /// Ein Schritt der Einrichtung: erledigt mit Häkchen, offen als antippbare Zeile.
-    private func setupStep(done: Bool, title: LocalizedStringKey, detail: String, action: @escaping () -> Void) -> some View {
+    private func setupStep(done: Bool, busy: Bool = false, title: LocalizedStringKey, detail: String,
+                           action: @escaping () -> Void) -> some View {
         Button(action: action) {
             HStack(spacing: 12) {
-                Image(systemName: done ? "checkmark.circle.fill" : "circle")
-                    .foregroundStyle(done ? Color.green : Color.secondary)
-                    .imageScale(.large)
+                Group {
+                    if busy {
+                        // Läuft gerade (z. B. automatische Anmeldung beim Start): nicht als „fehlt“ zeigen.
+                        ProgressView()
+                    } else {
+                        Image(systemName: done ? "checkmark.circle.fill" : "circle")
+                            .foregroundStyle(done ? Color.green : Color.secondary)
+                            .imageScale(.large)
+                    }
+                }
+                .frame(width: 24)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
                         .foregroundStyle(done ? .secondary : .primary)
@@ -161,7 +173,7 @@ struct SignerView: View {
                         .lineLimit(3)
                 }
                 Spacer(minLength: 0)
-                if !done {
+                if !done && !busy {
                     Image(systemName: "chevron.forward")
                         .font(.footnote.weight(.semibold))
                         .foregroundStyle(.tertiary)
@@ -170,7 +182,7 @@ struct SignerView: View {
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
-        .disabled(done)
+        .disabled(done || busy)
     }
 
     private var statusDetail: String {

@@ -210,6 +210,9 @@ final class AppleAccountService {
         {"increased_memory_limit":\(options.increasedMemoryLimit),"register_extensions":\(options.registerExtensions)}
         """
         let reporter = CoreProgress(progress)
+        // Beim ersten Signieren legt der Kern den Account-Schlüssel an: sofort sichern, sonst wäre er
+        // nach einer Neuinstallation weg und Apple müsste ein weiteres Zertifikat ausstellen.
+        defer { CoreVault.backup() }
         return try await Core.run(AccountSignResult.self) {
             withExtendedLifetime(reporter) {
                 appURL.path.withCString { path in
@@ -223,6 +226,7 @@ final class AppleAccountService {
 
     /// Exportiert das Account-Zertifikat als .p12 mit dem angegebenen Passwort.
     func exportP12(password: String) async throws -> (data: Data, serial: String) {
+        defer { CoreVault.backup() }
         let result = try await Core.run(ExportedP12.self) { password.withCString { sc_account_export_p12($0) } }
         guard let data = Data(base64Encoded: result.p12) else { throw AppError("Ungültige .p12 vom Kern.") }
         return (data, result.serial)

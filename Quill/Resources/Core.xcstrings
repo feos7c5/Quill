@@ -2281,42 +2281,42 @@
         }
       }
     },
-    "There are too many development certificates. Revoke one under Certificates at Apple and try again.": {
+    "There are too many development certificates. Revoke one from another app or computer under Certificates at Apple and try again.": {
       "localizations": {
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "Es gibt zu viele Entwicklungszertifikate. Unter „Zertifikate bei Apple“ eines widerrufen und erneut versuchen."
-          }
-        },
-        "fr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Il y a trop de certificats de développement. Révoquez-en un sous Certificats chez Apple et réessayez."
-          }
-        },
-        "es": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Hay demasiados certificados de desarrollo. Revoca uno en Certificados en Apple e inténtalo de nuevo."
-          }
-        },
-        "it": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Ci sono troppi certificati di sviluppo. Revocane uno in Certificati presso Apple e riprova."
-          }
-        },
-        "tr": {
-          "stringUnit": {
-            "state": "translated",
-            "value": "Çok fazla geliştirme sertifikası var. Apple'daki Sertifikalar bölümünden birini iptal edip yeniden deneyin."
+            "value": "Es gibt zu viele Entwicklungszertifikate. Unter „Zertifikate bei Apple“ eines von einer anderen App oder einem Computer widerrufen und erneut versuchen."
           }
         },
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "There are too many development certificates. Revoke one under Certificates at Apple and try again."
+            "value": "There are too many development certificates. Revoke one from another app or computer under Certificates at Apple and try again."
+          }
+        },
+        "fr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Il y a trop de certificats de développement. Révoquez-en un d'une autre app ou d'un ordinateur sous Certificats chez Apple, puis réessayez."
+          }
+        },
+        "es": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hay demasiados certificados de desarrollo. Revoca uno de otra app u ordenador en Certificados de Apple e inténtalo de nuevo."
+          }
+        },
+        "it": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ci sono troppi certificati di sviluppo. Revoca quello di un'altra app o di un computer in Certificati Apple e riprova."
+          }
+        },
+        "tr": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Çok fazla geliştirme sertifikası var. Apple'daki Sertifikalar bölümünden başka bir uygulamaya veya bilgisayara ait birini iptal edip yeniden deneyin."
           }
         }
       }

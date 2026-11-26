@@ -267,7 +267,7 @@ pub async fn sign(app_path: PathBuf, options: SignOptions, progress: &Progress) 
             a.email.clone(),
         )
         .team_selection(TeamSelection::First)
-        .max_certs_behavior(MaxCertsBehavior::Error)
+        .max_certs_behavior(replace_lost_quill_certificates())
         .extensions_behavior(ExtensionsBehaviorSelection::Fixed(behavior))
         .storage(Box::new(account_storage(&a.data_dir)))
         .machine_name(MACHINE_NAME.to_string())
@@ -301,6 +301,26 @@ pub async fn sign(app_path: PathBuf, options: SignOptions, progress: &Progress) 
     .await
 }
 
+/// Quill nutzt ein einziges Zertifikat pro Account. Passt keines bei Apple zum gespeicherten Schlüssel,
+/// ist der alte Schlüssel verloren (z. B. Neuinstallation vor der Sicherung) und das alte Quill-Zertifikat
+/// unbrauchbar. Ist das Limit erreicht, widerruft Quill nur seine eigenen alten Zertifikate,
+/// nie fremde (Xcode, AltStore, SideStore …).
+fn replace_lost_quill_certificates() -> MaxCertsBehavior<MaxCertsCallbackBox> {
+    MaxCertsBehavior::Prompt(Box::new(|certs| {
+        Box::pin(async move {
+            let serials: Vec<String> = certs
+                .iter()
+                .filter(|c| c.machine_name.as_deref() == Some(MACHINE_NAME))
+                .filter_map(|c| c.serial_number.clone())
+                .collect();
+            if !serials.is_empty() {
+                tracing::info!("Revoking {} lost Quill certificate(s)", serials.len());
+            }
+            Ok((!serials.is_empty()).then_some(serials))
+        })
+    }))
+}
+
 fn explain_sign_error(error: CoreError) -> CoreError {
     let text = error.detail.clone().unwrap_or_else(|| error.message.clone());
     let lower = text.to_lowercase();
@@ -312,7 +332,7 @@ fn explain_sign_error(error: CoreError) -> CoreError {
     }
     if lower.contains("maximum") && lower.contains("certificate") {
         return CoreError::with(
-            "There are too many development certificates. Revoke one under Certificates at Apple and try again.",
+            "There are too many development certificates. Revoke one from another app or computer under Certificates at Apple and try again.",
             text,
         );
     }
@@ -392,7 +412,7 @@ pub async fn export_p12(password: String) -> CoreResult<Value> {
             &mut a.session,
             &team,
             &storage,
-            &MaxCertsBehavior::<MaxCertsCallbackBox>::Error,
+            &replace_lost_quill_certificates(),
         )
         .await
         .map_err(|e| explain_sign_error(message(e)))?;

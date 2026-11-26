@@ -61,6 +61,7 @@ struct LibraryView: View {
                     Button("Löschen", systemImage: "trash", role: .destructive) {
                         AppLibrary.delete(app, context: context)
                     }
+                    .tint(.red)
                 }
             }
         }

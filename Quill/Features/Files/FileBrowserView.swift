@@ -97,6 +97,7 @@ struct FileBrowserView: View {
                 row(for: item)
                     .swipeActions(edge: .trailing) {
                         Button("Löschen", systemImage: "trash", role: .destructive) { delete(item) }
+                        .tint(.red)
                     }
                     .contextMenu { menu(for: item) }
             }

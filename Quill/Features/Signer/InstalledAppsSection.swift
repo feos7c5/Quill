@@ -29,10 +29,11 @@ struct InstalledAppsSection: View {
                         removing = app
                         confirmRemove = true
                     }
+                    .tint(.red)
                 }
                 .swipeActions(edge: .leading) {
                     Button("Erneuern", systemImage: "arrow.clockwise") { refresh(app) }
-                        .tint(.accentColor)
+                        .tint(.blue)
                 }
             }
             if !apps.isEmpty {

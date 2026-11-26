@@ -227,6 +227,7 @@ struct DownloadsView: View {
                 }
                 .swipeActions(edge: .trailing) {
                     Button("Entfernen", systemImage: "xmark", role: .destructive) { downloads.remove(item.id) }
+                        .tint(.red)
                 }
             }
         }
